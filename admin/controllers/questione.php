@@ -55,7 +55,7 @@ class MPollControllerQuestionE extends MPollController
 	*/
 	function doMove()
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 
 		$newpoll	= JRequest::getVar( 'newpoll' );
 		$cid	= JRequest::getVar( 'cid', array(), 'post', 'array' );
@@ -180,8 +180,6 @@ class MPollControllerQuestionE extends MPollController
 	}
 	function reqpublish()
 	{
-		global $mainframe;
-
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -201,8 +199,6 @@ class MPollControllerQuestionE extends MPollController
 
 	function requnpublish()
 	{
-		global $mainframe;
-
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {

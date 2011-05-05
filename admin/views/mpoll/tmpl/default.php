@@ -57,7 +57,7 @@ $order = JHTML::_('grid.order', $this->items);
             <td>
 				<?php 
 				
-					echo '<a href="index.php?option=com_mpoll&view=question&q_poll='.$row->poll_id.'"><img src="../includes/js/ThemeOffice/edit.png" alt="Edit Questions" border="0">'; 
+					echo '<a href="index.php?option=com_mpoll&view=question&q_poll='.$row->poll_id.'">Questions'; 
 					$db =& JFactory::getDBO();
 					$query = 'SELECT count(*) FROM #__mpoll_questions WHERE q_poll="'.$row->poll_id.'"';
 					$db->setQuery( $query );

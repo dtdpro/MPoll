@@ -7,7 +7,7 @@ class MPollViewMPoll extends JView
 {
 	function display($tpl = null)
 	{
-		global $mainframe;
+		$mainframe =& JFactory::getApplication();
 		$params = $mainframe->getPageParameters();
 		$model =& $this->getModel();
 		$pollid = JRequest::getVar( 'poll' );

@@ -9,7 +9,6 @@ class MPollViewPollResults extends JView
 {
 	function display($tpl = null)
 	{
-		global $mainframe,$option;
 		$pid = JRequest::getVar('poll');
 		JToolBarHelper::title(   JText::_( 'By User Poll Results' ), 'generic.png' );
 		$tbar =& JToolBar::getInstance('toolbar');

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<install type="component" version="1.5.0" method="upgrade">
-	<name>MPoll</name>
+<extension type="component" version="1.6.0" method="upgrade">
+	<name>com_mpoll</name>
 	<creationDate>2009.01.09</creationDate>
 	<author>DtD Productions</author>
 	<authorEmail>mike@dtdpro.com</authorEmail>
 	<authorUrl>http://www.ditzthedaisy.com</authorUrl>
 	<copyright>(c)2008-2011</copyright>
 	<license>GPL v2</license>
-	<version>1.5</version>
-	<description>MPoll</description>
+	<version>1.6</version>
+    <releaseDate>2011.05.04</releaseDate>
+    <releaseType>Update</releaseType>
+	<description>COM_MPOLL_DESC</description>
 
 	<files folder="site"> 
 		<filename>index.html</filename>
@@ -25,7 +27,7 @@
 	</install>		
 	<administration>
 		<!-- Administration Menu Section -->
-		<menu>MPoll</menu>
+		<menu>COM_MPOLL_MENU</menu>
 
 		
 		<files folder="admin">
@@ -38,32 +40,13 @@
 			<folder>models</folder>
 			<folder>views</folder>
 			<folder>tables</folder>
-		</files>		
+		</files>
+		<languages folder="admin">
+			<language tag="en-GB">language/en-GB.com_mpoll.ini</language>
+			<language tag="en-GB">language/en-GB.com_mpoll.sys.ini</language>
+		</languages>		
 	</administration>
-	<params addpath="/administrator/components/com_mpoll/elements">
-		<param name="poll" type="mpoll" default="" label="Poll" description="PARAMMODULEMPOLL" />
-		<param name="task" type="radio" default="ballot" label="View" description="View">
-			<option value="ballot">Ballot</option>
-			<option value="results">Results</option>
-		</param>
-		<param name="showlist" type="radio" default="after" label="Poll List" description="Show a drop down list of published polls and allow navigation to.">
-			<option value="both">Results and Poll</option>
-			<option value="after">Results Only</option>
-			<option value="never">Do Not Display</option>
-		</param>
-		<param name="listloc" type="radio" default="top" label="Poll List Loaction" description="Locxation of poll list">
-			<option value="both">Top and Bottom</option>
-			<option value="top">Top</option>
-			<option value="bottom">Bottom</option>
-		</param>
-		<param name="showstats" type="radio" default="1" label="Show Results Stats" description="# Voters, First and last vote time">
-			<option value="1">Yes</option>
-			<option value="0">No</option>
-		</param>
-		<param name="rtmpl" type="text" default="" label="Results Template" description="temp=" />
-		
-	</params>
-	<params>
-	</params>
+
+
 	
-</install>
+</extension>

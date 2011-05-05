@@ -15,10 +15,10 @@ class MPollModelQuestion extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe, $context;
+		$mainframe =& JFactory::getApplication();
 		
-		$limit			= $mainframe->getUserStateFromRequest( $context.'limit', 'limit', $mainframe->getCfg('list_limit'), 0);
-		$limitstart = $mainframe->getUserStateFromRequest( $context.'limitstart', 'limitstart', 0 );
+		$limit			= $mainframe->getUserStateFromRequest( 'com.mpoll.question.limit', 'limit', $mainframe->getCfg('list_limit'), 0);
+		$limitstart = $mainframe->getUserStateFromRequest( 'com.mpoll.question.limitstart', 'limitstart', 0 );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);

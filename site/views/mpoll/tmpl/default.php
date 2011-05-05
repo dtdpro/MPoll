@@ -1,6 +1,6 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access'); 
-global $cecfg;
+
 $db =& JFactory::getDBO();
 if ($this->showlist != 'never') {
 	$jumpurl = 'index.php?option=com_mpoll&task='.$this->task.'&Itemid='.JRequest::getVar( 'Itemid' ).'&poll=';

@@ -57,23 +57,7 @@ class MPollControllerPollResults extends MPollController
 				}
 				echo ',';
 			}
-		
-			
-			/*if (qtype == 'multi') { 
-				if ($this->data->qcat=='assess') {
-					if ($row->correct) echo $row->opttxt;
-					else echo $row->opttxt; 
-				}
-				else echo $row->opttxt;
-			} else if ($qtype == 'mcbox') {
-				$query = 'SELECT * FROM #__ce_questions_opts WHERE question = '.$row->question.' ORDER BY disporder ASC';
-				$db->setQuery( $query );
-				$qopts = $db->loadAssocList();
-				$answers = explode(' ',$row->answer);
-				foreach ($qopts as $opts) {
-					if (in_array($opts['id'],$answers)) { echo $opts['opttxt'].'  '; } 
-				}
-			} else { echo $row->answer; }*/
+
 			echo "\n";
 		}
 

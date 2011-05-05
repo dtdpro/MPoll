@@ -83,7 +83,7 @@ $order = JHTML::_('grid.order', $this->items);
             <td>
 				<?php echo $published; ?>
 			</td>
-            <td><?php if ($row->q_type == 'multi' || $row->q_type == 'mcbox' || $row->q_type == 'dropdown') { ?><a href="index.php?option=com_mpoll&view=answer&q_poll=<?php echo $this->pollid; ?>&opt_qid=<?php echo $row->q_id; ?>"><img src="../includes/js/ThemeOffice/edit.png" alt="Edit Answers" border="0"><?php
+            <td><?php if ($row->q_type == 'multi' || $row->q_type == 'mcbox' || $row->q_type == 'dropdown') { ?><a href="index.php?option=com_mpoll&view=answer&q_poll=<?php echo $this->pollid; ?>&opt_qid=<?php echo $row->q_id; ?>">Options<?php
 			$db =& JFactory::getDBO();
 			$query = 'SELECT count(*) FROM #__mpoll_questions_opts WHERE opt_qid="'.$row->q_id.'"';
 		$db->setQuery( $query );
@@ -92,7 +92,7 @@ $order = JHTML::_('grid.order', $this->items);
 			 
 			 }
 			?></a></td>
-            <td><a href="index.php?option=com_mpoll&view=ansquest&q_poll=<?php echo $this->pollid; ?>&opt_qid=<?php echo $row->q_id; ?>"><img src="../includes/js/ThemeOffice/query.png" alt="View Responses" border="0"> [View]</a></td>
+            <td><a href="index.php?option=com_mpoll&view=ansquest&q_poll=<?php echo $this->pollid; ?>&opt_qid=<?php echo $row->q_id; ?>">Responses</a></td>
 		</tr>
 		<?php
 		$k = 1 - $k;

@@ -67,8 +67,6 @@ class MPollControllerMPollE extends MPollController
 
 	function publish()
 	{
-		global $mainframe;
-
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -86,8 +84,6 @@ class MPollControllerMPollE extends MPollController
 
 	function unpublish()
 	{
-		global $mainframe;
-
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {

@@ -15,7 +15,7 @@ class MPollModelAnswer extends JModel
 	{
 		parent::__construct();
 
-		global $mainframe, $context;
+		$mainframe =& JFactory::getApplication();
 		$context='com_mpoll.answer.';
 		$limit			= $mainframe->getUserStateFromRequest( $context.'limit', 'limit', $mainframe->getCfg('list_limit'), 0);
 		$limitstart = $mainframe->getUserStateFromRequest( $context.'limitstart', 'limitstart', 0 );

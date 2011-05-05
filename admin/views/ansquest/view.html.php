@@ -9,7 +9,6 @@ class MPollViewAnsQuest extends JView
 {
 	function display($tpl = null)
 	{
-		global $mainframe,$option;
 		$qid = JRequest::getVar('opt_qid');
 		$cid = JRequest::getVar('q_poll');
 		JToolBarHelper::title(   JText::_( 'MPoll Poll Question Results by Question' ), 'generic.png' );
