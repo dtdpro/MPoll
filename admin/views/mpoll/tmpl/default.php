@@ -1,104 +1,47 @@
-<?php defined('_JEXEC') or die('Restricted access'); 
-$order = JHTML::_('grid.order', $this->items);
+<?php
+
+// No direct access to this file
+defined('_JEXEC') or die('Restricted Access');
+// load tooltip behavior
+JHtml::_('behavior.tooltip');
 ?>
-<form action="" method="post" name="adminForm">
-
-<div id="editcell">
+<form action="<?php echo JRoute::_('index.php?option=com_vidrev'); ?>" method="post" name="adminForm">
+	<fieldset id="filter-bar">
+		<div class="filter-search fltlft">
+			<label class="filter-search-lbl" for="filter_search"><?php echo JText::_('JSEARCH_FILTER_LABEL'); ?></label>
+			<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->escape($this->state->get('filter.search')); ?>" title="Search" />
+			<button type="submit"><?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?></button>
+			<button type="button" onclick="document.id('filter_search').value='';this.form.submit();"><?php echo JText::_('JSEARCH_FILTER_CLEAR'); ?></button>
+		</div>
+		<div class="filter-select fltrt">
+			<select name="filter_published" class="inputbox" onchange="this.form.submit()">
+				<option value=""><?php echo JText::_('JOPTION_SELECT_PUBLISHED');?></option>
+				<?php echo JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.state'), true);?>
+			</select>
+			<select name="filter_category_id" class="inputbox" onchange="this.form.submit()">
+				<option value=""><?php echo JText::_('JOPTION_SELECT_CATEGORY');?></option>
+				<?php echo JHtml::_('select.options', JHtml::_('category.options', 'com_vidrev'), 'value', 'text', $this->state->get('filter.category_id'));?>
+			</select>
+            <select name="filter_access" class="inputbox" onchange="this.form.submit()">
+				<option value=""><?php echo JText::_('JOPTION_SELECT_ACCESS');?></option>
+				<?php echo JHtml::_('select.options', JHtml::_('access.assetgroups'), 'value', 'text', $this->state->get('filter.access'));?>
+			</select>
+		</div>
+	</fieldset>
+	<div class="clr"> </div>
+	
 	<table class="adminlist">
-	<thead>
-		<tr>
-			<th width="5">
-				<?php echo JText::_( 'id' ); ?>
-			</th>
-			<th width="20">
-				<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count( $this->items ); ?>);" />
-			</th>			
-			<th>
-				<?php echo JText::_( 'Poll Name' ); ?>
-			</th>
-
-            <th width="50">
-				<?php echo JText::_( 'Questions' ); ?>
-			</th>
-            <th width="50">
-				<?php echo JText::_( '1 Vote Each' ); ?>
-			</th>
-            <th width="5">
-				<?php echo JText::_( 'Published' ); ?>
-			</th>
-			<th width="150">
-				<?php echo JText::_( 'Available' ); ?>
-			</th>
-			<th width="100">
-				<?php echo JText::_( 'Results' ); ?>
-			</th>
-		</tr>			
-	</thead>
-	<?php
-	$k = 0;
-	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
-	{
-		$row = &$this->items[$i];
-		$checked 	= JHTML::_('grid.id',   $i, $row->poll_id );
-		$published 	= JHTML::_('grid.published',   $row, $i  );
-		$link 		= JRoute::_( 'index.php?option=com_mpoll&controller=mpolle&task=edit&cid[]='. $row->poll_id );
-
-		?>
-		<tr class="<?php echo "row$k"; ?>">
-			<td>
-				<?php echo $row->poll_id; ?>
-			</td>
-			<td>
-				<?php echo $checked; ?>
-			</td>
-			<td>
-				<a href="<?php echo $link; ?>"><?php echo $row->poll_name; ?></a>
-			</td>
-            <td>
-				<?php 
-				
-					echo '<a href="index.php?option=com_mpoll&view=question&q_poll='.$row->poll_id.'">Questions'; 
-					$db =& JFactory::getDBO();
-					$query = 'SELECT count(*) FROM #__mpoll_questions WHERE q_poll="'.$row->poll_id.'"';
-					$db->setQuery( $query );
-					echo ' ['.$db->loadResult().']</a>'; 
-				
-				?>
-			</td>
-
-			
-            <td>
-				<?php 
-					if ($row->poll_only) echo 'Yes';
-					else echo 'No'; 
-				?>
-			</td>
-			<td>
-				<?php echo $published; ?>
-			</td>
-			<td>
-				<?php 
-					if ($row->poll_start == '0000-00-00') echo 'Always';
-					else echo date("M d, Y",strtotime($row->poll_start)).' - '.date("M d, Y",strtotime($row->poll_end)); 
-				?>
-			</td>
-			<td>
-				<?php 
-					echo '<a href="index.php?option=com_mpoll&view=pollresults&poll='.$row->poll_id.'">By User</a>';
-					echo ' | <a href="index.php?option=com_mpoll&view=tally&poll='.$row->poll_id.'">Tally</a>';
-				?>
-			</td>
-		</tr>
-		<?php
-		$k = 1 - $k;
-	}
-	?>
+		<thead><?php echo $this->loadTemplate('head');?></thead>
+		<tfoot><?php echo $this->loadTemplate('foot');?></tfoot>
+		<tbody><?php echo $this->loadTemplate('body');?></tbody>
 	</table>
-    Helpful hint should go here.
-</div>
-
-<input type="hidden" name="option" value="com_mpoll" />
-<input type="hidden" name="task" value="" />
-<input type="hidden" name="boxchecked" value="0" />
-<input type="hidden" name="controller" value="mpolle" />
+	<div>
+		<input type="hidden" name="task" value="" />
+		<input type="hidden" name="boxchecked" value="0" />
+		<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
+		<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
+		<?php echo JHtml::_('form.token'); ?>
+	</div>
 </form>
+
+

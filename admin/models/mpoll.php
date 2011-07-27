@@ -1,24 +1,114 @@
 <?php
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die();
+// No direct access to this file
+defined('_JEXEC') or die('Restricted access');
 
-jimport( 'joomla.application.component.model' );
+// import the Joomla modellist library
+jimport('joomla.application.component.modellist');
 
-class MPollModelMPoll extends JModel
+
+class MPollModelMPoll extends JModelList
 {
-	var $_data;
-
-
-	function getPolls()
+	
+public function __construct($config = array())
 	{
-		$query  = ' SELECT * ';
-		$query .= ' FROM #__mpoll_polls';
-		$query .= ' ORDER BY poll_name ASC';
-		$db =& JFactory::getDBO();
-		$db->setQuery($query);
-		$data = $db->loadObjectList();
-		return $data;
-	}
+		if (empty($config['filter_fields'])) {
+			$config['filter_fields'] = array(
+				'poll_id', 'p.poll_id',
+				'poll_name', 'p.poll_name',
+				'poll_cat', 'p.poll_cat', 'category_title',
+				'state', 'p.state',
+				'access', 'p.access', 'access_level',
+			);
+		}
 
+		parent::__construct($config);
+	}
+	
+	protected function populateState($ordering = null, $direction = null)
+	{
+		// Initialise variables.
+		$app = JFactory::getApplication('administrator');
+
+		// Load the filter state.
+		$search = $this->getUserStateFromRequest($this->context.'.filter.search', 'filter_search');
+		$this->setState('filter.search', $search);
+
+		$accessId = $this->getUserStateFromRequest($this->context.'.filter.access', 'filter_access', null, 'int');
+		$this->setState('filter.access', $accessId);
+
+		$published = $this->getUserStateFromRequest($this->context.'.filter.state', 'filter_published', '', 'string');
+		$this->setState('filter.state', $published);
+
+		$categoryId = $this->getUserStateFromRequest($this->context.'.filter.category_id', 'filter_category_id', '');
+		$this->setState('filter.category_id', $categoryId);
+
+		// Load the parameters.
+		$params = JComponentHelper::getParams('com_mpoll');
+		$this->setState('params', $params);
+
+		// List state information.
+		parent::populateState('p.poll_name', 'asc');
+	}
+	
+	protected function getListQuery() 
+	{
+		// Create a new query object.
+		$db = JFactory::getDBO();
+		$query = $db->getQuery(true);
+
+		// Select some fields
+		$query->select('p.*');
+
+		// From the hello table
+		$query->from('#__mpoll_polls as p');
+		
+		// Join over the asset groups.
+		$query->select('ag.title AS access_level');
+		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = p.access');
+		
+		// Join over the categories.
+		$query->select('c.title AS category_title');
+		$query->join('LEFT', '#__categories AS c ON c.id = p.poll_cat');
+		
+		// Filter by access level.
+		if ($access = $this->getState('filter.access')) {
+			$query->where('p.access = '.(int) $access);
+		}
+
+		// Filter by published state
+		$state = $this->getState('filter.state');
+		if (is_numeric($state)) {
+			$query->where('p.state = '.(int) $state);
+		} else if ($state === '') {
+			$query->where('(p.state IN (0, 1))');
+		}
+
+		// Filter by category.
+		$categoryId = $this->getState('filter.category_id');
+		if (is_numeric($categoryId)) {
+			$query->where('p.poll_cat = '.(int) $categoryId);
+		}
+
+		// Filter by search in title
+		$search = $this->getState('filter.search');
+		if (!empty($search)) {
+			if (stripos($search, 'id:') === 0) {
+				$query->where('p.poll_id = '.(int) substr($search, 3));
+			} else {
+				$search = $db->Quote('%'.$db->getEscaped($search, true).'%');
+				$query->where('(v.poll_name LIKE '.$search.' )');
+			}
+		}
+
+		// Add the list ordering clause.
+		$orderCol	= $this->state->get('list.ordering');
+		$orderDirn	= $this->state->get('list.direction');
+		if ($orderCol == 'category_title') {
+			$orderCol = 'category_title ';
+		}
+		$query->order($db->getEscaped($orderCol.' '.$orderDirn));
+				
+		return $query;
+	}
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="Poll Page">
+		<message>Poll Page</message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request" addfieldpath="/administrator/components/com_mpoll/models/fields">
+			<field name="poll" type="modal_mpoll" label="Poll" description="" required="true" />
+			<field name="task" type="radio" default="ballot" label="View" description="View">
+				<option value="ballot">Ballot</option>
+				<option value="results">Results</option>
+			</field>
+			<field name="showlist" type="radio" default="after" label="Poll List" description="Show a drop down list of published polls and allow navigation to.">
+				<option value="both">Results and Poll</option>
+				<option value="after">Results Only</option>
+				<option value="never">Do Not Display</option>
+			</field>
+			<field name="listloc" type="radio" default="top" label="Poll List Loaction" description="Locxation of poll list">
+				<option value="both">Top and Bottom</option>
+				<option value="top">Top</option>
+				<option value="bottom">Bottom</option>
+			</field>
+			<field name="showstats" type="radio" default="1" label="Show Results Stats" description="# Voters, First and last vote time">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
+			<field name="rtmpl" type="text" default="" label="Results Template" description="temp=" />
+			
+		</fieldset>
+	</fields>
+</metadata>

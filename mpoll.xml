@@ -7,8 +7,8 @@
 	<authorUrl>http://www.ditzthedaisy.com</authorUrl>
 	<copyright>(c)2008-2011</copyright>
 	<license>GPL v2</license>
-	<version>1.6</version>
-    <releaseDate>2011.05.04</releaseDate>
+	<version>1.6.1</version>
+    <releaseDate>2011.07.26</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
 
@@ -32,7 +32,7 @@
 		
 		<files folder="admin">
 			<filename>index.html</filename>
-			<filename>admin.mpoll.php</filename>
+			<filename>mpoll.php</filename>
 			<filename>controller.php</filename>
 			<filename>install.sql</filename>
 			<folder>controllers</folder>
@@ -40,6 +40,7 @@
 			<folder>models</folder>
 			<folder>views</folder>
 			<folder>tables</folder>
+			<folder>helpers</folder>
 		</files>
 		<languages folder="admin">
 			<language tag="en-GB">language/en-GB.com_mpoll.ini</language>
