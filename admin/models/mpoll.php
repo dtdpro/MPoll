@@ -3,112 +3,79 @@
 // No direct access to this file
 defined('_JEXEC') or die('Restricted access');
 
-// import the Joomla modellist library
-jimport('joomla.application.component.modellist');
+// import Joomla modelform library
+jimport('joomla.application.component.modeladmin');
 
-
-class MPollModelMPoll extends JModelList
+class MPollModelMPoll extends JModelAdmin
 {
-	
-public function __construct($config = array())
+	/**
+	 * Method override to check if you can edit an existing record.
+	 *
+	 * @param	array	$data	An array of input data.
+	 * @param	string	$key	The name of the key for the primary key.
+	 *
+	 * @return	boolean
+	 * @since	1.6
+	 */
+	protected function allowEdit($data = array(), $key = 'poll_id')
 	{
-		if (empty($config['filter_fields'])) {
-			$config['filter_fields'] = array(
-				'poll_id', 'p.poll_id',
-				'poll_name', 'p.poll_name',
-				'poll_cat', 'p.poll_cat', 'category_title',
-				'state', 'p.state',
-				'access', 'p.access', 'access_level',
-			);
-		}
-
-		parent::__construct($config);
+		// Check specific edit permission then general edit permission.
+		return JFactory::getUser()->authorise('core.edit', 'com_mpoll.poll.'.((int) isset($data[$key]) ? $data[$key] : 0)) or parent::allowEdit($data, $key);
 	}
-	
-	protected function populateState($ordering = null, $direction = null)
+	/**
+	 * Returns a reference to the a Table object, always creating it.
+	 *
+	 * @param	type	The table type to instantiate
+	 * @param	string	A prefix for the table class name. Optional.
+	 * @param	array	Configuration array for model. Optional.
+	 * @return	JTable	A database object
+	 * @since	1.6
+	 */
+	public function getTable($type = 'MPoll', $prefix = 'MPollTable', $config = array()) 
 	{
-		// Initialise variables.
-		$app = JFactory::getApplication('administrator');
-
-		// Load the filter state.
-		$search = $this->getUserStateFromRequest($this->context.'.filter.search', 'filter_search');
-		$this->setState('filter.search', $search);
-
-		$accessId = $this->getUserStateFromRequest($this->context.'.filter.access', 'filter_access', null, 'int');
-		$this->setState('filter.access', $accessId);
-
-		$published = $this->getUserStateFromRequest($this->context.'.filter.state', 'filter_published', '', 'string');
-		$this->setState('filter.state', $published);
-
-		$categoryId = $this->getUserStateFromRequest($this->context.'.filter.category_id', 'filter_category_id', '');
-		$this->setState('filter.category_id', $categoryId);
-
-		// Load the parameters.
-		$params = JComponentHelper::getParams('com_mpoll');
-		$this->setState('params', $params);
-
-		// List state information.
-		parent::populateState('p.poll_name', 'asc');
+		return JTable::getInstance($type, $prefix, $config);
 	}
-	
-	protected function getListQuery() 
+	/**
+	 * Method to get the record form.
+	 *
+	 * @param	array	$data		Data for the form.
+	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
+	 * @return	mixed	A JForm object on success, false on failure
+	 * @since	1.6
+	 */
+	public function getForm($data = array(), $loadData = true) 
 	{
-		// Create a new query object.
-		$db = JFactory::getDBO();
-		$query = $db->getQuery(true);
-
-		// Select some fields
-		$query->select('p.*');
-
-		// From the hello table
-		$query->from('#__mpoll_polls as p');
-		
-		// Join over the asset groups.
-		$query->select('ag.title AS access_level');
-		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = p.access');
-		
-		// Join over the categories.
-		$query->select('c.title AS category_title');
-		$query->join('LEFT', '#__categories AS c ON c.id = p.poll_cat');
-		
-		// Filter by access level.
-		if ($access = $this->getState('filter.access')) {
-			$query->where('p.access = '.(int) $access);
+		// Get the form.
+		$form = $this->loadForm('com_mpoll.mpoll', 'mpoll', array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form)) 
+		{
+			return false;
 		}
-
-		// Filter by published state
-		$state = $this->getState('filter.state');
-		if (is_numeric($state)) {
-			$query->where('p.state = '.(int) $state);
-		} else if ($state === '') {
-			$query->where('(p.state IN (0, 1))');
+		return $form;
+	}
+	/**
+	 * Method to get the script that have to be included on the form
+	 *
+	 * @return string	Script files
+	 */
+	public function getScript() 
+	{
+		return 'administrator/components/com_mpoll/models/forms/mpoll.js';
+	}
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return	mixed	The data for the form.
+	 * @since	1.6
+	 */
+	protected function loadFormData() 
+	{
+		// Check the session for previously entered form data.
+		$data = JFactory::getApplication()->getUserState('com_mpoll.edit.mpoll.data', array());
+		if (empty($data)) 
+		{
+			$data = $this->getItem();
 		}
-
-		// Filter by category.
-		$categoryId = $this->getState('filter.category_id');
-		if (is_numeric($categoryId)) {
-			$query->where('p.poll_cat = '.(int) $categoryId);
-		}
-
-		// Filter by search in title
-		$search = $this->getState('filter.search');
-		if (!empty($search)) {
-			if (stripos($search, 'id:') === 0) {
-				$query->where('p.poll_id = '.(int) substr($search, 3));
-			} else {
-				$search = $db->Quote('%'.$db->getEscaped($search, true).'%');
-				$query->where('(v.poll_name LIKE '.$search.' )');
-			}
-		}
-
-		// Add the list ordering clause.
-		$orderCol	= $this->state->get('list.ordering');
-		$orderDirn	= $this->state->get('list.direction');
-		if ($orderCol == 'category_title') {
-			$orderCol = 'category_title ';
-		}
-		$query->order($db->getEscaped($orderCol.' '.$orderDirn));
-				
-		return $query;
+		return $data;
 	}
 }

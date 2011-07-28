@@ -24,15 +24,21 @@
 		<sql>
 			<file charset="utf8" driver="mysql">install.sql</file>
 		</sql>
-	</install>		
+	</install>	
+	<media destination="com_mpoll" folder="media">
+		<filename>index.html</filename>
+		<folder>images</folder>
+	</media>	
 	<administration>
 		<!-- Administration Menu Section -->
-		<menu>COM_MPOLL_MENU</menu>
+		<menu img="../media/com_mpoll/images/mpoll-16x16.png">COM_MPOLL_MENU</menu>
 
 		
 		<files folder="admin">
 			<filename>index.html</filename>
 			<filename>mpoll.php</filename>
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
 			<filename>controller.php</filename>
 			<filename>install.sql</filename>
 			<folder>controllers</folder>

@@ -8,7 +8,7 @@ class MPollController extends JController
 	function display()
 	{
 		// set default view if not set
-		JRequest::setVar('view', JRequest::getCmd('view', 'mpoll'));
+		JRequest::setVar('view', JRequest::getCmd('view', 'mpolls'));
 
 		// call parent behavior
 		parent::display($cachable);

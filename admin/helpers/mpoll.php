@@ -29,11 +29,11 @@ abstract class MPollHelper
 			$assetName = 'com_mpoll';
 		}
 		else {
-			$assetName = 'com_mpoll.video.'.(int) $vidId;
+			$assetName = 'com_mpoll.poll.'.(int) $vidId;
 		}
 
 		$actions = array(
-			'core.admin', 'core.manage', 'core.create', 'core.edit', 'core.delete'
+			'core.admin', 'core.manage', 'core.create', 'core.edit', 'core.delete', 'core.edit.state'
 		);
 
 		foreach ($actions as $action) {

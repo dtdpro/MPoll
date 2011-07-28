@@ -12,7 +12,7 @@ defined('_JEXEC') or die('Restricted Access');
 			<?php echo JHtml::_('grid.id', $i, $item->poll_id); ?>
 		</td>
 		<td>
-			<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=mpolle.edit&poll_id=' . $item->poll_id); ?>">
+			<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=mpoll.edit&poll_id=' . $item->poll_id); ?>">
 				<?php echo $item->poll_name; ?>
 			</a>
 		</td>
@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted Access');
 			<?php echo $item->category_title; ?>
 		</td>
 		<td class="center">
-			<?php echo JHtml::_('jgrid.published', $item->state, $i, 'mpolle.', true);?>
+			<?php echo JHtml::_('jgrid.published', $item->published, $i, 'mpolls.', true);?>
 		</td>
 		<td>
 			<?php echo $item->access_level; ?>
@@ -28,9 +28,9 @@ defined('_JEXEC') or die('Restricted Access');
         <td>
 			<?php 
 		
-			echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=question&q_poll='.$row->poll_id).'">Questions'; 
+			echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=question&q_poll='.$item->poll_id).'">Questions'; 
 			$db =& JFactory::getDBO();
-			$query = 'SELECT count(*) FROM #__mpoll_questions WHERE q_poll="'.$row->poll_id.'"';
+			$query = 'SELECT count(*) FROM #__mpoll_questions WHERE q_poll="'.$item->poll_id.'"';
 			$db->setQuery( $query );
 			echo ' ['.$db->loadResult().']</a>'; 
 		

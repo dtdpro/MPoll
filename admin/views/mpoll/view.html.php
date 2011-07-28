@@ -8,12 +8,16 @@ jimport('joomla.application.component.view');
 
 class MPollViewMPoll extends JView
 {
-	function display($tpl = null) 
+	/**
+	 * display method of view
+	 * @return void
+	 */
+	public function display($tpl = null) 
 	{
-		// Get data from the model
-		$items = $this->get('Items');
-		$pagination = $this->get('Pagination');
-		$this->state		= $this->get('State');
+		// get the Data
+		$form = $this->get('Form');
+		$item = $this->get('Item');
+		$script = $this->get('Script');
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) 
@@ -21,9 +25,10 @@ class MPollViewMPoll extends JView
 			JError::raiseError(500, implode('<br />', $errors));
 			return false;
 		}
-		// Assign data to the view
-		$this->items = $items;
-		$this->pagination = $pagination;
+		// Assign the Data
+		$this->form = $form;
+		$this->item = $item;
+		$this->script = $script;
 
 		// Set the toolbar
 		$this->addToolBar();
@@ -40,26 +45,43 @@ class MPollViewMPoll extends JView
 	 */
 	protected function addToolBar() 
 	{
-		$canDo = mpollHelper::getActions();
-		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_POLLS'), 'MPoll');
-		if ($canDo->get('core.create')) 
+		JRequest::setVar('hidemainmenu', true);
+		$user = JFactory::getUser();
+		$userId = $user->id;
+		$isNew = $this->item->poll_id == 0;
+		$canDo = MPollHelper::getActions($this->item->poll_id);
+		JToolBarHelper::title($isNew ? JText::_('COM_MPOLL_MANAGER_MPOLL_NEW') : JText::_('COM_MPOLL_MANAGER_MPOLL_EDIT'), 'mpoll');
+		// Built the actions for new and existing records.
+		if ($isNew) 
 		{
-			JToolBarHelper::addNew('mpoll.add', 'JTOOLBAR_NEW');
+			// For new records, check the create permission.
+			if ($canDo->get('core.create')) 
+			{
+				JToolBarHelper::apply('mpoll.apply', 'JTOOLBAR_APPLY');
+				JToolBarHelper::save('mpoll.save', 'JTOOLBAR_SAVE');
+				JToolBarHelper::custom('mpoll.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+			}
+			JToolBarHelper::cancel('mpoll.cancel', 'JTOOLBAR_CANCEL');
 		}
-		if ($canDo->get('core.edit')) 
+		else
 		{
-			JToolBarHelper::editList('mpoll.edit', 'JTOOLBAR_EDIT');
-			JToolBarHelper::custom('mpolls.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
-			JToolBarHelper::custom('mpolls.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
-		}
-		if ($canDo->get('core.delete')) 
-		{
-			JToolBarHelper::deleteList('', 'mpolls.delete', 'JTOOLBAR_DELETE');
-		}
-		if ($canDo->get('core.admin')) 
-		{
-			JToolBarHelper::divider();
-			JToolBarHelper::preferences('com_mpoll');
+			if ($canDo->get('core.edit'))
+			{
+				// We can save the new record
+				JToolBarHelper::apply('mpoll.apply', 'JTOOLBAR_APPLY');
+				JToolBarHelper::save('mpoll.save', 'JTOOLBAR_SAVE');
+
+				// We can save this record, but check the create permission to see if we can return to make a new one.
+				if ($canDo->get('core.create')) 
+				{
+					JToolBarHelper::custom('mpoll.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+				}
+			}
+			if ($canDo->get('core.create')) 
+			{
+				JToolBarHelper::custom('mpoll.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
+			}
+			JToolBarHelper::cancel('mpoll.cancel', 'JTOOLBAR_CLOSE');
 		}
 	}
 	/**
@@ -69,7 +91,11 @@ class MPollViewMPoll extends JView
 	 */
 	protected function setDocument() 
 	{
+		$isNew = $this->item->poll_id == 0;
 		$document = JFactory::getDocument();
-		$document->setTitle(JText::_('COM_MPOLL_ADMINISTRATION'));
+		$document->setTitle($isNew ? JText::_('COM_MPOLL_MPOLL_CREATING') : JText::_('COM_MPOLL_MPOLL_EDITING'));
+		$document->addScript(JURI::root() . $this->script);
+		$document->addScript(JURI::root() . "/administrator/components/com_mpoll/views/mpoll/submitbutton.js");
+		JText::script('COM_MPOLL_MPOLL_ERROR_UNACCEPTABLE');
 	}
 }

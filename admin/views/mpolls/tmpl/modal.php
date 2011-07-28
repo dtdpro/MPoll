@@ -14,7 +14,7 @@ JHtml::_('behavior.tooltip');
 
 $function	= JRequest::getCmd('function', 'jSelectNewsfeed');
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=mpoll&layout=modal&tmpl=component');?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=mpolls&layout=modal&tmpl=component');?>" method="post" name="adminForm" id="adminForm">
 	<table class="adminlist">
 		<thead>
 			<tr>

@@ -5,7 +5,7 @@ $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 ?><tr>
 	<th width="5">
-		<?php echo JText::_('COM_MPOLL_MPOLL_HEADING_ID'); ?>
+		<?php echo JHtml::_('grid.sort','COM_MPOLL_MPOLL_HEADING_ID','p.poll_id', $listDirn, $listOrder); ?>
 	</th>
 	<th width="20">
 		<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->items); ?>);" />
