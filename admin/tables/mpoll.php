@@ -69,7 +69,7 @@ class MPollTableMPoll extends JTable
 		if (empty($this->poll_alias)) {
 			$this->poll_alias = $this->poll_name;
 		}
-		$this->pol_alias = JApplication::stringURLSafe($this->poll_alias);
+		$this->poll_alias = JApplication::stringURLSafe($this->poll_alias);
 		if (trim(str_replace('-','',$this->poll_alias)) == '') {
 			$this->poll_alias = JFactory::getDate()->format("Y-m-d-H-i-s");
 		}

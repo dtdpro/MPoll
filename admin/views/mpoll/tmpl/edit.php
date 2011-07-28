@@ -9,31 +9,31 @@ $params = $this->form->getFieldsets('params');
 <form action="<?php echo JRoute::_('index.php?option=com_mpoll&layout=edit&poll_id='.(int) $this->item->poll_id); ?>" method="post" name="adminForm" id="mpoll-form" class="form-validate">
 	<div class="width-60 fltlft">
 		<fieldset class="adminform">
-			<legend><?php echo JText::_( 'COM_MPOLL_MPOLL_DETAILS' ); ?></legend>
+			<legend><?php echo JText::_( 'COM_MPOLL_MPOLL_SETUP' ); ?></legend>
 			<ul class="adminformlist">
-<?php foreach($this->form->getFieldset('details') as $field): ?>
+<?php foreach($this->form->getFieldset('setup') as $field): ?>
 				<li><?php echo $field->label;echo $field->input;?></li>
 <?php endforeach; ?>
 			</ul>
+		</fieldset>
+		<fieldset class="adminform">
+			<legend><?php echo JText::_( 'COM_MPOLL_MPOLL_DETAILS' ); ?></legend>
+<?php foreach($this->form->getFieldset('details') as $field): ?>
+				<?php echo '<div>'.$field->label.'<div class="clr"></div>'.$field->input.'</div>';?>
+<?php endforeach; ?>
+		</fieldset>
 	</div>
 
 	<div class="width-40 fltrt">
 		<?php echo JHtml::_('sliders.start', 'mpollrev-slider'); ?>
-
-<?php foreach ($params as $name => $fieldset): ?>
-		<?php echo JHtml::_('sliders.panel', JText::_($fieldset->label), $name.'-params');?>
-	<?php if (isset($fieldset->description) && trim($fieldset->description)): ?>
-		<p class="tip"><?php echo $this->escape(JText::_($fieldset->description));?></p>
-	<?php endif;?>
-		<fieldset class="panelform" >
+			<?php echo JHtml::_('sliders.panel', JText::_('COM_MPOLL_MPOLL_PUBLISHING'), 'publishing-details'); ?>
+		<fieldset class="panelform">
 			<ul class="adminformlist">
-	<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-				<li><?php echo $field->label; ?><?php echo $field->input; ?></li>
-	<?php endforeach; ?>
+<?php foreach($this->form->getFieldset('publishing') as $field): ?>
+				<li><?php echo $field->label;echo $field->input;?></li>
+<?php endforeach; ?>
 			</ul>
 		</fieldset>
-<?php endforeach; ?>
-
 		<?php echo JHtml::_('sliders.end'); ?>
 	</div>
 

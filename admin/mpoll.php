@@ -14,6 +14,7 @@ JLoader::register('MPollHelper', dirname(__FILE__) . DS . 'helpers' . DS . 'mpol
 
 $document = JFactory::getDocument();
 $document->addStyleDeclaration('.icon-48-MPoll {background-image: url(../media/com_mpoll/images/mpoll-48x48.png);}');
+$document->addStyleDeclaration('.icon-48-mpoll {background-image: url(../media/com_mpoll/images/mpoll-48x48.png);}');
 
 // import joomla controller library
 jimport('joomla.application.component.controller');
