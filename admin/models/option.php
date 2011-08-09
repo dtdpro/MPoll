@@ -6,7 +6,7 @@ defined('_JEXEC') or die('Restricted access');
 // import Joomla modelform library
 jimport('joomla.application.component.modeladmin');
 
-class MPollModelMPoll extends JModelAdmin
+class MPollModelOption extends JModelAdmin
 {
 	/**
 	 * Method override to check if you can edit an existing record.
@@ -17,10 +17,10 @@ class MPollModelMPoll extends JModelAdmin
 	 * @return	boolean
 	 * @since	1.6
 	 */
-	protected function allowEdit($data = array(), $key = 'poll_id')
+	protected function allowEdit($data = array(), $key = 'opt_id')
 	{
 		// Check specific edit permission then general edit permission.
-		return JFactory::getUser()->authorise('core.edit', 'com_mpoll.poll.'.((int) isset($data[$key]) ? $data[$key] : 0)) or parent::allowEdit($data, $key);
+		return JFactory::getUser()->authorise('core.edit', 'com_mpoll.option.'.((int) isset($data[$key]) ? $data[$key] : 0)) or parent::allowEdit($data, $key);
 	}
 	/**
 	 * Returns a reference to the a Table object, always creating it.
@@ -31,7 +31,7 @@ class MPollModelMPoll extends JModelAdmin
 	 * @return	JTable	A database object
 	 * @since	1.6
 	 */
-	public function getTable($type = 'MPoll', $prefix = 'MPollTable', $config = array()) 
+	public function getTable($type = 'Option', $prefix = 'MPollTable', $config = array()) 
 	{
 		return JTable::getInstance($type, $prefix, $config);
 	}
@@ -46,7 +46,7 @@ class MPollModelMPoll extends JModelAdmin
 	public function getForm($data = array(), $loadData = true) 
 	{
 		// Get the form.
-		$form = $this->loadForm('com_mpoll.mpoll', 'mpoll', array('control' => 'jform', 'load_data' => $loadData));
+		$form = $this->loadForm('com_mpoll.option', 'option', array('control' => 'jform', 'load_data' => $loadData));
 		if (empty($form)) 
 		{
 			return false;
@@ -60,7 +60,7 @@ class MPollModelMPoll extends JModelAdmin
 	 */
 	public function getScript() 
 	{
-		return 'administrator/components/com_mpoll/models/forms/mpoll.js';
+		return 'administrator/components/com_mpoll/models/forms/option.js';
 	}
 	/**
 	 * Method to get the data that should be injected in the form.
@@ -71,16 +71,57 @@ class MPollModelMPoll extends JModelAdmin
 	protected function loadFormData() 
 	{
 		// Check the session for previously entered form data.
-		$data = JFactory::getApplication()->getUserState('com_mpoll.edit.mpoll.data', array());
+		$data = JFactory::getApplication()->getUserState('com_mpoll.edit.option.data', array());
 		if (empty($data)) 
 		{
 			$data = $this->getItem();
-			// Prime some default values.
-			if ($this->getState('mpoll.poll_id') == 0) {
+			if ($this->getState('option.opt_id') == 0) {
 				$app = JFactory::getApplication();
-				$data->set('poll_cat', JRequest::getInt('poll_cat', $app->getUserState('com_mpoll.mpolls.filter.category_id')));
+				$data->set('opt_qid', JRequest::getInt('opt_qid', $app->getUserState('com_mpoll.options.filter.question')));
 			}
 		}
 		return $data;
+	}
+	
+	/**
+	 * Prepare and sanitise the table prior to saving.
+	 *
+	 * @since	1.6
+	 */
+	protected function prepareTable(&$table)
+	{
+		jimport('joomla.filter.output');
+		$date = JFactory::getDate();
+		$user = JFactory::getUser();
+
+		if (empty($table->opt_id)) {
+			// Set the values
+
+			// Set ordering to the last item if not set
+			if (empty($table->ordering)) {
+				$db = JFactory::getDbo();
+				$db->setQuery('SELECT MAX(ordering) FROM #__mpoll_questions_opts WHERE opt_qid = '.$table->opt_qid);
+				$max = $db->loadResult();
+
+				$table->ordering = $max+1;
+			}
+		}
+		else {
+			// Set the values
+		}
+	}
+
+	/**
+	 * A protected method to get a set of ordering conditions.
+	 *
+	 * @param	object	A record object.
+	 * @return	array	An array of conditions to add to add to ordering queries.
+	 * @since	1.6
+	 */
+	protected function getReorderConditions($table)
+	{
+		$condition = array();
+		$condition[] = 'opt_qid = '.(int) $table->opt_qid;
+		return $condition;
 	}
 }

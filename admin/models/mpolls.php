@@ -19,6 +19,7 @@ public function __construct($config = array())
 				'poll_cat', 'p.poll_cat', 'category_title',
 				'published', 'p.published',
 				'access', 'p.access', 'access_level',
+				'ordering', 'a.ordering',
 			);
 		}
 
@@ -105,7 +106,7 @@ public function __construct($config = array())
 		$orderCol	= $this->state->get('list.ordering');
 		$orderDirn	= $this->state->get('list.direction');
 		if ($orderCol == 'category_title') {
-			$orderCol = 'category_title ';
+			$orderCol = 'category_title '.$orderDirn;
 		}
 		$query->order($db->getEscaped($orderCol.' '.$orderDirn));
 				

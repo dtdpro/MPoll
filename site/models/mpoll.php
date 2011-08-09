@@ -11,7 +11,8 @@ class MPollModelMPoll extends JModel
 	function getPoll($pollid)
 	{
 		$db =& JFactory::getDBO();
-		$query = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.' && published=1';
+		$user =& JFactory::getUser();
+		$query = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.' && published > 0 && access IN ('.implode(",",$user->getAuthorisedViewLevels()).')';
 		$db->setQuery( $query );
 		$pdata = $db->loadAssoc();
 		return $pdata;
@@ -70,10 +71,10 @@ class MPollModelMPoll extends JModel
 		else return false;
 	}
 	
-	function getPolls() {
+	function getPolls($catid) {
 		$query  = ' SELECT * ';
 		$query .= ' FROM #__mpoll_polls';
-		$query .= ' WHERE published = 1';
+		$query .= ' WHERE published = 1 && poll_cat = '.$catid;
 		$query .= ' ORDER BY poll_name ASC';
 		$db =& JFactory::getDBO();
 		$db->setQuery($query);

@@ -24,12 +24,12 @@ class MPollViewMPoll extends JView
 		$user =& JFactory::getUser();
 		$guest = $user->guest ? true : false;
 		$pdata=$model->getPoll($pollid); 
-		$polllist = $model->getPolls();
-		if (empty($pdata)) { $task='notfound'; $msg='This Vote is currently unavailble.'; }
+		$polllist = $model->getPolls($pdata['poll_cat']);
+		if (empty($pdata)) { $task='notfound'; $msg='This Poll is currently unavailble.'; }
 		else {
 			//date stuff
-			if ((strtotime($pdata['poll_start']) > strtotime(date("Y-m-d"))) && $pdata['poll_start'] != '0000-00-00') { $task='notfound'; $msg='Voting has not yet opened'; }
-			if ((strtotime($pdata['poll_end']) < strtotime(date("Y-m-d"))) && $pdata['poll_start'] != '0000-00-00') { $task='notfound'; $msg='Voting has been closed'; }
+			if ((strtotime($pdata['poll_start']) > strtotime(date("Y-m-d H:i:s"))) && $pdata['poll_start'] != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
+			if ((strtotime($pdata['poll_end']) < strtotime(date("Y-m-d H:i:s"))) && $pdata['poll_start'] != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
 			
 		}
 		$qdata=$model->getQuestions($pollid);

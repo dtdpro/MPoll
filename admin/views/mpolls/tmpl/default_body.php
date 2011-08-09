@@ -14,7 +14,7 @@ defined('_JEXEC') or die('Restricted Access');
 			<?php echo JHtml::_('grid.id', $i, $item->poll_id); ?>
 		</td>
 		<td>
-				<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=mpoll.edit&id='.(int) $item->poll_id); ?>">
+				<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=mpoll.edit&poll_id='.(int) $item->poll_id); ?>">
 				<?php echo $this->escape($item->poll_name); ?></a>
 			<p class="smallsub"><?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($item->poll_alias));?></p>
 		</td>
@@ -29,8 +29,8 @@ defined('_JEXEC') or die('Restricted Access');
 		</td>
         <td>
 			<?php 
-		
-			echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=question&q_poll='.$item->poll_id).'">Questions'; 
+			
+			echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=questions&q_poll='.$item->poll_id).'">Questions'; 
 			$db =& JFactory::getDBO();
 			$query = 'SELECT count(*) FROM #__mpoll_questions WHERE q_poll="'.$item->poll_id.'"';
 			$db->setQuery( $query );

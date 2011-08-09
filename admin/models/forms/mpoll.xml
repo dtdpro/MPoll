@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- $Id: helloworld.xml 62 2010-11-28 16:08:16Z chdemko $ -->
+<!-- $Id: mpoll.xml 62 2010-11-28 16:08:16Z chdemko $ -->
 <form>
 	<fieldset name="setup">
 		<field
@@ -47,7 +47,7 @@
 			class="inputbox"
 			default=""
 			label="COM_MPOLL_MPOLL_FIELD_CATID_LABEL"
-			description="COM_VMPOLL_MPOLL_FIELD_CATID_DESC"
+			description="COM_MPOLL_MPOLL_FIELD_CATID_DESC"
 			required="true">
 			<option value="0">JOPTION_SELECT_CATEGORY</option>
 		</field>
@@ -100,8 +100,8 @@
 			class="inputbox"
 			required="true"
 			default="">
-			<option	value="0">Yes</option>
-			<option	value="1">No</option>
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
 		</field>
 		<field
 			name="poll_showresults"
@@ -112,8 +112,8 @@
 			class="inputbox"
 			required="true"
 			default="">
-			<option	value="0">Yes</option>
-			<option	value="1">No</option>
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
 		</field>
 		<field 
 			name="poll_created" 

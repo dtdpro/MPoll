@@ -1,77 +1,127 @@
 <?php
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die();
 
-jimport( 'joomla.application.component.model' );
+// No direct access to this file
+defined('_JEXEC') or die('Restricted access');
 
-class MPollModelQuestion extends JModel
+// import Joomla modelform library
+jimport('joomla.application.component.modeladmin');
+
+class MPollModelQuestion extends JModelAdmin
 {
-	var $_data;
-	var $_total = null;
-	var $_pagination = null;
-
-
-	function __construct()
+	/**
+	 * Method override to check if you can edit an existing record.
+	 *
+	 * @param	array	$data	An array of input data.
+	 * @param	string	$key	The name of the key for the primary key.
+	 *
+	 * @return	boolean
+	 * @since	1.6
+	 */
+	protected function allowEdit($data = array(), $key = 'q_id')
 	{
-		parent::__construct();
-
-		$mainframe =& JFactory::getApplication();
-		
-		$limit			= $mainframe->getUserStateFromRequest( 'com.mpoll.question.limit', 'limit', $mainframe->getCfg('list_limit'), 0);
-		$limitstart = $mainframe->getUserStateFromRequest( 'com.mpoll.question.limitstart', 'limitstart', 0 );
-
-		$this->setState('limit', $limit);
-		$this->setState('limitstart', $limitstart);
-
+		// Check specific edit permission then general edit permission.
+		return JFactory::getUser()->authorise('core.edit', 'com_mpoll.question.'.((int) isset($data[$key]) ? $data[$key] : 0)) or parent::allowEdit($data, $key);
 	}
-	function _buildQuery()
+	/**
+	 * Returns a reference to the a Table object, always creating it.
+	 *
+	 * @param	type	The table type to instantiate
+	 * @param	string	A prefix for the table class name. Optional.
+	 * @param	array	Configuration array for model. Optional.
+	 * @return	JTable	A database object
+	 * @since	1.6
+	 */
+	public function getTable($type = 'Question', $prefix = 'MPollTable', $config = array()) 
 	{
-		$pollid = JRequest::getVar('q_poll');
-		$query = ' SELECT *,q_req as published '
-			. ' FROM #__mpoll_questions'
-			. ' WHERE q_poll = '.$pollid.' ORDER BY ordering';
-
-		return $query;
+		return JTable::getInstance($type, $prefix, $config);
 	}
-
-	function getData()
+	/**
+	 * Method to get the record form.
+	 *
+	 * @param	array	$data		Data for the form.
+	 * @param	boolean	$loadData	True if the form is to load its own data (default case), false if not.
+	 * @return	mixed	A JForm object on success, false on failure
+	 * @since	1.6
+	 */
+	public function getForm($data = array(), $loadData = true) 
 	{
-		if (empty( $this->_data ))
+		// Get the form.
+		$form = $this->loadForm('com_mpoll.question', 'question', array('control' => 'jform', 'load_data' => $loadData));
+		if (empty($form)) 
 		{
-			$query = $this->_buildQuery();
-			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));;
+			return false;
 		}
-
-		return $this->_data;
+		return $form;
 	}
-	function getTotal()
+	/**
+	 * Method to get the script that have to be included on the form
+	 *
+	 * @return string	Script files
+	 */
+	public function getScript() 
 	{
-		if (empty($this->_total))
+		return 'administrator/components/com_mpoll/models/forms/question.js';
+	}
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return	mixed	The data for the form.
+	 * @since	1.6
+	 */
+	protected function loadFormData() 
+	{
+		// Check the session for previously entered form data.
+		$data = JFactory::getApplication()->getUserState('com_mpoll.edit.question.data', array());
+		if (empty($data)) 
 		{
-			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
+			$data = $this->getItem();
+			if ($this->getState('question.q_id') == 0) {
+				$app = JFactory::getApplication();
+				$data->set('q_poll', JRequest::getInt('q_poll', $app->getUserState('com_mpoll.questions.filter.poll')));
+			}
 		}
-
-		return $this->_total;
+		return $data;
 	}
 	
-	function getPagination()
+	/**
+	 * Prepare and sanitise the table prior to saving.
+	 *
+	 * @since	1.6
+	 */
+	protected function prepareTable(&$table)
 	{
-		if (empty($this->_pagination))
-		{
-			jimport('joomla.html.pagination');
-			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+		jimport('joomla.filter.output');
+		$date = JFactory::getDate();
+		$user = JFactory::getUser();
+
+		if (empty($table->q_id)) {
+			// Set the values
+
+			// Set ordering to the last item if not set
+			if (empty($table->ordering)) {
+				$db = JFactory::getDbo();
+				$db->setQuery('SELECT MAX(ordering) FROM #__mpoll_questions WHERE q_poll = '.$table->q_poll);
+				$max = $db->loadResult();
+
+				$table->ordering = $max+1;
+			}
 		}
-
-		return $this->_pagination;
+		else {
+			// Set the values
+		}
 	}
-	
-	function getPollInfo($pollid)
+
+	/**
+	 * A protected method to get a set of ordering conditions.
+	 *
+	 * @param	object	A record object.
+	 * @return	array	An array of conditions to add to add to ordering queries.
+	 * @since	1.6
+	 */
+	protected function getReorderConditions($table)
 	{
-		$q='SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid;
-		$db =& $this->getDBO();
-		$db->setQuery( $q );
-		return $db->loadObject();
+		$condition = array();
+		$condition[] = 'q_poll = '.(int) $table->q_poll;
+		return $condition;
 	}
-
 }

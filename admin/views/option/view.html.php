@@ -6,7 +6,7 @@ defined('_JEXEC') or die('Restricted access');
 // import Joomla view library
 jimport('joomla.application.component.view');
 
-class MPollViewQuestion extends JView
+class MPollViewOption extends JView
 {
 	/**
 	 * display method of view
@@ -48,40 +48,40 @@ class MPollViewQuestion extends JView
 		JRequest::setVar('hidemainmenu', true);
 		$user = JFactory::getUser();
 		$userId = $user->id;
-		$isNew = $this->item->q_id == 0;
-		$canDo = MPollHelper::getActions($this->item->q_id);
-		JToolBarHelper::title($isNew ? JText::_('COM_MPOLL_MANAGER_QUESTION_NEW') : JText::_('COM_MPOLL_MANAGER_QUESTION_EDIT'), 'mpoll');
+		$isNew = $this->item->opt_id == 0;
+		$canDo = MPollHelper::getActions($this->item->opt_id);
+		JToolBarHelper::title($isNew ? JText::_('COM_MPOLL_MANAGER_OPTION_NEW') : JText::_('COM_MPOLL_MANAGER_OPTION_EDIT'), 'mpoll');
 		// Built the actions for new and existing records.
 		if ($isNew) 
 		{
 			// For new records, check the create permission.
 			if ($canDo->get('core.create')) 
 			{
-				JToolBarHelper::apply('question.apply', 'JTOOLBAR_APPLY');
-				JToolBarHelper::save('question.save', 'JTOOLBAR_SAVE');
-				JToolBarHelper::custom('question.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+				JToolBarHelper::apply('option.apply', 'JTOOLBAR_APPLY');
+				JToolBarHelper::save('option.save', 'JTOOLBAR_SAVE');
+				JToolBarHelper::custom('option.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
 			}
-			JToolBarHelper::cancel('question.cancel', 'JTOOLBAR_CANCEL');
+			JToolBarHelper::cancel('option.cancel', 'JTOOLBAR_CANCEL');
 		}
 		else
 		{
 			if ($canDo->get('core.edit'))
 			{
 				// We can save the new record
-				JToolBarHelper::apply('question.apply', 'JTOOLBAR_APPLY');
-				JToolBarHelper::save('question.save', 'JTOOLBAR_SAVE');
+				JToolBarHelper::apply('option.apply', 'JTOOLBAR_APPLY');
+				JToolBarHelper::save('option.save', 'JTOOLBAR_SAVE');
 
 				// We can save this record, but check the create permission to see if we can return to make a new one.
 				if ($canDo->get('core.create')) 
 				{
-					JToolBarHelper::custom('question.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+					JToolBarHelper::custom('option.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
 				}
 			}
 			if ($canDo->get('core.create')) 
 			{
-				JToolBarHelper::custom('question.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
+				JToolBarHelper::custom('option.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
 			}
-			JToolBarHelper::cancel('question.cancel', 'JTOOLBAR_CLOSE');
+			JToolBarHelper::cancel('option.cancel', 'JTOOLBAR_CLOSE');
 		}
 	}
 	/**
@@ -91,11 +91,11 @@ class MPollViewQuestion extends JView
 	 */
 	protected function setDocument() 
 	{
-		$isNew = $this->item->q_id == 0;
+		$isNew = $this->item->opt_id == 0;
 		$document = JFactory::getDocument();
-		$document->setTitle($isNew ? JText::_('COM_MPOLL_QUESTION_CREATING') : JText::_('COM_MPOLL_QUESTION_EDITING'));
+		$document->setTitle($isNew ? JText::_('COM_MPOLL_OPTION_CREATING') : JText::_('COM_MPOLL_OPTION_EDITING'));
 		$document->addScript(JURI::root() . $this->script);
 		$document->addScript(JURI::root() . "/administrator/components/com_mpoll/views/mpoll/submitbutton.js");
-		JText::script('COM_MPOLL_QUESTION_ERROR_UNACCEPTABLE');
+		JText::script('COM_MPOLL_OPTION_ERROR_UNACCEPTABLE');
 	}
 }

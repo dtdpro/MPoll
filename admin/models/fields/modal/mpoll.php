@@ -53,7 +53,7 @@ class JFormFieldModal_MPoll extends JFormField
 			$title = JText::_('COM_MPOLL_SELECT_A_POLL');
 		}
 
-		$link = 'index.php?option=com_mpoll&amp;view=mpoll&amp;layout=modal&amp;tmpl=component&amp;function=jSelectChart_'.$this->id;
+		$link = 'index.php?option=com_mpoll&amp;view=mpolls&amp;layout=modal&amp;tmpl=component&amp;function=jSelectChart_'.$this->id;
 
 		JHtml::_('behavior.modal', 'a.modal');
 		$html = "\n".'<div class="fltlft"><input type="text" id="'.$this->id.'_name" value="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8').'" disabled="disabled" /></div>';

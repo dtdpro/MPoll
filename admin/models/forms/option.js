@@ -1,5 +1,5 @@
 window.addEvent('domready', function() {
-	document.formvalidator.setHandler('mpoll',
+	document.formvalidator.setHandler('option',
 		function (value) {
 			regex=/^[^0-9]+$/;
 			return regex.test(value);

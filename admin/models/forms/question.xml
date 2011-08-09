@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id: question.xml 62 2010-11-28 16:08:16Z chdemko $ -->
+<form>
+	<fieldset name="details">
+		<field
+			name="q_id"
+			type="hidden"
+		/>
+		<field
+			name="published"
+			type="list"
+			id="published"
+			class="inputbox"
+			label="JSTATUS"
+			description="JFIELD_PUBLISHED_DESC"
+			size="1"
+			default="1"
+			filter="integer">
+			<option	value="1">JPUBLISHED</option>
+			<option	value="0">JUNPUBLISHED</option>
+		</field>
+		<field 
+			name="q_poll" 
+			type="Polls" 
+			class="inputbox"
+			label="COM_MPOLL_QUESTION_FIELD_POLL_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_POLL_DESC" 
+		/>
+		<field 
+			name="ordering" 
+			type="OrderQuestion" 
+			class="inputbox"
+			label="JFIELD_ORDERING_LABEL"
+			description="JFIELD_ORDERING_DESC" 
+		/>
+		<field
+			name="q_text"
+			type="textarea"
+			label="COM_MPOLL_QUESTION_FIELD_NAME_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_NAME_DESC"
+			rows="3"
+			cols="80"
+			class="inputbox"
+			required="true"
+			default=""
+		/>
+		<field
+			name="q_type"
+			type="list"
+			extension="com_mpoll"
+			class="inputbox"
+			default=""
+			label="COM_MPOLL_QUESTION_FIELD_TYPE_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_TYPE_DESC"
+			required="true">
+			<option value="textar">Text Box</option>
+			<option value="textbox">Text Field</option>
+			<option value="multi">Radio Select</option>
+			<option value="cbox">Check Box</option>
+			<option value="mcbox">Multi Checkbox</option>
+		</field>
+		<field
+			name="q_req"
+			type="radio"
+			label="COM_MPOLL_QUESTION_FIELD_REQ_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_REQ_DESC"
+			size="1"
+			class="inputbox"
+			required="true"
+			default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+	</fieldset>
+	
+
+</form>
+

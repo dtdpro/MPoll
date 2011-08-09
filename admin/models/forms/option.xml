@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id: question.xml 62 2010-11-28 16:08:16Z chdemko $ -->
+<form>
+	<fieldset name="details">
+		<field
+			name="opt_id"
+			type="hidden"
+		/>
+		<field
+			name="published"
+			type="list"
+			id="published"
+			class="inputbox"
+			label="JSTATUS"
+			description="JFIELD_PUBLISHED_DESC"
+			size="1"
+			default="1"
+			filter="integer">
+			<option	value="1">JPUBLISHED</option>
+			<option	value="0">JUNPUBLISHED</option>
+		</field>
+		<field 
+			name="opt_qid" 
+			type="hidden" 
+		/>
+		<field 
+			name="ordering" 
+			type="OrderOption" 
+			class="inputbox"
+			label="JFIELD_ORDERING_LABEL"
+			description="JFIELD_ORDERING_DESC" 
+		/>
+		<field
+			name="opt_txt"
+			type="textarea"
+			label="COM_MPOLL_OPTION_FIELD_NAME_LABEL"
+			description="COM_MPOLL_OPTION_FIELD_NAME_DESC"
+			rows="3"
+			cols="80"
+			class="inputbox"
+			required="true"
+			default=""
+		/>
+		<field
+			name="opt_other"
+			type="radio"
+			label="COM_MPOLL_OPTION_FIELD_OTHER_LABEL"
+			description="COM_MPOLL_OPTION_FIELD_OTHER_DESC"
+			size="1"
+			class="inputbox"
+			required="true"
+			default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
+			name="opt_correct"
+			type="radio"
+			label="COM_MPOLL_OPTION_FIELD_CORRECT_LABEL"
+			description="COM_MPOLL_OPTION_FIELD_CORRECT_DESC"
+			size="1"
+			class="inputbox"
+			required="true"
+			default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+	</fieldset>
+	
+
+</form>
+

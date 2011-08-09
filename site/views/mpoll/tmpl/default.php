@@ -13,9 +13,6 @@ if ($this->showlist != 'never') {
 if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	if ($this->showlist == 'both' && ($this->listloc == 'top' || $this->listloc == 'both')) echo $jumpformt;
 	echo '<div class="componentheading">'.$this->pdata['poll_name'].'</div>';
-	$candopoll = true;
-	if ($this->guest && $this->pdata['poll_regonly']) $candopoll=false;	
-	if (!$candopoll) echo '<p align="left"><font color="#800000"><b>You must be logged in to participate</b></font></p>';
 	echo '<p>'.$this->pdata['poll_desc'].'</p>';
 	echo '<form name="evalf" method="post" action="" onSubmit="return checkRq();"><input type="hidden" name="stepnext" value="">';
 	foreach ($this->qdata as $qdata) {
@@ -113,12 +110,10 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		
 	}
 	
-	if ($candopoll) {
 	echo '<p align="center">';
 	echo '<input type="hidden" name="casting" value="true">';
 	echo '<input name="castvote" id="castvote" value="Submit"  type="image" src="components/com_mpoll/images/submit.png" >';
 	echo '</form></p>';
-	} else { echo '<p align="center"><font color="#800000">You must be logged in to participate</font></p>'; }
 	$cnt = count($req_q);
 	?>
 	<script type='text/javascript'>
