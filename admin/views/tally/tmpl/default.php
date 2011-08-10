@@ -4,7 +4,6 @@ $db =& JFactory::getDBO();
 		
 /*** DISPLAY POLL RESULTS ***/
 	echo '<div class="componentheading">'.$this->pdata['poll_name'].'</div>';
-	//echo '<p>'.$this->pdata['poll_rmsg'].'</p>';
 	foreach ($this->qdata as $qdata) {
 		switch ($qdata['q_type']) {
 		case 'multi':
@@ -33,9 +32,6 @@ $db =& JFactory::getDBO();
 				if ($cbg == "#FFFFFF") $cbg="#DDDDDD";
 				else $cbg="#FFFFFF";
 			}
-			//echo '<tr bgcolor="'.$cbg.'"><td align="right">Total:</td><td align="left"><b>';
-			//if ($numr != 0) echo $numr; else echo '0';
-			//echo '</b></td></tr>';
 			echo '</table>';
 			break;
 		}

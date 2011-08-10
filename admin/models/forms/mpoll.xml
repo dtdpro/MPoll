@@ -45,7 +45,6 @@
 			type="category"
 			extension="com_mpoll"
 			class="inputbox"
-			default=""
 			label="COM_MPOLL_MPOLL_FIELD_CATID_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_CATID_DESC"
 			required="true">

@@ -16,8 +16,8 @@ class MPollViewTally extends JView
 		$pollid = JRequest::getVar( 'poll' );
 		$qdata=$model->getQuestions($pollid);
 		$pdata=$model->getPoll($pollid); 
-		$this->assignRef('qdata',$qdata);
-		$this->assignRef('pdata',$pdata);
+		$this->qdata = $qdata;
+		$this->pdata = $pdata;
 		
 		parent::display($tpl);
 	}

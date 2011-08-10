@@ -49,7 +49,7 @@ defined('_JEXEC') or die('Restricted Access');
 		<td>
 			<?php 
 				echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=pollresults&poll='.$item->poll_id).'">By User</a>';
-				echo ' | <a href="'.JRoute::_('index.php?option=com_mpoll&view=tally&poll='.$i->poll_id).'">Tally</a>';
+				echo ' | <a href="'.JRoute::_('index.php?option=com_mpoll&view=tally&poll='.$item->poll_id).'">Tally</a>';
 			?>
 		</td>
 	</tr>

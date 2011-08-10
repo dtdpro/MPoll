@@ -42,12 +42,12 @@ class MPollModelMPoll extends JModel
 		foreach ($qdata as $ques) {
 			$otherans=$db->getEscaped(JRequest::getVar('q'.$ques['q_id'].'o'));
 			if ($ques['q_type'] != 'mcbox') {
-				$ans = $db->getEscaped(JRequest::getVar('q'.$ques['q_id']));
+				$ans = JRequest::getVar('q'.$ques['q_id']);
 				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
 				$db->setQuery( $q );
 				$db->query();
 			} else {
-				$ansarr = $db->getEscaped(JRequest::getVar('q'.$ques['q_id'])); 
+				$ansarr = JRequest::getVar('q'.$ques['q_id']); 
 				$ans = implode(' ',$ansarr);
 				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
 				$db->setQuery( $q );
