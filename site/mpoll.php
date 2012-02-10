@@ -11,7 +11,11 @@ if($controller = JRequest::getVar('controller')) {
 	require_once (JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php');
 }
 // Create the controller
-		
+
+$doc = &JFactory::getDocument();
+$doc->addStyleSheet('media/com_mpoll/mpoll.css');
+
+
 $classname	= 'MPollController'.$controller;
 $controller = new $classname( );
 		

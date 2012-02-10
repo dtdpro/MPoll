@@ -16,41 +16,41 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	echo '<p>'.$this->pdata['poll_desc'].'</p>';
 	echo '<form name="evalf" method="post" action="" onSubmit="return checkRq();"><input type="hidden" name="stepnext" value="">';
 	foreach ($this->qdata as $qdata) {
-		if ($qdata['q_req'] && $qdata['q_type'] != 'mcbox') { 
-			$req_q[] = 'q'.$qdata['q_id'];
-			$req_t[] = $qdata['q_type'];
+		if ($qdata->q_req && $qdata->q_type != 'mcbox') { 
+			$req_q[] = 'q'.$qdata->q_id;
+			$req_t[] = $qdata->q_type;
 		}
 		//Question #
 		echo '<p>';
 	
 		//Question text if not a single checkbox
-		if ($qdata['q_type'] != 'cbox') {
+		if ($qdata->q_type != 'cbox') {
 			echo '<strong>';
-			echo $qdata['q_text'];
+			echo $qdata->q_text;
 			echo '</strong>';
 		}
 		
 		//output checkbox
-		if ($qdata['q_type'] == 'cbox') { 
-			echo '<label><input type="checkbox" size="40" name="q'.$qdata['q_id'].'">'.$qdata['q_text'].'</label><br />';
+		if ($qdata->q_type == 'cbox') { 
+			echo '<label><input type="checkbox" size="40" name="q'.$qdata->q_id.'">'.$qdata->q_text.'</label><br />';
 		}
 		
 		//verification msg area
-		echo '<div id="'.'q'.$qdata['q_id'].'_msg" class="error_msg"></div>';
+		echo '<div id="'.'q'.$qdata->q_id.'_msg" class="error_msg"></div>';
 		
 		//output radio select
-		if ($qdata['q_type'] == 'multi') {
-			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata['q_id'].' ORDER BY ordering ASC';
+		if ($qdata->q_type== 'multi') {
+			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' ORDER BY ordering ASC';
 			$db->setQuery( $query );
 			$qopts = $db->loadAssocList();
 			$numopts=0;
 			foreach ($qopts as $opts) {
-				echo '<label><input type="radio" name="q'.$qdata['q_id'].'" value="'.$opts['opt_id'].'"';
-				//if ($opts['opt_other']) echo " onfocus=\"dispOther('q".$qdata['q_id']."other".$opts['opt_id']."');\"";
+				echo '<label><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts['opt_id'].'"';
+				//if ($opts['opt_other']) echo " onfocus=\"dispOther('q".$qdata->q_id']."other".$opts['opt_id']."');\"";
 				echo '> '.$opts['opt_txt'].'</label>';
 				if ($opts['opt_other']) {
-					echo ' <div id="q'.$qdata['q_id'].'other'.$opts['opt_id'].'" style="display: inline;" >';
-					echo '<input type="text" size="30" onfocus="document.evalf.q'.$qdata['q_id'].'['.($numopts).'].checked=true;" name="q'.$qdata['q_id'].'o"></div>';
+					echo ' <div id="q'.$qdata->q_id.'other'.$opts['opt_id'].'" style="display: inline;" >';
+					echo '<input type="text" size="30" onfocus="document.evalf.q'.$qdata->q_id.'['.($numopts).'].checked=true;" name="q'.$qdata->q_id.'o"></div>';
 				}
 				echo '<br />';
 				$numopts++;
@@ -58,19 +58,19 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		} 
 	
 		//output multi checkbox
-		if ($qdata['q_type'] == 'mcbox') {
+		if ($qdata->q_type == 'mcbox') {
 			//echo '<em>(check all that apply)</em><br />';
-			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata['q_id'].' ORDER BY ordering ASC';
+			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' ORDER BY ordering ASC';
 			$db->setQuery( $query );
 			$qopts = $db->loadAssocList();
 			$numopts=0;
 			foreach ($qopts as $opts) {
-				echo '<label><input type="checkbox" name="q'.$qdata['q_id'].'[]" value="'.$opts['opt_id'].'"';
-				//if ($opts['opt_other']) echo " onchange=\"dispOther('q".$qdata['q_id']."other');\"";
+				echo '<label><input type="checkbox" name="q'.$qdata->q_id.'[]" value="'.$opts['opt_id'].'"';
+				//if ($opts['opt_other']) echo " onchange=\"dispOther('q".$qdata->q_id']."other');\"";
 				echo '> '.$opts['opt_txt'].'</label>';
 				if ($opts['opt_other']) {
-					echo ' <div id="q'.$qdata['q_id'].'other" style="display: inline;">';
-					echo '<input type="text" size="30" name="q'.$qdata['q_id'].'o"></div>';
+					echo ' <div id="q'.$qdata->q_id.'other" style="display: inline;">';
+					echo '<input type="text" size="30" name="q'.$qdata->q_id.'o"></div>';
 				}
 				echo '<br />';
 				$numopts++;
@@ -78,9 +78,9 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		} 
 		
 		//output dropdown
-		if ($qdata['q_type'] == 'dropdown') {
+		if ($qdata->q_type == 'dropdown') {
 			//echo '<em>(check all that apply)</em><br />';
-			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata['q_id'].' ORDER BY ordering ASC';
+			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' ORDER BY ordering ASC';
 			$db->setQuery( $query );
 			$qopts = $db->loadAssocList();
 			$options = '';
@@ -90,22 +90,22 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				$options .= '>'.$opts['opt_txt'].'</option>';
 				if ($opts['opt_other']) $hasother=true;
 			}
-			echo '<select name="q'.$qdata['q_id'].'">';
+			echo '<select name="q'.$qdata->q_id.'">';
 			echo $options;
 			echo '</select>';
-			//if ($hasother) echo ' <div id="q'.$qdata['q_id'].'other" style="display: none;"><input type="text" size="30" name="q'.$qdata['q_id'].'o"></div>';
+			//if ($hasother) echo ' <div id="q'.$qdata->q_id.'other" style="display: none;"><input type="text" size="30" name="q'.$qdata->q_id.'o"></div>';
 			echo '<br />';
 		} 
 		
 		
 		//output text field
-		if ($qdata['q_type'] == 'textbox') { echo '<input type="text" size="40" name="q'.$qdata['q_id'].'"><br>'; }
+		if ($qdata->q_type == 'textbox') { echo '<input type="text" size="40" name="q'.$qdata->q_id.'"><br>'; }
 		
 		//output text box
-		if ($qdata['q_type'] == 'textar') { echo '<textarea cols="60" rows="3" name="q'.$qdata['q_id'].'"></textarea><br>'; }
+		if ($qdata->q_type == 'textar') { echo '<textarea cols="60" rows="3" name="q'.$qdata->q_id.'"></textarea><br>'; }
 
 		//add in verification if nedded
-		if ($qdata['q_req'] && $qdata['q_type'] != 'mcbox') { $req_o[] = $numopts;}
+		if ($qdata->q_req && $qdata->q_type != 'mcbox') { $req_o[] = $numopts;}
 		echo '</p>';
 		
 	}
@@ -181,40 +181,57 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	echo '<div class="componentheading">'.$this->pdata['poll_name'].'</div>';
 	echo '<p>'.$this->pdata['poll_rmsg'].'</p>';
 	if ($this->pdata['poll_showresults']) {
-	foreach ($this->qdata as $qdata) {
-		switch ($qdata['q_type']) {
-		case 'multi':
-		case 'mcbox':
-		case 'dropdown':
-			echo '<p>';
-			echo '<strong>';
-			echo $qdata['q_text'];
-			echo '</strong></p>';
-			echo '<table width="100%" border="0">'; 
-			$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$qdata['q_id'].' GROUP BY res_qid';
-			$db->setQuery( $qnum );
-			$qnums = $db->loadAssocList();
-			$numr=$qnums[0]['count(res_qid)'];
-			$query  = 'SELECT *,COUNT(r.res_ans) FROM #__mpoll_questions_opts as o ';
-			$query .= 'LEFT JOIN #__mpoll_results as r ON o.opt_id = r.res_ans ';
-			$query .= 'WHERE opt_qid = '.$qdata['q_id'].' GROUP BY o.opt_id ORDER BY o.ordering ASC';
-			$db->setQuery( $query );
-			$qopts = $db->loadAssocList();
-			$barc=1;
-			$cbg = "#FFFFFF";
-			
-			foreach ($qopts as $opts) {
-				if ($numr != 0) $per = $opts['COUNT(r.res_ans)']/$numr; else $per=1;
-				echo '<tr bgcolor="'.$cbg.'"><td valign="center" align="left" width="200">'.$opts['opt_txt'].'</td><td valign="center" wdith="350"><img src="components/com_mpoll/images/bar_'.$barc.'.jpg" height="15" width="'.($per*300).'" align="absmiddle"> <b>'.$opts['COUNT(r.res_ans)'].'</b></td></tr>';
-				$barc = $barc + 1;
-				if ($barc==5) $barc=1;
-				if ($cbg == "#FFFFFF") $cbg="#DDDDDD";
-				else $cbg="#FFFFFF";
+	foreach ($this->qdata as $q) {
+		echo '<div class="mpollcom-question">';
+		$anscor=false;
+		echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
+		switch ($q->q_type) {
+			case 'multi':
+				$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
+				$db->setQuery( $qnum );
+				$qnums = $db->loadAssoc();
+				$numr=$qnums['count(res_qid)'];
+				$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
+				$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
+				$db->setQuery( $query );
+				$qopts = $db->loadObjectList();
+				$tph=0;
+				foreach ($qopts as &$o) {
+					$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->opt_id.' GROUP BY res_ans';
+					$db->setQuery($qa);
+					$o->anscount = $db->loadResult();
+					if ($o->anscount == "") $o->anscount = 0;
+				}
+				$barc=1; $gper=0; $ansper=0; $gperid = 0;
+				foreach ($qopts as $opts) {
+					if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
+					if ($qans == $opts->id && $opts->correct) {
+						$anscor=true;
+					}
+					echo '<div class="mpollcom-opt">';
+					
+					echo '<div class="mpollcom-opt-text">';
+					if ($opts->opt_correct) echo '<span class="mpollcom-opt-correct"><b>'.$opts->opt_txt.'</b></span>';
+					else echo $opts->opt_txt;
+					echo '</div>';
+					echo '<div class="mpollcom-opt-count">';
+					echo ($opts->anscount);
+					echo '</div>';
+					echo '<div class="mpollcom-opt-bar-box-'.$barc.'"><div class="mpollcom-opt-bar-bar-'.$barc.'" style="width:'.($per*100).'%"></div></div>';
+					//echo '<img src="media/com_mpoll/images/bar_'.$barc.'.jpg" height="15" width="'.($per*600).'" align="absmiddle" style="padding-bottom:8px;"> ';
+					echo '</div>';
+					$barc = $barc + 1;
+					if ($barc==5) $barc=1;
+					if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
+					if ($qans==$opts->opt_id) {
+						if ($qdata->q_expl) $expl=$qdata->q_expl;
+						else $expl=$opts->opt_expl;
+					}
+				}
+				break;
+				
 			}
-
-			echo '</table>';
-			break;
-		}
+		echo '</div>';
 	}}
 	if ($this->showstats) {
 		echo '<p>';

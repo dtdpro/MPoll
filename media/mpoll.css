@@ -1,7 +1,7 @@
 @CHARSET "UTF-8";
 
 .mpollmod-res-msg { width:100%;padding-bottom:20px;}
-.mpollmod-question {width:100%;padding-bottom:20px;}
+.mpollmod-question {width:100%;padding-bottom:20px; clear:both;}
 .mpollmod-question-text { width:100%;font-weight:bold;padding-bottom:12px;}
 .mpollmod-opt { float:left; clear: both;width:100%; padding-bottom:12px;}
 .mpollmod-opt-text { float:left; width:80%; }
@@ -29,3 +29,35 @@
 .mpollmod-opt-bar-bar-7 { height: 10px; background-color: #440000; }
 .mpollmod-opt-bar-bar-8 { height: 10px; background-color: #004400; }
 .mpollmod-opt-bar-bar-9 { height: 10px; background-color: #000044; }
+
+
+
+.mpollcom-res-msg { width:100%;padding-bottom:20px;}
+.mpollcom-question {width:100%;padding-bottom:20px; clear:both;}
+.mpollcom-question-text { width:100%;font-weight:bold;padding-bottom:12px;}
+.mpollcom-opt { float:left; clear: both;width:100%; padding-bottom:12px;}
+.mpollcom-opt-text { float:left; width:80%; }
+.mpollcom-opt-count { float:right; width: 18%; text-align:right;  }
+.mpollcom-answer { width:90%; margin:0 auto;}
+.mpollcom-error_msg { font-size: 10px; display: none;}
+
+.mpollcom-opt-bar-box-1 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-2 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-3 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-4 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-5 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-6 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-7 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-8 { background-color: #777777; width: 99%; height: 20px; float:left;}
+.mpollcom-opt-bar-box-9 { background-color: #777777; width: 99%; height: 20px; float:left;}
+
+	
+.mpollcom-opt-bar-bar-1 { height: 20px; background-color: #440000; }
+.mpollcom-opt-bar-bar-2 { height: 20px; background-color: #004400; }
+.mpollcom-opt-bar-bar-3 { height: 20px; background-color: #000044; }
+.mpollcom-opt-bar-bar-4 { height: 20px; background-color: #440000; }
+.mpollcom-opt-bar-bar-5 { height: 20px; background-color: #004400; }
+.mpollcom-opt-bar-bar-6 { height: 20px; background-color: #000044; }
+.mpollcom-opt-bar-bar-7 { height: 20px; background-color: #440000; }
+.mpollcom-opt-bar-bar-8 { height: 20px; background-color: #004400; }
+.mpollcom-opt-bar-bar-9 { height: 20px; background-color: #000044; }

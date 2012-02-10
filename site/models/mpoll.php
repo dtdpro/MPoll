@@ -21,9 +21,9 @@ class MPollModelMPoll extends JModel
 	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_questions ';
-		$query .= 'WHERE q_poll = '.$courseid.' ORDER BY ordering ASC';
+		$query .= 'WHERE published = 1 && q_poll = '.$courseid.' ORDER BY ordering ASC';
 		$db->setQuery( $query );
-		$qdata = $db->loadAssocList();
+		$qdata = $db->loadObjectList();
 		return $qdata;
 	}
 	function saveBallot($pollid) {
