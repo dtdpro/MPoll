@@ -174,14 +174,14 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	</script>
 	<?php 
 	if ($this->showlist == 'both' && ($this->listloc == 'bottom' || $this->listloc == 'both')) echo $jumpformb;
+
+
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
-	echo '<script type="text/javascript" src="http://www.google.com/jsapi"></script>';
 	if (($this->showlist == 'both' || $this->showlist == 'after') && ($this->listloc == 'top' || $this->listloc == 'both')) echo $jumpformt;
 	echo '<div class="componentheading">'.$this->pdata['poll_name'].'</div>';
 	echo '<p>'.$this->pdata['poll_rmsg'].'</p>';
 	if ($this->pdata['poll_showresults']) {
 	foreach ($this->qdata as $qdata) {
-		?> <style> .chartheader {display: none} .chartcell {width: 50%;border-bottom:dotted 1px #CCCCCC;} </style> <?php
 		switch ($qdata['q_type']) {
 		case 'multi':
 		case 'mcbox':
@@ -202,77 +202,16 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			$qopts = $db->loadAssocList();
 			$barc=1;
 			$cbg = "#FFFFFF";
-			if ($qdata['q_charttype'] == 'bar') {
-				foreach ($qopts as $opts) {
-					if ($numr != 0) $per = $opts['COUNT(r.res_ans)']/$numr; else $per=1;
-					echo '<tr bgcolor="'.$cbg.'"><td valign="center" align="left" width="200">'.$opts['opt_txt'].'</td><td valign="center" wdith="350"><img src="components/com_mpoll/images/bar_'.$barc.'.jpg" height="15" width="'.($per*300).'" align="absmiddle"> <b>'.$opts['COUNT(r.res_ans)'].'</b></td></tr>';
-					$barc = $barc + 1;
-					if ($barc==5) $barc=1;
-					if ($cbg == "#FFFFFF") $cbg="#DDDDDD";
-					else $cbg="#FFFFFF";
-				}
-			} else if ($qdata['q_charttype'] == 'pieg') {
-				?>
-				<script type="text/javascript">
-				
-				  google.load('visualization', '1', {'packages':['piechart']});
-				  
-				  google.setOnLoadCallback(drawChart<?php echo $qdata['q_id']; ?>);
-				  
-				  function drawChart<?php echo $qdata['q_id']; ?>() {
 			
-					var data = new google.visualization.DataTable();
-					data.addColumn('string', 'Answer');
-					data.addColumn('number', 'Count');
-					data.addRows([
-					  <?php 
-					  $first=true;
-					  foreach ($qopts as $opts) {
-						  if (!$first) echo ",";
-						  else $first = false;
-						  echo "['".$opts['opt_txt']."', ".$opts['COUNT(r.res_ans)']."]";
-					  }
-					  ?>
-					]);
-			
-					var chart<?php echo $qdata['q_id']; ?> = new google.visualization.PieChart(document.getElementById('chart_div<?php echo $qdata['q_id']; ?>'));
-					chart<?php echo $qdata['q_id']; ?>.draw(data, {height: 250, is3D: true, legend: 'label',legendFontSize: 11});
-				  }
-				</script>
-				<div id="chart_div<?php echo $qdata['q_id']; ?>"></div>
-				 <?php
-			} else if ($qdata['q_charttype'] == 'barg') {
-				?>
-				<script type="text/javascript">
-    				google.load('visualization', '1', {packages: ['table']});
-    				google.setOnLoadCallback(drawVisualization<?php echo $qdata['q_id']; ?>);
-      				function drawVisualization<?php echo $qdata['q_id']; ?>() {
-						var data = new google.visualization.DataTable();
-  						data.addColumn('string', '');
-  						data.addColumn('number', '');
-  						data.addRows(<?php echo count($qopts); ?>);
-  						<?php
-						$count = 0;
-						foreach ($qopts as $opts) {
-								  echo 'data.setCell('.$count.',0,"'.$opts['opt_txt'].'");'."\n";
-								  echo 'data.setCell('.$count.',1,'.$opts['COUNT(r.res_ans)'].');'."\n";
-								  $count++;
-					
-						}
-						?>
-						var cssClassNames<?php echo $qdata['q_id']; ?> = {headerRow: 'chartheader', tableCell: 'chartcell'};
-						var table<?php echo $qdata['q_id']; ?> = new google.visualization.Table(document.getElementById('chart_div<?php echo $qdata['q_id']; ?>'));
-						var formatter<?php echo $qdata['q_id']; ?> = new google.visualization.TableBarFormat({width: 200, max: <?php echo $numr; ?>});
-						formatter<?php echo $qdata['q_id']; ?>.format(data, 1); // Apply formatter to second column
-						table<?php echo $qdata['q_id']; ?>.draw(data, {allowHtml: true, showRowNumber: false, cssClassNames: cssClassNames<?php echo $qdata['q_id']; ?>});
-					}
-				</script>
-				<div id="chart_div<?php echo $qdata['q_id']; ?>"  ></div>
-	 			<?php
+			foreach ($qopts as $opts) {
+				if ($numr != 0) $per = $opts['COUNT(r.res_ans)']/$numr; else $per=1;
+				echo '<tr bgcolor="'.$cbg.'"><td valign="center" align="left" width="200">'.$opts['opt_txt'].'</td><td valign="center" wdith="350"><img src="components/com_mpoll/images/bar_'.$barc.'.jpg" height="15" width="'.($per*300).'" align="absmiddle"> <b>'.$opts['COUNT(r.res_ans)'].'</b></td></tr>';
+				$barc = $barc + 1;
+				if ($barc==5) $barc=1;
+				if ($cbg == "#FFFFFF") $cbg="#DDDDDD";
+				else $cbg="#FFFFFF";
 			}
-			//echo '<tr bgcolor="'.$cbg.'"><td align="right">Total:</td><td align="left"><b>';
-			//if ($numr != 0) echo $numr; else echo '0';
-			//echo '</b></td></tr>';
+
 			echo '</table>';
 			break;
 		}

@@ -36,7 +36,7 @@ class MPollModelMPoll extends JModel
 		$db->query();
 		$lastid = $db->insertid();
 		//saev answers
-		$query = 'SELECT * FROM #__mpoll_questions WHERE q_poll = '.$pollid;
+		$query = 'SELECT * FROM #__mpoll_questions WHERE published =1 && q_poll = '.$pollid;
 		$db->setQuery( $query );
 		$qdata = $db->loadAssocList(); 
 		foreach ($qdata as $ques) {

@@ -17,7 +17,7 @@ defined('_JEXEC') or die('Restricted Access');
 			<?php echo JHtml::_('grid.id', $i, $item->opt_id); ?>
 		</td>
 		<td>
-				<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=option.edit&q_id='.(int) $item->opt_id); ?>">
+				<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=option.edit&opt_id='.(int) $item->opt_id); ?>">
 				<?php echo $this->escape($item->opt_txt); ?></a>
 		</td>
 		<td class="center">

@@ -23,7 +23,7 @@ class MPollTableMPoll extends JTable
 	{
 		$date	= JFactory::getDate();
 		$user	= JFactory::getUser();
-		if ($this->id) {
+		if ($this->poll_id) {
 			// Existing item
 			$this->poll_modified		= $date->toMySQL();
 			$this->poll_modified_by	= $user->get('id');
@@ -33,7 +33,7 @@ class MPollTableMPoll extends JTable
 			if (!intval($this->poll_created)) {
 				$this->poll_created = $date->toMySQL();
 			}
-			if (empty($this->created_by)) {
+			if (empty($this->poll_created_by)) {
 				$this->poll_created_by = $user->get('id');
 			}
 		}

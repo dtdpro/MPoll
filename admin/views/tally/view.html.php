@@ -9,7 +9,7 @@ class MPollViewTally extends JView
 {
 	function display($tpl = null)
 	{
-		JToolBarHelper::title(   JText::_( 'MPoll Polls Manager' ), 'generic.png' );
+		JToolBarHelper::title(   JText::_( 'MPoll Polls Manager' ), 'continued' );
 		JToolBarHelper::back('Polls','index.php?option=com_mpoll');
 		$model = $this->getModel('tally');
 		// Get data from the model

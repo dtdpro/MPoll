@@ -10,7 +10,7 @@ class MPollViewPollResults extends JView
 	function display($tpl = null)
 	{
 		$pid = JRequest::getVar('poll');
-		JToolBarHelper::title(   JText::_( 'By User Poll Results' ), 'generic.png' );
+		JToolBarHelper::title(   JText::_( 'By User Poll Results' ), 'continued' );
 		$tbar =& JToolBar::getInstance('toolbar');
 		$tbar->appendButton('Link','archive','Export CSV','index.php?option=com_mpoll&controller=pollresults&task=csvme&poll='.$pid.'&format=raw');
 		JToolBarHelper::back('Polls','index.php?option=com_mpoll');

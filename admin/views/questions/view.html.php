@@ -61,11 +61,9 @@ class MPollViewQuestions extends JView
 		} else if ($canDo->get('core.edit.state')) {
 			JToolBarHelper::trash('questions.trash');
 		}
-		if ($canDo->get('core.admin')) 
-		{
-			JToolBarHelper::divider();
-			JToolBarHelper::back('COM_MPOLL_TOOLBAR_POLLS','index.php?option=com_mpoll&view=mpolls');
-		}
+		JToolBarHelper::divider();
+		JToolBarHelper::back('COM_MPOLL_TOOLBAR_POLLS','index.php?option=com_mpoll&view=mpolls');
+		
 	}
 	/**
 	 * Method to set up the document properties

@@ -11,7 +11,7 @@ class MPollViewAnsQuest extends JView
 	{
 		$qid = JRequest::getVar('opt_qid');
 		$cid = JRequest::getVar('q_poll');
-		JToolBarHelper::title(   JText::_( 'MPoll Poll Question Results by Question' ), 'generic.png' );
+		JToolBarHelper::title(   JText::_( 'MPoll Poll Question Results by Question' ), 'continued' );
 		$tbar =& JToolBar::getInstance('toolbar');
 		$tbar->appendButton('Link','archive','Export CSV','index.php?option=com_movte&controller=ansquest&task=csvme&opt_qid='.$qid.'&format=raw');
 		JToolBarHelper::back('Questions','index.php?option=com_mpoll&view=question&q_poll='.$cid);

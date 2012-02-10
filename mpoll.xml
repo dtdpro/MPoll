@@ -27,6 +27,7 @@
 	</install>	
 	<media destination="com_mpoll" folder="media">
 		<filename>index.html</filename>
+		<filename>mpoll.css</filename>
 		<folder>images</folder>
 	</media>	
 	<administration>
