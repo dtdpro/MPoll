@@ -81,6 +81,9 @@ class MPollModelOption extends JModelAdmin
 			}
 		}
 		return $data;
+		
+		
+		
 	}
 	
 	/**

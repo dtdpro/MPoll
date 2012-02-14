@@ -65,6 +65,14 @@
 			<option	value="1">Yes</option>
 			<option	value="0">No</option>
 		</field>
+		<field
+			name="opt_color"
+			type="color"
+			label="COM_MPOLL_OPTION_FIELD_COLOR_LABEL"
+			description="COM_MPOLL_OPTION_FIELD_COLOR_DESC"
+			class="inputbox"
+			required="true"
+		/>
 	</fieldset>
 	
 

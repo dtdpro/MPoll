@@ -22,7 +22,7 @@ class MPollModelQuestions extends JModelList
 		$app = JFactory::getApplication('administrator');
 
 		// Load the filter state.
-		$pollId = $this->getUserStateFromRequest($this->context.'.filter.poll', 'filter_poll', JRequest::getInt('q_poll',0));
+		$pollId = $this->getUserStateFromRequest($this->context.'.filter.poll', 'filter_poll','');
 		$this->setState('filter.poll', $pollId);
 
 		// Load the parameters.

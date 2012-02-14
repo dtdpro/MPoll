@@ -30,7 +30,7 @@ defined('_JEXEC') or die('Restricted Access');
         <td>
 			<?php 
 			
-			echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=questions&q_poll='.$item->poll_id).'">Questions'; 
+			echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=questions&filter_poll='.$item->poll_id).'">Questions'; 
 			$db =& JFactory::getDBO();
 			$query = 'SELECT count(*) FROM #__mpoll_questions WHERE q_poll="'.$item->poll_id.'"';
 			$db->setQuery( $query );

@@ -13,7 +13,7 @@ class MPollModelTally extends JModel
 		$db =& JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.'';
 		$db->setQuery( $query ); 
-		$pdata = $db->loadAssoc();
+		$pdata = $db->loadObject();
 		return $pdata;
 	}
 	function getQuestions($pollid)
@@ -22,7 +22,7 @@ class MPollModelTally extends JModel
 		$query = 'SELECT * FROM #__mpoll_questions ';
 		$query .= 'WHERE q_poll = '.$pollid.' && published = 1 ORDER BY ordering ASC';
 		$db->setQuery( $query ); 
-		$qdata = $db->loadAssocList();
+		$qdata = $db->loadObjectList();
 		return $qdata;
 	}
 

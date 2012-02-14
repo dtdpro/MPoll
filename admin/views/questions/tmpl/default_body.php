@@ -46,7 +46,7 @@ defined('_JEXEC') or die('Restricted Access');
         <td>
 			<?php 
 			if ($item->q_type=='multi' || $item->q_type=='mcbox') {
-				echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=options&opt_question='.$item->q_id).'">Options'; 
+				echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=options&filter_question='.$item->q_id).'">Options'; 
 				$db =& JFactory::getDBO();
 				$query = 'SELECT count(*) FROM #__mpoll_questions_opts WHERE opt_qid="'.$item->q_id.'"';
 				$db->setQuery( $query );

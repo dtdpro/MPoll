@@ -202,7 +202,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 					$o->anscount = $db->loadResult();
 					if ($o->anscount == "") $o->anscount = 0;
 				}
-				$barc=1; $gper=0; $ansper=0; $gperid = 0;
+				$gper=0; $ansper=0; $gperid = 0;
 				foreach ($qopts as $opts) {
 					if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
 					if ($qans == $opts->id && $opts->correct) {
@@ -217,11 +217,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 					echo '<div class="mpollcom-opt-count">';
 					echo ($opts->anscount);
 					echo '</div>';
-					echo '<div class="mpollcom-opt-bar-box-'.$barc.'"><div class="mpollcom-opt-bar-bar-'.$barc.'" style="width:'.($per*100).'%"></div></div>';
-					//echo '<img src="media/com_mpoll/images/bar_'.$barc.'.jpg" height="15" width="'.($per*600).'" align="absmiddle" style="padding-bottom:8px;"> ';
+					echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
 					echo '</div>';
-					$barc = $barc + 1;
-					if ($barc==5) $barc=1;
 					if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
 					if ($qans==$opts->opt_id) {
 						if ($qdata->q_expl) $expl=$qdata->q_expl;
