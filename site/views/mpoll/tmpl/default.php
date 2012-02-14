@@ -179,7 +179,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
 	if (($this->showlist == 'both' || $this->showlist == 'after') && ($this->listloc == 'top' || $this->listloc == 'both')) echo $jumpformt;
 	echo '<div class="componentheading">'.$this->pdata['poll_name'].'</div>';
-	echo '<p>'.$this->pdata['poll_rmsg'].'</p>';
+	if ($this->pdata['poll_rmsg']) echo $this->pdata['poll_rmsg'];
 	if ($this->pdata['poll_showresults']) {
 	foreach ($this->qdata as $q) {
 		echo '<div class="mpollcom-question">';
