@@ -12,7 +12,7 @@ if ($this->showlist != 'never') {
 
 if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	if ($this->showlist == 'both' && ($this->listloc == 'top' || $this->listloc == 'both')) echo $jumpformt;
-	echo '<div class="componentheading">'.$this->pdata['poll_name'].'</div>';
+	echo '<h2 class="componentheading">'.$this->pdata['poll_name'].'</h2>';
 	echo '<p>'.$this->pdata['poll_desc'].'</p>';
 	echo '<form name="evalf" method="post" action="" onSubmit="return checkRq();"><input type="hidden" name="stepnext" value="">';
 	foreach ($this->qdata as $qdata) {
@@ -178,58 +178,60 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
 	if (($this->showlist == 'both' || $this->showlist == 'after') && ($this->listloc == 'top' || $this->listloc == 'both')) echo $jumpformt;
-	echo '<div class="componentheading">'.$this->pdata['poll_name'].'</div>';
-	if ($this->pdata['poll_rmsg']) echo $this->pdata['poll_rmsg'];
+	echo '<h2 class="componentheading">'.$this->pdata['poll_name'].'</h2>';
+	if ($this->pdata['poll_results_msg_before']) echo $this->pdata['poll_results_msg_before'];
 	if ($this->pdata['poll_showresults']) {
-	foreach ($this->qdata as $q) {
-		echo '<div class="mpollcom-question">';
-		$anscor=false;
-		echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
-		switch ($q->q_type) {
-			case 'multi':
-				$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
-				$db->setQuery( $qnum );
-				$qnums = $db->loadAssoc();
-				$numr=$qnums['count(res_qid)'];
-				$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
-				$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
-				$db->setQuery( $query );
-				$qopts = $db->loadObjectList();
-				$tph=0;
-				foreach ($qopts as &$o) {
-					$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->opt_id.' GROUP BY res_ans';
-					$db->setQuery($qa);
-					$o->anscount = $db->loadResult();
-					if ($o->anscount == "") $o->anscount = 0;
-				}
-				$gper=0; $ansper=0; $gperid = 0;
-				foreach ($qopts as $opts) {
-					if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-					if ($qans == $opts->id && $opts->correct) {
-						$anscor=true;
+		foreach ($this->qdata as $q) {
+			echo '<div class="mpollcom-question">';
+			$anscor=false;
+			echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
+			switch ($q->q_type) {
+				case 'multi':
+					$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
+					$db->setQuery( $qnum );
+					$qnums = $db->loadAssoc();
+					$numr=$qnums['count(res_qid)'];
+					$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
+					$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
+					$db->setQuery( $query );
+					$qopts = $db->loadObjectList();
+					$tph=0;
+					foreach ($qopts as &$o) {
+						$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->opt_id.' GROUP BY res_ans';
+						$db->setQuery($qa);
+						$o->anscount = $db->loadResult();
+						if ($o->anscount == "") $o->anscount = 0;
 					}
-					echo '<div class="mpollcom-opt">';
+					$gper=0; $ansper=0; $gperid = 0;
+					foreach ($qopts as $opts) {
+						if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
+						if ($qans == $opts->id && $opts->correct) {
+							$anscor=true;
+						}
+						echo '<div class="mpollcom-opt">';
+						
+						echo '<div class="mpollcom-opt-text">';
+						if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->opt_txt.'</div>';
+						else echo $opts->opt_txt;
+						echo '</div>';
+						echo '<div class="mpollcom-opt-count">';
+						echo ($opts->anscount);
+						echo '</div>';
+						echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
+						echo '</div>';
+						if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
+						if ($qans==$opts->opt_id) {
+							if ($qdata->q_expl) $expl=$qdata->q_expl;
+							else $expl=$opts->opt_expl;
+						}
+					}
+					break;
 					
-					echo '<div class="mpollcom-opt-text">';
-					if ($opts->opt_correct) echo '<span class="mpollcom-opt-correct"><b>'.$opts->opt_txt.'</b></span>';
-					else echo $opts->opt_txt;
-					echo '</div>';
-					echo '<div class="mpollcom-opt-count">';
-					echo ($opts->anscount);
-					echo '</div>';
-					echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
-					echo '</div>';
-					if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
-					if ($qans==$opts->opt_id) {
-						if ($qdata->q_expl) $expl=$qdata->q_expl;
-						else $expl=$opts->opt_expl;
-					}
 				}
-				break;
-				
-			}
-		echo '</div>';
-	}}
+			echo '</div>';
+		}
+	}
+	if ($this->pdata['poll_results_msg_after']) echo $this->pdata['poll_results_msg_after'];
 	if ($this->showstats) {
 		echo '<p>';
 		echo '<b>Number of Voters:</b> '.$this->ncast.'<br />';

@@ -8,6 +8,7 @@
 .mpollmod-opt-count { float:right; width: 18%; text-align:right;  }
 .mpollmod-answer { width:90%; margin:0 auto;}
 .mpollmod-error_msg { font-size: 10px; display: none;}
+.mpollmod-opt-correct { font-weight: bold; }
 
 .mpollmod-opt-bar-box { background-color: #777777; width: 100%; height: 10px; float:left;}
 
@@ -24,6 +25,7 @@
 .mpollcom-opt-count { float:right; width: 18%; text-align:right;  }
 .mpollcom-answer { width:90%; margin:0 auto;}
 .mpollcom-error_msg { font-size: 10px; display: none;}
+.mpollcom-opt-correct { font-weight: bold; }
 
 .mpollcom-opt-bar-box { background-color: #777777; width: 100%; height: 20px; float:left;}
 

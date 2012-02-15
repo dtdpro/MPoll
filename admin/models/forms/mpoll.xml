@@ -63,10 +63,30 @@
 			hide="readmore,pagebreak,article"
 		/>
 		<field
-			name="poll_rmsg"
+			name="poll_results_msg_before"
 			type="editor"
-			label="COM_MPOLL_MPOLL_FIELD_RMSG_LABEL"
-			description="COM_MPOLL_MPOLL_FIELD_RMSG_DESC"
+			label="COM_MPOLL_MPOLL_FIELD_RMSGB_LABEL"
+			description="COM_MPOLL_MPOLL_FIELDB_RMSG_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak,article"
+		/>
+		<field
+			name="poll_results_msg_after"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_RMSGA_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_RMSGA_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak,article"
+		/>
+		<field
+			name="poll_results_msg_mod"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_RMSGM_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_RMSGM_DESC"
 			class="inputbox"
 			filter="safehtml"
 			buttons="true"
