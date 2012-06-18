@@ -112,7 +112,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	
 	echo '<p align="center">';
 	echo '<input type="hidden" name="casting" value="true">';
-	echo '<input name="castvote" id="castvote" value="Submit"  type="image" src="components/com_mpoll/images/submit.png" >';
+	echo '<input name="castvote" id="castvote" value="Submit"  type="submit" class="button">';
 	echo '</form></p>';
 	$cnt = count($req_q);
 	?>
