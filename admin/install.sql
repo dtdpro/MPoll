@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `jos_mpoll_completed` (
+CREATE TABLE IF NOT EXISTS `#__mpoll_completed` (
   `cm_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `cm_user` int(11) NOT NULL,
   `cm_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `jos_mpoll_completed` (
   PRIMARY KEY (`cm_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `jos_mpoll_polls` (
+CREATE TABLE IF NOT EXISTS `#__mpoll_polls` (
   `poll_id` int(11) NOT NULL AUTO_INCREMENT,
   `poll_name` varchar(255) NOT NULL,
   `poll_alias` varchar(255) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `jos_mpoll_polls` (
   PRIMARY KEY (`poll_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `jos_mpoll_questions` (
+CREATE TABLE IF NOT EXISTS `#__mpoll_questions` (
   `q_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `q_poll` int(11) NOT NULL,
   `ordering` smallint(6) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `jos_mpoll_questions` (
   PRIMARY KEY (`q_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `jos_mpoll_questions_opts` (
+CREATE TABLE IF NOT EXISTS `#__mpoll_questions_opts` (
   `opt_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `opt_qid` bigint(20) NOT NULL,
   `opt_txt` varchar(255) NOT NULL,
@@ -50,4 +50,16 @@ CREATE TABLE IF NOT EXISTS `jos_mpoll_questions_opts` (
   `opt_color` varchar(10) NOT NULL,
   `published` tinyint(4) NOT NULL,
   PRIMARY KEY (`opt_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `#__mpoll_results` (
+  `res_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `res_user` int(11) NOT NULL,
+  `res_poll` int(11) NOT NULL,
+  `res_qid` bigint(20) NOT NULL,
+  `res_ans` text NOT NULL,
+  `res_cm` int(11) NOT NULL,
+  `res_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `res_ans_other` text NOT NULL,
+  PRIMARY KEY (`res_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

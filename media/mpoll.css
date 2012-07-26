@@ -6,7 +6,7 @@
 .mpollmod-opt { float:left; clear: both;width:100%; padding-bottom:12px;}
 .mpollmod-opt-text { float:left; width:80%; }
 .mpollmod-opt-count { float:right; width: 18%; text-align:right;  }
-.mpollmod-answer { width:90%; margin:0 auto;}
+.mpollmod-answer { margin:0 auto;}
 .mpollmod-error_msg { font-size: 10px; display: none;}
 .mpollmod-opt-correct { font-weight: bold; }
 

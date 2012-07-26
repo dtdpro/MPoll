@@ -13,7 +13,6 @@
 		<filename module="mod_mpoll">mod_mpoll.php</filename>
 		<filename module="mod_mpoll">mod_mpoll_ajax.php</filename>
 		<folder>tmpl</folder>
-		<folder>images</folder>
 		<filename>helper.php</filename>
 		<filename>index.html</filename>
 	</files>
