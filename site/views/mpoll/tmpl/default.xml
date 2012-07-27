@@ -10,6 +10,10 @@
 				<option value="ballot">Ballot</option>
 				<option value="results">Results</option>
 			</field>
+		</fieldset>
+	</fields>
+	<fields name="params">
+		<fieldset name="basic">
 			<field name="showlist" type="radio" default="after" label="Poll List" description="Show a drop down list of published polls and allow navigation to.">
 				<option value="both">Results and Poll</option>
 				<option value="after">Results Only</option>

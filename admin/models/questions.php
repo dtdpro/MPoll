@@ -24,7 +24,11 @@ class MPollModelQuestions extends JModelList
 		// Load the filter state.
 		$pollId = $this->getUserStateFromRequest($this->context.'.filter.poll', 'filter_poll','');
 		$this->setState('filter.poll', $pollId);
-
+		
+		$published = $this->getUserStateFromRequest($this->context.'.filter.published', 'filter_published', '', 'string');
+		$this->setState('filter.published', $published);
+		
+		
 		// Load the parameters.
 		$params = JComponentHelper::getParams('com_mpoll');
 		$this->setState('params', $params);
@@ -45,6 +49,14 @@ class MPollModelQuestions extends JModelList
 		// From the hello table
 		$query->from('#__mpoll_questions as q');
 		
+		// Filter by published state
+		$published = $this->getState('filter.published');
+		if (is_numeric($published)) {
+			$query->where('q.published = '.(int) $published);
+		} else if ($published === '') {
+			$query->where('(q.published IN (0, 1))');
+		}
+
 		// Filter by poll.
 		$pollId = $this->getState('filter.poll');
 		if (is_numeric($pollId)) {

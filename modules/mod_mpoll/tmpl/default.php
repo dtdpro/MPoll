@@ -4,16 +4,12 @@ $db =& JFactory::getDBO();
 ?>
 <form name="mpollf<?php echo $pdata['poll_id']; ?>">
 
-<table width="95%" border="0" cellspacing="0" cellpadding="1" align="center" class="poll<?php echo $params->get('moduleclass_sfx'); ?>">
-<thead>
-	<tr>
-		<td style="font-weight: bold;">
-			<?php if ($showtitle) echo $pdata['poll_name']; ?>
-		</td>
-	</tr>
-</thead>
-	<tr>
-		<td align="left"><div id="mpollmod<?php echo $pdata['poll_id']; ?>">
+<?php 
+if ($showtitle) {
+	echo '<div class="mpollmod-title">'.$pdata['poll_name'].'</div>';
+}
+?>
+	<div id="mpollmod<?php echo $pdata['poll_id']; ?>" class="mpollmod-pollbody">
 			<?php
 				if ($status != 'closed' && $status != 'done') {
 					foreach ($qdatap as $qdata) {
@@ -29,10 +25,10 @@ $db =& JFactory::getDBO();
 							echo '<div class="mpollmod-question-text">'.$qdata->q_text.'</div>';
 							
 						}
-						
+						echo '<div class="mpollmod-answers">';
 						//output checkbox
 						if ($qdata->q_type == 'cbox') { 
-							echo '<div class="mpollmod-answer"><label><input type="checkbox" size="40" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"> '.$qdata->q_text.'</label></div>';
+							echo '<div class="mpollmod-answer"><input type="checkbox" size="40" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"><label for="q'.$qdata->q_id.'"> '.$qdata->q_text.'</label></div>';
 						}
 						
 						//verification msg area
@@ -45,7 +41,7 @@ $db =& JFactory::getDBO();
 							$qopts = $db->loadAssocList();
 							$numopts=0;
 							foreach ($qopts as $opts) {
-								echo '<div class="mpollmod-answer"><label><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts['opt_id'].'" id="q'.$qdata->q_id.'"> '.$opts['opt_txt'].'</label></div>';
+								echo '<div class="mpollmod-answer"><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts['opt_id'].'" id="q'.$qdata->q_id.$opts['opt_id'].'"> <label for="q'.$qdata->q_id.$opts['opt_id'].'">'.$opts['opt_txt'].'</label></div>';
 								$numopts++;
 							}
 						} 
@@ -68,15 +64,19 @@ $db =& JFactory::getDBO();
 						
 						//add in verification if nedded
 						if ($qdata->q_req && $qdata->q_type != 'mcbox') { $req_o[] = $numopts;}
-						echo '</div>';
+						echo '</div></div>';
 					}
+					echo '<p align="center">';
 					if ($status == 'open') {
-						echo '<p align="center">';
 						echo '<a href="javascript:checkRq'.$pdata['poll_id'].'();" class="button">Submit</a>';
-						echo '</p>';
 					} else { 
-						echo '<p align="center">Log in to Vote</p>'; 
+						echo 'Log in to Vote'; 
 					}
+					if ($params->get( 'showresultslink', 0 )) {
+						echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']).'" class="button">Results</a>';
+					}
+					echo '</p>';
+					
 					$cnt = count($req_q);
 					?>
 					<script type='text/javascript'>
@@ -181,7 +181,8 @@ $db =& JFactory::getDBO();
 						}
 						var queryString = "?";
 						<?php
-						echo "queryString += 'poll=' + '".$pdata['poll_id']."';\n";
+						echo "queryString += 'poll=".$pdata['poll_id']."&showresults=".$params->get( 'showresults', 1 )."&showresultslink=".$params->get( 'showresultslink', 0 )."';\n";
+						if ($params->get( 'showresultslink', 0 )) echo "queryString += '&resultslink=".urlencode(JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']))."';\n";
 						foreach ($qdatap as $qdata) {
 							if ($qdata->q_type = 'multi') {
 								echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + getCheckedValue".$pdata['poll_id']."(ev.q".$qdata->q_id.");\n";
@@ -195,11 +196,12 @@ $db =& JFactory::getDBO();
 					</script><?php 
 				} else if ($status == 'done') {
 					if ($pdata['poll_results_msg_before']) echo $pdata['poll_results_msg_before'];
-					if ($pdata['poll_showresults']) {
+					if ($pdata['poll_showresults'] && $params->get( 'showresults', 1 )) {
 						foreach ($qdatap as $q) {
 							echo '<div class="mpollmod-question">';
 							$anscor=false;
 							echo '<div class="mpollmod-question-text">'.$q->q_text.'</div>';
+							echo '<div class="mpollmod-options">';
 							switch ($q->q_type) {
 								case 'multi':
 									$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
@@ -244,20 +246,21 @@ $db =& JFactory::getDBO();
 									
 							}
 							
-							echo '</div>';
+							echo '</div></div>';
 						}
 					}
 					if ($pdata['poll_results_msg_mod']) echo $pdata['poll_results_msg_mod'];
+					
+					if ($params->get( 'showresultslink', 0 )) {
+						echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']).'" class="button">Results</a></p>';
+					}
 				}
 				
 				
 				
 				?>
 				
-		</div></td>
-	</tr>
-</table>
-
+		</div>
 	
 
 </form>

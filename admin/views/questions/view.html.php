@@ -43,21 +43,14 @@ class MPollViewQuestions extends JView
 		$state	= $this->get('State');
 		$canDo = MPollHelper::getActions();
 		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_QUESTIONS'), 'MPoll');
-		if ($canDo->get('core.create')) 
-		{
-			JToolBarHelper::addNew('question.add', 'JTOOLBAR_NEW');
-		}
-		if ($canDo->get('core.edit')) 
-		{
-			JToolBarHelper::editList('question.edit', 'JTOOLBAR_EDIT');
-			JToolBarHelper::divider();
-			JToolBarHelper::custom('questions.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
-			JToolBarHelper::custom('questions.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
-			JToolBarHelper::divider();
-		}
-		if ($state->get('filter.state') == -2 && $canDo->get('core.delete')) {
+		JToolBarHelper::addNew('question.add', 'JTOOLBAR_NEW');
+		JToolBarHelper::editList('question.edit', 'JTOOLBAR_EDIT');
+		JToolBarHelper::divider();
+		JToolBarHelper::custom('questions.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
+		JToolBarHelper::custom('questions.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
+		JToolBarHelper::divider();
+		if ($state->get('filter.published') == -2) {
 			JToolBarHelper::deleteList('', 'questions.delete', 'JTOOLBAR_EMPTY_TRASH');
-			JToolBarHelper::divider();
 		} else if ($canDo->get('core.edit.state')) {
 			JToolBarHelper::trash('questions.trash');
 		}

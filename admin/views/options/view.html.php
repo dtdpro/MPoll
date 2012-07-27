@@ -43,29 +43,20 @@ class MPollViewOptions extends JView
 		$state	= $this->get('State');
 		$canDo = MPollHelper::getActions();
 		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_OPTIONS'), 'MPoll');
-		if ($canDo->get('core.create')) 
-		{
-			JToolBarHelper::addNew('option.add', 'JTOOLBAR_NEW');
-		}
-		if ($canDo->get('core.edit')) 
-		{
-			JToolBarHelper::editList('option.edit', 'JTOOLBAR_EDIT');
-			JToolBarHelper::divider();
-			JToolBarHelper::custom('options.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
-			JToolBarHelper::custom('options.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
-			JToolBarHelper::divider();
-		}
-		if ($state->get('filter.state') == -2 && $canDo->get('core.delete')) {
+		JToolBarHelper::addNew('option.add', 'JTOOLBAR_NEW');
+		JToolBarHelper::editList('option.edit', 'JTOOLBAR_EDIT');
+		JToolBarHelper::divider();
+		JToolBarHelper::custom('options.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
+		JToolBarHelper::custom('options.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
+		JToolBarHelper::divider();
+		if ($state->get('filter.published') == -2) {
 			JToolBarHelper::deleteList('', 'options.delete', 'JTOOLBAR_EMPTY_TRASH');
-			JToolBarHelper::divider();
 		} else if ($canDo->get('core.edit.state')) {
 			JToolBarHelper::trash('options.trash');
 		}
-		if ($canDo->get('core.admin')) 
-		{
-			JToolBarHelper::divider();
-			JToolBarHelper::back('COM_MPOLL_TOOLBAR_QUESTIONS','index.php?option=com_mpoll&view=questions');
-		}
+		JToolBarHelper::divider();
+		JToolBarHelper::back('COM_MPOLL_TOOLBAR_QUESTIONS','index.php?option=com_mpoll&view=questions');
+		
 	}
 	/**
 	 * Method to set up the document properties

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="1.6.0" client="site" method="upgrade">
-	<name>MPoll</name>
+<extension type="module" version="2.5.0" client="site" method="upgrade">
+	<name>mod_mpoll</name>
 	<author>DtD Productions</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 DTD Productsion</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
-	<authorEmail>info@ditzthedaisy.com</authorEmail>
-	<authorUrl>www.ditzthedaisy.com</authorUrl>
+	<authorEmail>info@dtdpro.com</authorEmail>
+	<authorUrl>www.dtdpro.com</authorUrl>
 	<version>1.6</version>
-	<description>Module for MPoll</description>
+	<description>MOD_MPOLL_DESC</description>
 	<files>
 		<filename module="mod_mpoll">mod_mpoll.php</filename>
 		<filename module="mod_mpoll">mod_mpoll_ajax.php</filename>
@@ -26,6 +26,14 @@
 				<field name="poll" type="modal_mpoll" label="Poll" description="" required="true" />
 				<field name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="" />
 				<field name="showtitle" type="radio" default="1" label="Show Poll Title" description="">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="showresults" type="radio" default="1" label="Show Poll Results" description="">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="showresultslink" type="radio" default="0" label="Show Results Button" description="">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>

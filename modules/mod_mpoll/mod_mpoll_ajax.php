@@ -22,6 +22,9 @@ $db  =& JFactory::getDBO();
 $user = &JFactory::getUser();
 
 $pollid  = JRequest::getVar('poll');
+$showresults  = JRequest::getVar('showresults');
+$showresultslink  = JRequest::getVar('showresultslink');
+$resultslink  = urldecode(JRequest::getVar('resultslink'));
 $userid = $user->id;
 
 //save completed
@@ -60,11 +63,12 @@ $query = 'SELECT * FROM #__mpoll_questions WHERE published = 1 && q_poll = '.$po
 $db->setQuery( $query );
 $qdata = $db->loadObjectList();
 
-if ($pdata['poll_showresults']) {
+if ($pdata['poll_showresults'] && $showresults) {
 	foreach ($qdata as $q) {
 		echo '<div class="mpollmod-question">';
 		$anscor=false;
 		echo '<div class="mpollmod-question-text">'.$q->q_text.'</div>';
+		echo '<div class="mpollmod-options">';
 		switch ($q->q_type) {
 			case 'multi':
 				$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
@@ -108,8 +112,10 @@ if ($pdata['poll_showresults']) {
 				break;
 				
 			}
-		echo '</div>';
+		echo '</div></div>';
 	}
 }
 if ($pdata['poll_results_msg_mod']) echo $pdata['poll_results_msg_mod'];
-
+if ($showresultslink) {
+	echo '<p align="center"><a href="'.$resultslink.'" class="button">Results</a></p>';
+}

@@ -3,9 +3,13 @@ defined('_JEXEC') or die('Restricted access');
 
 $db =& JFactory::getDBO();
 if ($this->showlist != 'never') {
-	$jumpurl = 'index.php?option=com_mpoll&task='.$this->task.'&Itemid='.JRequest::getVar( 'Itemid' ).'&poll=';
-	$jumplistt = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollT();"','poll_id','poll_name',$this->pdata['poll_id']);
-	$jumplistb = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollB();"','poll_id','poll_name',$this->pdata['poll_id']);
+	if ($this->task=='results') {
+		$jumplistt = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollT();"','poll_resultsurl','poll_name',$this->pdata['poll_id']);
+		$jumplistb = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollB();"','poll_resultsurl','poll_name',$this->pdata['poll_id']);
+	} else {
+		$jumplistt = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollT();"','poll_balloturl','poll_name',$this->pdata['poll_id']);
+		$jumplistb = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollB();"','poll_balloturl','poll_name',$this->pdata['poll_id']);
+	}
 	$jumpformt = '<form name ="chplft" action=""><p align="center">Select Poll: '.$jumplistt.'</p></form>';
 	$jumpformb = '<form name ="chplfb" action=""><p align="center">Select Poll: '.$jumplistb.'</p></form>';
 }
@@ -40,7 +44,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		
 		//output radio select
 		if ($qdata->q_type== 'multi') {
-			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' ORDER BY ordering ASC';
+			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' && published > 0 ORDER BY ordering ASC';
 			$db->setQuery( $query );
 			$qopts = $db->loadAssocList();
 			$numopts=0;
@@ -60,7 +64,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		//output multi checkbox
 		if ($qdata->q_type == 'mcbox') {
 			//echo '<em>(check all that apply)</em><br />';
-			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' ORDER BY ordering ASC';
+			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' && published > 0 ORDER BY ordering ASC';
 			$db->setQuery( $query );
 			$qopts = $db->loadAssocList();
 			$numopts=0;
@@ -80,7 +84,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		//output dropdown
 		if ($qdata->q_type == 'dropdown') {
 			//echo '<em>(check all that apply)</em><br />';
-			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' ORDER BY ordering ASC';
+			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' && published > 0 ORDER BY ordering ASC';
 			$db->setQuery( $query );
 			$qopts = $db->loadAssocList();
 			$options = '';
@@ -252,11 +256,11 @@ if ($this->showlist != 'never') {
 <script type='text/javascript'>
 function changePollT() {
 	var pollchg = 	document.chplft.chpoll.value;
-	window.location = "<?php echo $jumpurl; ?>" + pollchg;
+	window.location = pollchg;
 }
 function changePollB() {
 	var pollchg = 	document.chplfb.chpoll.value;
-	window.location = "<?php echo $jumpurl; ?>" + pollchg;
+	window.location = pollchg;
 }
 </script>
 <?php } ?>

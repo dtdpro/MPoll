@@ -21,7 +21,7 @@ class MPollModelMPoll extends JModel
 	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_questions ';
-		$query .= 'WHERE published = 1 && q_poll = '.$courseid.' ORDER BY ordering ASC';
+		$query .= 'WHERE published > 0 && q_poll = '.$courseid.' ORDER BY ordering ASC';
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
 		return $qdata;
@@ -36,7 +36,7 @@ class MPollModelMPoll extends JModel
 		$db->query();
 		$lastid = $db->insertid();
 		//saev answers
-		$query = 'SELECT * FROM #__mpoll_questions WHERE published =1 && q_poll = '.$pollid;
+		$query = 'SELECT * FROM #__mpoll_questions WHERE published > 0 && q_poll = '.$pollid;
 		$db->setQuery( $query );
 		$qdata = $db->loadAssocList(); 
 		foreach ($qdata as $ques) {
@@ -79,6 +79,10 @@ class MPollModelMPoll extends JModel
 		$db =& JFactory::getDBO();
 		$db->setQuery($query);
 		$data = $db->loadObjectList();
+		foreach ($data as &$d) {
+			$d->poll_resultsurl = JRoute::_('index.php?option=com_mpoll&task=results&poll='.$d->poll_id);
+			$d->poll_balloturl = JRoute::_('index.php?option=com_mpoll&task=ballot&poll='.$d->poll_id);
+		}
 		return $data;
 	}
 	

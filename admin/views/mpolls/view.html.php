@@ -56,7 +56,7 @@ class MPollViewMPolls extends JView
 			JToolBarHelper::divider();
 			JToolBarHelper::archiveList('mpolls.archive');
 		}
-		if ($state->get('filter.state') == -2 && $canDo->get('core.delete')) {
+		if ($state->get('filter.published') == -2 && $canDo->get('core.delete')) {
 			JToolBarHelper::deleteList('', 'mpolls.delete', 'JTOOLBAR_EMPTY_TRASH');
 			JToolBarHelper::divider();
 		} else if ($canDo->get('core.edit.state')) {
