@@ -3,19 +3,18 @@ defined('_JEXEC') or die('Restricted access');
 
 $db =& JFactory::getDBO();
 if ($this->showlist != 'never') {
-	if ($this->task=='results') {
-		$jumplistt = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollT();"','poll_resultsurl','poll_name',$this->pdata['poll_id']);
-		$jumplistb = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollB();"','poll_resultsurl','poll_name',$this->pdata['poll_id']);
-	} else {
-		$jumplistt = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollT();"','poll_balloturl','poll_name',$this->pdata['poll_id']);
-		$jumplistb = JHTML::_('select.genericlist',$this->polllist,'chpoll','onchange="changePollB();"','poll_balloturl','poll_name',$this->pdata['poll_id']);
-	}
-	$jumpformt = '<form name ="chplft" action=""><p align="center">Select Poll: '.$jumplistt.'</p></form>';
-	$jumpformb = '<form name ="chplfb" action=""><p align="center">Select Poll: '.$jumplistb.'</p></form>';
+	$jumplist  = '<form name="jumppoll" action="" method="post">';
+	$jumplist .= '<p align="center">Select Poll: ';
+	$jumplist .= JHTML::_('select.genericlist',$this->polllist,'poll','onchange="changePoll();"','poll_id','poll_name',$this->pdata['poll_id']);
+	$jumplist .= '<input type="hidden" name="jumptask" value="'.$this->task.'">';
+	$jumplist .= '<input type="hidden" name="option" value="com_mpoll">';
+	$jumplist .= '<input type="hidden" name="task" value="gotopoll">';
+	$jumplist .= '</p>';
+	$jumplist .= '</form>';
 }
 
 if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
-	if ($this->showlist == 'both' && ($this->listloc == 'top' || $this->listloc == 'both')) echo $jumpformt;
+	if ($this->showlist == 'both') echo $jumplist;
 	echo '<h2 class="componentheading">'.$this->pdata['poll_name'].'</h2>';
 	echo '<p>'.$this->pdata['poll_desc'].'</p>';
 	echo '<form name="evalf" method="post" action="" onSubmit="return checkRq();"><input type="hidden" name="stepnext" value="">';
@@ -177,11 +176,10 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	
 	</script>
 	<?php 
-	if ($this->showlist == 'both' && ($this->listloc == 'bottom' || $this->listloc == 'both')) echo $jumpformb;
 
 
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
-	if (($this->showlist == 'both' || $this->showlist == 'after') && ($this->listloc == 'top' || $this->listloc == 'both')) echo $jumpformt;
+	if (($this->showlist == 'both' || $this->showlist == 'after')) echo $jumplist;
 	echo '<h2 class="componentheading">'.$this->pdata['poll_name'].'</h2>';
 	if ($this->pdata['poll_results_msg_before']) echo $this->pdata['poll_results_msg_before'];
 	if ($this->pdata['poll_showresults']) {
@@ -191,6 +189,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
 			switch ($q->q_type) {
 				case 'multi':
+				case 'mcbox':
 					$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
 					$db->setQuery( $qnum );
 					$qnums = $db->loadAssoc();
@@ -201,7 +200,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 					$qopts = $db->loadObjectList();
 					$tph=0;
 					foreach ($qopts as &$o) {
-						$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->opt_id.' GROUP BY res_ans';
+						$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans LIKE "%'.$o->opt_id.'%" GROUP BY res_qid';
 						$db->setQuery($qa);
 						$o->anscount = $db->loadResult();
 						if ($o->anscount == "") $o->anscount = 0;
@@ -254,13 +253,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 if ($this->showlist != 'never') {
 ?>
 <script type='text/javascript'>
-function changePollT() {
-	var pollchg = 	document.chplft.chpoll.value;
-	window.location = pollchg;
-}
-function changePollB() {
-	var pollchg = 	document.chplfb.chpoll.value;
-	window.location = pollchg;
+function changePoll() {
+	document.jumppoll.submit();
 }
 </script>
 <?php } ?>

@@ -19,11 +19,6 @@
 				<option value="after">Results Only</option>
 				<option value="never">Do Not Display</option>
 			</field>
-			<field name="listloc" type="radio" default="top" label="Poll List Loaction" description="Locxation of poll list">
-				<option value="both">Top and Bottom</option>
-				<option value="top">Top</option>
-				<option value="bottom">Bottom</option>
-			</field>
 			<field name="showstats" type="radio" default="1" label="Show Results Stats" description="# Voters, First and last vote time">
 				<option value="1">Yes</option>
 				<option value="0">No</option>

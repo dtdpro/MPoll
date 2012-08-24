@@ -79,10 +79,6 @@ class MPollModelMPoll extends JModel
 		$db =& JFactory::getDBO();
 		$db->setQuery($query);
 		$data = $db->loadObjectList();
-		foreach ($data as &$d) {
-			$d->poll_resultsurl = JRoute::_('index.php?option=com_mpoll&task=results&poll='.$d->poll_id);
-			$d->poll_balloturl = JRoute::_('index.php?option=com_mpoll&task=ballot&poll='.$d->poll_id);
-		}
 		return $data;
 	}
 	

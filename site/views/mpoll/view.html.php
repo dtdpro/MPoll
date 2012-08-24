@@ -12,10 +12,15 @@ class MPollViewMPoll extends JView
 		$model =& $this->getModel();
 		$pollid = JRequest::getVar( 'poll' );
 		$task = JRequest::getVar('task');
+		$jumptask = JRequest::getVar('jumptask');
+		
+		if ($task == "gotopoll") {
+			$mainframe->redirect(JRoute::_("index.php?option=com_mpoll&task=".$jumptask."&poll=".$pollid,false));
+		}
+		
 		if (empty($pollid)) $pollid = $params->get('poll');
 		if (empty($task))$task=$params->get('task');
 		$showlist = $params->get('showlist');
-		$listloc = $params->get('listloc');
 		$showstats = $params->get('showstats');
 		$rtmpl = $params->get('rtmpl');
 		$itemid = JRequest::getVar( 'Itemid' );
@@ -52,9 +57,9 @@ class MPollViewMPoll extends JView
 		} else if ($casting && $task=='ballot' && !$casted) {
 			//save vote results
 			$se=$model->saveBallot($pollid);
-			$url = 'index.php?option=com_mpoll&task=results&Itemid='.JRequest::getVar( 'Itemid' ).'&poll='.$pollid;
+			$url = 'index.php?option=com_mpoll&task=results&poll='.$pollid;
 			if ($rtmpl) $url .= '&tmpl='.$rtmpl;
-			$mainframe->redirect($url);
+			$mainframe->redirect(JRoute::_($url,false));
 		} else if (($casted && $task=='ballot') || $task=='results') { 
 			$task='results';
 			$fcast = $model->getFirstCast($pollid);
