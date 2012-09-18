@@ -22,6 +22,7 @@ class MPollViewMPoll extends JView
 		if (empty($task))$task=$params->get('task');
 		$showlist = $params->get('showlist');
 		$showstats = $params->get('showstats');
+		$resultsas = $params->get('resultsas');
 		$rtmpl = $params->get('rtmpl');
 		$itemid = JRequest::getVar( 'Itemid' );
 		$casting = JRequest::getVar( 'casting' );
@@ -49,6 +50,7 @@ class MPollViewMPoll extends JView
 		$this->assignRef('qdata',$qdata);
 		$this->assignRef('guest',$guest);
 		$this->assignRef('polllist',$polllist);
+		$this->assignRef('resultsas',$resultsas);
 		$this->assignRef('showlist',$showlist);
 		$this->assignRef('showstats',$showstats);
 		$this->assignRef('listloc',$listloc);

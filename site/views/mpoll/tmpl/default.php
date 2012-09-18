@@ -218,7 +218,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 						else echo $opts->opt_txt;
 						echo '</div>';
 						echo '<div class="mpollcom-opt-count">';
-						echo ($opts->anscount);
+						if ($this->resultsas == "percent") echo (int)($per*100)."%";
+						else echo ($opts->anscount);
 						echo '</div>';
 						echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
 						echo '</div>';
