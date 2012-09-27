@@ -30,6 +30,8 @@ class MPollModelMPoll extends JModel
 		$db =& JFactory::getDBO();
 		$user =& JFactory::getUser();
 		$userid = $user->id;
+		$pollinfo=$this->getPoll($pollid);
+		$email = '';
 		//save completed
 		$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll) VALUES ('.$userid.','.$pollid.')';
 		$db->setQuery( $qc );
@@ -40,20 +42,45 @@ class MPollModelMPoll extends JModel
 		$db->setQuery( $query );
 		$qdata = $db->loadAssocList(); 
 		foreach ($qdata as $ques) {
+			if ($pollinfo['poll_emailto']) $email .= '<b>'.$ques['q_text'].'</b>';
 			$otherans=$db->getEscaped(JRequest::getVar('q'.$ques['q_id'].'o'));
 			if ($ques['q_type'] != 'mcbox') {
 				$ans = JRequest::getVar('q'.$ques['q_id']);
+				if ($pollinfo['poll_emailto']) {
+					if ($ques['q_type' == "multi"]) {
+						$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$ans;
+						$db->setQuery($qo); $result = $db->loadResult();
+						$email .= '<br />'.$result.'<br /><br />';
+					} else {
+						$email .= '<br />'.$ans.'<br /><br />';
+					}
+				}
 				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
 				$db->setQuery( $q );
 				$db->query();
 			} else {
 				$ansarr = JRequest::getVar('q'.$ques['q_id']); 
 				$ans = implode(' ',$ansarr);
+				if ($pollinfo['poll_emailto']) {
+					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.implode(',',$ansarr).')';
+					$db->setQuery($qo); $result = $db->loadResultArray();
+					$email .= '<br />'.implode("; ",$result).'<br /><br />';
+				}
 				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
 				$db->setQuery( $q );
 				$db->query();
 			}
 			
+		}
+		
+		if ($pollinfo['poll_emailto']) {
+			$mail = &JFactory::getMailer();
+			$mail->IsHTML(true);
+			$mail->addRecipient($pollinfo['poll_emailto'],$pollinfo['poll_emailto']);
+			$mail->setSender($pollinfo['poll_emailto'],$pollinfo['poll_emailto']);
+			$mail->setSubject("MPoll Results: ".$pollinfo['poll_name']);
+			$mail->setBody( $email );
+			$sent = $mail->Send();
 		}
 		return 0;
 	}

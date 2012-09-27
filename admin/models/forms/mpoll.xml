@@ -50,6 +50,16 @@
 			required="true">
 			<option value="0">JOPTION_SELECT_CATEGORY</option>
 		</field>
+		<field
+			name="poll_emailto"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_EMAILTO_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_EMAILTO_DESC"
+			size="40"
+			class="inputbox"
+			required="true"
+			default=""
+		/>
 	</fieldset>
 	<fieldset name="details">
 		<field
