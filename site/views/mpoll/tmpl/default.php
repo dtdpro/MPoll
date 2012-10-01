@@ -102,7 +102,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		
 		
 		//output text field
-		if ($qdata->q_type == 'textbox') { echo '<input type="text" size="40" name="q'.$qdata->q_id.'"><br>'; }
+		if ($qdata->q_type == 'textbox' || $qdata->q_type == 'email') { echo '<input type="text" size="40" name="q'.$qdata->q_id.'"><br>'; }
 		
 		//output text box
 		if ($qdata->q_type == 'textar') { echo '<textarea cols="60" rows="3" name="q'.$qdata->q_id.'"></textarea><br>'; }
@@ -123,10 +123,12 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	function checkRq() {
 		ev = document.evalf;
 		erMsg = '<span style="color:#800000"><b>Answer is Required</b></span>';
+		erMsgEml = '<span style="color:#800000"><b>A valid email address is required</b></span>';
 		cks = false; errs = false;
 	<?
 	for ($i=0; $i<$cnt; $i++) {
 		if ($req_t[$i] == 'textbox') { echo "	if(isEmpty(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
+		if ($req_t[$i] == 'email') { echo "	if(isEmpty(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg') || isNotEmail(ev.".$req_q[$i].", erMsgEml,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
 		if ($req_t[$i] == 'multi') { echo "	if(isNCheckedR(ev.".$req_q[$i].", erMsg,".$req_o[$i].",'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
 		if ($req_t[$i] == 'cbox') { echo "	if(isChecked(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
 		
@@ -141,6 +143,19 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			elem.focus(); // set the focus to this input
 			return true;
 		}
+		document.getElementById(msgl).innerHTML ='';
+			return false;
+	}
+	
+	function isNotEmail(elem, helperMsg,msgl){
+
+		var emailExp=/^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-Z0-9]{2,4}$/;
+		if (!elem.value.match(emailExp)) { 
+			elem.focus();
+			document.getElementById(msgl).innerHTML = helperMsg; 
+			return true;
+		} 
+		
 		document.getElementById(msgl).innerHTML ='';
 			return false;
 	}
@@ -230,8 +245,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 						}
 					}
 					break;
-					
-				}
+				default: break;
+			}
 			echo '</div>';
 		}
 	}

@@ -55,6 +55,7 @@
 			required="true">
 			<option value="textar">Text Box</option>
 			<option value="textbox">Text Field</option>
+			<option value="email">EMail</option>
 			<option value="multi">Radio Select</option>
 			<option value="cbox">Check Box</option>
 			<option value="mcbox">Multi Checkbox</option>

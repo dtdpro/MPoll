@@ -47,7 +47,7 @@ class MPollModelMPoll extends JModel
 			if ($ques['q_type'] != 'mcbox') {
 				$ans = JRequest::getVar('q'.$ques['q_id']);
 				if ($pollinfo['poll_emailto']) {
-					if ($ques['q_type' == "multi"]) {
+					if ($ques['q_type'] == "multi") {
 						$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$ans;
 						$db->setQuery($qo); $result = $db->loadResult();
 						$email .= '<br />'.$result.'<br /><br />';
@@ -76,8 +76,12 @@ class MPollModelMPoll extends JModel
 		if ($pollinfo['poll_emailto']) {
 			$mail = &JFactory::getMailer();
 			$mail->IsHTML(true);
-			$mail->addRecipient($pollinfo['poll_emailto'],$pollinfo['poll_emailto']);
-			$mail->setSender($pollinfo['poll_emailto'],$pollinfo['poll_emailto']);
+			$emllist = Array();
+			$emllist = explode(",",$pollinfo['poll_emailto']);
+			foreach ($emllist as $e) {
+				$mail->addRecipient($e,$e);
+			}
+			$mail->setSender($emllist[0],$emllist[0]);
 			$mail->setSubject("MPoll Results: ".$pollinfo['poll_name']);
 			$mail->setBody( $email );
 			$sent = $mail->Send();

@@ -24,7 +24,14 @@ defined('_JEXEC') or die('Restricted Access');
 			<?php echo JHtml::_('jgrid.published', $item->published, $i, 'questions.', true);?>
 		</td>
 		<td>
-			<?php echo $item->q_type; ?>
+			<?php switch ($item->q_type) {
+				case "textar": echo 'Text Box'; break;
+				case "textbox": echo 'Text Field'; break;
+				case "email": echo 'EMail'; break;
+				case "multi": echo 'Radio Select'; break;
+				case "cbox": echo 'Check Box'; break;
+				case "mcbox": echo 'Multi Checkbox'; break;
+			} ?>
 		</td>
 		<td>
 			<?php echo $item->q_req; ?>
