@@ -37,6 +37,10 @@
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>
+				<field name="resultsas" type="radio" default="count" label="Results as" description="Show results in the ____ format.">
+					<option value="count">Count</option>
+					<option value="percent">Percentages</option>
+				</field>
 			</fieldset>
 		</fields>
 	</config>

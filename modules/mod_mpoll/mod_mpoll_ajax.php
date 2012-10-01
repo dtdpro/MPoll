@@ -1,10 +1,4 @@
 <?php
-/*
-# ESPRate Plugin for Joomla! 1.5.x - Version 0.1b
-# License: http://www.gnu.org/copyleft/gpl.html
-# Authors: Mike Amundsen
-# Copyright (c) 2009 Corona Productions
-*/
 
 // Set flag that this is a parent file
 define( '_JEXEC', 1 );
@@ -24,6 +18,7 @@ $user = &JFactory::getUser();
 $pollid  = JRequest::getVar('poll');
 $showresults  = JRequest::getVar('showresults');
 $showresultslink  = JRequest::getVar('showresultslink');
+$resultsas  = JRequest::getVar('resultsas');
 $resultslink  = urldecode(JRequest::getVar('resultslink'));
 $userid = $user->id;
 
@@ -99,7 +94,11 @@ if ($pdata['poll_showresults'] && $showresults) {
 					else echo $opts->opt_txt;
 					echo '</div>';
 					echo '<div class="mpollmod-opt-count">';
-					echo ($opts->anscount);
+					if ($resultsas == "count") {
+						echo ($opts->anscount);
+					} else {
+						echo (int)($per*100)."%";
+					}
 					echo '</div>';
 					echo '<div class="mpollmod-opt-bar-box"><div class="mpollmod-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
 					echo '</div>';

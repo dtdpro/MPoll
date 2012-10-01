@@ -57,7 +57,7 @@
 			description="COM_MPOLL_MPOLL_FIELD_EMAILTO_DESC"
 			size="40"
 			class="inputbox"
-			required="true"
+			required="false"
 			default=""
 		/>
 	</fieldset>

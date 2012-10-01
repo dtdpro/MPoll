@@ -181,7 +181,7 @@ if ($showtitle) {
 						}
 						var queryString = "?";
 						<?php
-						echo "queryString += 'poll=".$pdata['poll_id']."&showresults=".$params->get( 'showresults', 1 )."&showresultslink=".$params->get( 'showresultslink', 0 )."';\n";
+						echo "queryString += 'poll=".$pdata['poll_id']."&showresults=".$params->get( 'showresults', 1 )."&showresultslink=".$params->get( 'showresultslink', 0 )."&resultsas=".$params->get( 'resultsas', "count" )."';\n";
 						if ($params->get( 'showresultslink', 0 )) echo "queryString += '&resultslink=".urlencode(JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']))."';\n";
 						foreach ($qdatap as $qdata) {
 							if ($qdata->q_type = 'multi') {
@@ -232,7 +232,11 @@ if ($showtitle) {
 										else echo $opts->opt_txt;
 										echo '</div>';
 										echo '<div class="mpollmod-opt-count">';
-										echo ($opts->anscount);
+										if ($params->get( 'resultsas', "count" ) == "count") {
+											echo ($opts->anscount);
+										} else {
+											echo (int)($per*100)."%";
+										}
 										echo '</div>';
 										echo '<div class="mpollmod-opt-bar-box"><div class="mpollmod-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
 										echo '</div>';

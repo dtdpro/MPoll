@@ -76,7 +76,7 @@ class MPollModelMPoll extends JModelAdmin
 		{
 			$data = $this->getItem();
 			// Prime some default values.
-			if ($this->getState('mpoll.poll_id') == 0) {
+			if ($this->getState('mpoll.id') == 0) {
 				$app = JFactory::getApplication();
 				$data->set('poll_cat', JRequest::getInt('poll_cat', $app->getUserState('com_mpoll.mpolls.filter.category_id')));
 			}
