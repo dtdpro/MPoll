@@ -19,7 +19,7 @@ for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 	if ($row['cm_user'] == 0) $contents .= 'Guest';
 	else $contents .= $row['name']; 
 	$contents .= "\",";
-	$contents .= "\"".$row['email']."\"";
+	$contents .= "\"".$row['email']."\",";
 	$contents .= "\"".$row['cm_time']."\"";
 
     foreach ($this->questions as $qu) {

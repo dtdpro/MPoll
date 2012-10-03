@@ -133,6 +133,29 @@
 			<option	value="0">No</option>
 		</field>
 		<field
+			name="poll_reqreq"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_REGREQ_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_REGREQ_DESC"
+			size="1"
+			class="inputbox"
+			required="true"
+			default="1">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
+			name="poll_reqreqmsg"
+			type="textarea"
+			label="COM_MPOLL_MPOLL_FIELD_REGREQMSG_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_REGREQMSG_DESC"
+			rows="3"
+			cols="30"
+			class="inputbox"
+			filter="safehtml"
+			buttons="false"
+		/>
+		<field
 			name="poll_showresults"
 			type="radio"
 			label="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_LABEL"
