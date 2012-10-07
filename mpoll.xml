@@ -7,7 +7,7 @@
 	<authorUrl>http://www.ditzthedaisy.com</authorUrl>
 	<copyright>(c)2008-2012</copyright>
 	<license>GPL v2</license>
-	<version>1.13.1</version>
+	<version>1.14.0</version>
     <releaseDate>2012.08.24</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
@@ -30,6 +30,7 @@
 		<filename>index.html</filename>
 		<filename>mpoll.css</filename>
 		<folder>images</folder>
+		<folder>upload</folder>
 	</media>	
 	<administration>
 		<!-- Administration Menu Section -->

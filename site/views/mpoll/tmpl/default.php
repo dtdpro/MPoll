@@ -2,6 +2,7 @@
 defined('_JEXEC') or die('Restricted access'); 
 
 $db =& JFactory::getDBO();
+$user = JFactory::getUser();
 if ($this->showlist != 'never') {
 	$jumplist  = '<form name="jumppoll" action="" method="post">';
 	$jumplist .= '<p align="center">Select Poll: ';
@@ -16,8 +17,11 @@ if ($this->showlist != 'never') {
 if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	if ($this->showlist == 'both') echo $jumplist;
 	echo '<h2 class="componentheading">'.$this->pdata['poll_name'].'</h2>';
+	if ($this->pdata['poll_regreq'] == 1 && $user->id == 0) {
+		echo '<p align="center">'.$this->pdata['poll_regreqmsg'].'</p>';
+	} 
 	echo '<p>'.$this->pdata['poll_desc'].'</p>';
-	echo '<form name="evalf" method="post" action="" onSubmit="return checkRq();"><input type="hidden" name="stepnext" value="">';
+	echo '<form name="evalf" method="post" action="" onSubmit="return checkRq();" enctype="multipart/form-data"><input type="hidden" name="stepnext" value="">';
 	foreach ($this->qdata as $qdata) {
 		if ($qdata->q_req && $qdata->q_type != 'mcbox') { 
 			$req_q[] = 'q'.$qdata->q_id;
@@ -106,6 +110,9 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		
 		//output text box
 		if ($qdata->q_type == 'textar') { echo '<textarea cols="60" rows="3" name="q'.$qdata->q_id.'"></textarea><br>'; }
+		
+		//File Attachment
+		if ($qdata->q_type == 'attach') { echo '<input id="q'.$qdata->q_id.'" name="q'.$qdata->q_id.'" type="file" size="40" /><br />Max Size: '.ini_get('upload_max_filesize'); }
 
 		//add in verification if nedded
 		if ($qdata->q_req && $qdata->q_type != 'mcbox') { $req_o[] = $numopts;}
@@ -115,7 +122,11 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	
 	echo '<p align="center">';
 	echo '<input type="hidden" name="casting" value="true">';
-	echo '<input name="castvote" id="castvote" value="Submit"  type="submit" class="button">';
+	if ($this->pdata['poll_regreq'] == 1 && $user->id == 0) {
+		echo $this->pdata['poll_regreqmsg'];
+	} else { 
+		echo '<input name="castvote" id="castvote" value="Submit"  type="submit" class="button">';
+	}
 	echo '</form></p>';
 	$cnt = count($req_q);
 	?>
@@ -199,55 +210,57 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	if ($this->pdata['poll_results_msg_before']) echo $this->pdata['poll_results_msg_before'];
 	if ($this->pdata['poll_showresults']) {
 		foreach ($this->qdata as $q) {
-			echo '<div class="mpollcom-question">';
-			$anscor=false;
-			echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
-			switch ($q->q_type) {
-				case 'multi':
-				case 'mcbox':
-					$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
-					$db->setQuery( $qnum );
-					$qnums = $db->loadAssoc();
-					$numr=$qnums['count(res_qid)'];
-					$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
-					$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
-					$db->setQuery( $query );
-					$qopts = $db->loadObjectList();
-					$tph=0;
-					foreach ($qopts as &$o) {
-						$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans LIKE "%'.$o->opt_id.'%" GROUP BY res_qid';
-						$db->setQuery($qa);
-						$o->anscount = $db->loadResult();
-						if ($o->anscount == "") $o->anscount = 0;
-					}
-					$gper=0; $ansper=0; $gperid = 0;
-					foreach ($qopts as $opts) {
-						if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-						if ($qans == $opts->id && $opts->correct) {
-							$anscor=true;
+			if ($q->q_type == "mcbox" || $q->q_type == "multi") {
+				echo '<div class="mpollcom-question">';
+				$anscor=false;
+				echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
+				switch ($q->q_type) {
+					case 'multi':
+					case 'mcbox':
+						$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
+						$db->setQuery( $qnum );
+						$qnums = $db->loadAssoc();
+						$numr=$qnums['count(res_qid)'];
+						$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
+						$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
+						$db->setQuery( $query );
+						$qopts = $db->loadObjectList();
+						$tph=0;
+						foreach ($qopts as &$o) {
+							$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans LIKE "%'.$o->opt_id.'%" GROUP BY res_qid';
+							$db->setQuery($qa);
+							$o->anscount = $db->loadResult();
+							if ($o->anscount == "") $o->anscount = 0;
 						}
-						echo '<div class="mpollcom-opt">';
-						
-						echo '<div class="mpollcom-opt-text">';
-						if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->opt_txt.'</div>';
-						else echo $opts->opt_txt;
-						echo '</div>';
-						echo '<div class="mpollcom-opt-count">';
-						if ($this->resultsas == "percent") echo (int)($per*100)."%";
-						else echo ($opts->anscount);
-						echo '</div>';
-						echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
-						echo '</div>';
-						if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
-						if ($qans==$opts->opt_id) {
-							if ($qdata->q_expl) $expl=$qdata->q_expl;
-							else $expl=$opts->opt_expl;
+						$gper=0; $ansper=0; $gperid = 0;
+						foreach ($qopts as $opts) {
+							if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
+							if ($qans == $opts->id && $opts->correct) {
+								$anscor=true;
+							}
+							echo '<div class="mpollcom-opt">';
+							
+							echo '<div class="mpollcom-opt-text">';
+							if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->opt_txt.'</div>';
+							else echo $opts->opt_txt;
+							echo '</div>';
+							echo '<div class="mpollcom-opt-count">';
+							if ($this->resultsas == "percent") echo (int)($per*100)."%";
+							else echo ($opts->anscount);
+							echo '</div>';
+							echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
+							echo '</div>';
+							if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
+							if ($qans==$opts->opt_id) {
+								if ($qdata->q_expl) $expl=$qdata->q_expl;
+								else $expl=$opts->opt_expl;
+							}
 						}
-					}
-					break;
-				default: break;
+						break;
+					default: break;
+				}
+				echo '</div>';
 			}
-			echo '</div>';
 		}
 	}
 	if ($this->pdata['poll_results_msg_after']) echo $this->pdata['poll_results_msg_after'];

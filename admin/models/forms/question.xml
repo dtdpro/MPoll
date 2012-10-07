@@ -59,6 +59,7 @@
 			<option value="multi">Radio Select</option>
 			<option value="cbox">Check Box</option>
 			<option value="mcbox">Multi Checkbox</option>
+			<option value="attach">File Attachment</option>
 		</field>
 		<field
 			name="q_req"

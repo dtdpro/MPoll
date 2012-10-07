@@ -47,6 +47,14 @@ $db =& JFactory::getDBO();
 					}
 					if ($qu->q_type == 'textbox') { echo $row[$qnum]; }
 					if ($qu->q_type == 'textar') { echo $row[$qnum]; }
+					if ($qu->q_type == 'attach') { 
+						if (strpos($row[$qnum],"ERROR:") === FALSE && $row[$qnum] != "") {
+							echo '<a href="'.$row[$qnum].'">Right Click Download</a>';
+						} else {
+							echo $row[$qnum];
+						}
+					}
+					if ($qu->q_type == 'email') { echo $row[$qnum]; }
 					if ($qu->q_type == 'cbox') { if ($row[$qnum] == 'on') echo 'Checked'; else echo 'Unchecked'; }
 					if ($qu->q_type == 'mcbox') {
 						$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qu->q_id.' ORDER BY ordering ASC';

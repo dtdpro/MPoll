@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS #__mpoll_polls (
   access int(11) NOT NULL DEFAULT '1',
   poll_cat int(11) NOT NULL,
   poll_emailto varchar(255) NOT NULL,
+  poll_emailsubject varchar(255) NOT NULL,
   poll_created datetime NOT NULL,
   poll_created_by int(11) NOT NULL,
   poll_modified datetime NOT NULL,

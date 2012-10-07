@@ -60,8 +60,10 @@ class MPollViewMPoll extends JView
 			//save vote results
 			$se=$model->saveBallot($pollid);
 			$url = 'index.php?option=com_mpoll&task=results&poll='.$pollid;
+			$urle = 'index.php?option=com_mpoll&task=ballot&poll='.$pollid;
 			if ($rtmpl) $url .= '&tmpl='.$rtmpl;
-			$mainframe->redirect(JRoute::_($url,false));
+			if ($model->errmsg) $mainframe->redirect(JRoute::_($urle,false),$model->errmsg,"error");
+			else $mainframe->redirect(JRoute::_($url,false));
 		} else if (($casted && $task=='ballot') || $task=='results') { 
 			$task='results';
 			$fcast = $model->getFirstCast($pollid);

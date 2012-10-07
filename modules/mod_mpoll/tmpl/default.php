@@ -56,11 +56,12 @@ if ($showtitle) {
 							foreach ($qopts as $opts) {
 								echo '<label><input type="checkbox" name="q'.$qdata->q_id.'[]" value="'.$opts['opt_id'].'" id="q'.$qdata->q_id.'">'.$opts['opt_txt'].'</label><br>';
 							}
-						} 
-						*/
-						//text boxes disabled for module
-						/*//output text field
-						if ($qdata->q_type == 'textbox') { echo '<input type="text" size="20" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"><br>'; }*/
+						} */
+						
+						//output text field
+						if ($qdata->q_type == 'textbox' || $qdata->q_type == 'email') { echo '<input type="text" size="20" style="width:100%" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"><br>'; }
+						if ($qdata->q_type == 'textar') { echo '<textarea cols="20" rows="2" style="width:100%" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"></textarea><br>'; }
+					
 						
 						//add in verification if nedded
 						if ($qdata->q_req && $qdata->q_type != 'mcbox') { $req_o[] = $numopts;}
@@ -83,10 +84,12 @@ if ($showtitle) {
 					function checkRq<?php echo $pdata['poll_id']; ?>() {
 						ev = document.mpollf<?php echo $pdata['poll_id']; ?>;
 						erMsg = '<span style="color:#800000"><b>Answer is Required</b></span>';
+						erMsgEml = '<span style="color:#800000"><b>A valid email address is required</b></span>';
 						cks = false; errs = false;
 					<?
 					for ($i=0; $i<$cnt; $i++) {
 						if ($req_t[$i] == 'textbox') { echo "	if(isEmpty".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
+						if ($req_t[$i] == 'email') { echo "	if(isEmpty".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg') || isNotEmail".$pdata['poll_id']."(ev.".$req_q[$i].", erMsgEml,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
 						if ($req_t[$i] == 'multi') { echo "	if(isNCheckedR".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,".$req_o[$i].",'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
 						if ($req_t[$i] == 'cbox') { echo "	if(isChecked".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
 						
@@ -96,6 +99,19 @@ if ($showtitle) {
 					if (!errs) MPollAJAX<?php echo $pdata['poll_id']; ?>();
 					}
 					
+					function isNotEmail<?php echo $pdata['poll_id']; ?>(elem, helperMsg,msgl){
+
+						var emailExp=/^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-Z0-9]{2,4}$/;
+						if (!elem.value.match(emailExp)) { 
+							elem.focus();
+							document.getElementById(msgl).innerHTML = helperMsg; 
+							return true;
+						} 
+						
+						document.getElementById(msgl).innerHTML ='';
+							return false;
+					}
+
 					function isEmpty<?php echo $pdata['poll_id']; ?>(elem, helperMsg,msgl){
 						if(elem.value.length == 0){
 							document.getElementById(msgl).innerHTML = helperMsg;
@@ -184,10 +200,10 @@ if ($showtitle) {
 						echo "queryString += 'poll=".$pdata['poll_id']."&showresults=".$params->get( 'showresults', 1 )."&showresultslink=".$params->get( 'showresultslink', 0 )."&resultsas=".$params->get( 'resultsas', "count" )."';\n";
 						if ($params->get( 'showresultslink', 0 )) echo "queryString += '&resultslink=".urlencode(JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']))."';\n";
 						foreach ($qdatap as $qdata) {
-							if ($qdata->q_type = 'multi') {
+							if ($qdata->q_type == 'multi') {
 								echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + getCheckedValue".$pdata['poll_id']."(ev.q".$qdata->q_id.");\n";
 							}
-							else echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + ev.q".$qdata->q_id.".value;\n";
+							else echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + encodeURIComponent(ev.q".$qdata->q_id.".value);\n";
 						} 
 						?> 
 						ajaxRequest.open("GET", "modules/mod_mpoll/mod_mpoll_ajax.php" + queryString, true);
@@ -198,59 +214,64 @@ if ($showtitle) {
 					if ($pdata['poll_results_msg_before']) echo $pdata['poll_results_msg_before'];
 					if ($pdata['poll_showresults'] && $params->get( 'showresults', 1 )) {
 						foreach ($qdatap as $q) {
-							echo '<div class="mpollmod-question">';
-							$anscor=false;
-							echo '<div class="mpollmod-question-text">'.$q->q_text.'</div>';
-							echo '<div class="mpollmod-options">';
-							switch ($q->q_type) {
-								case 'multi':
-									$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
-									$db->setQuery( $qnum );
-									$qnums = $db->loadAssoc();
-									$numr=$qnums['count(res_qid)'];
-									$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
-									$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
-									$db->setQuery( $query );
-									$qopts = $db->loadObjectList();
-									$tph=0;
-									foreach ($qopts as &$o) {
-										$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->opt_id.' GROUP BY res_ans';
-										$db->setQuery($qa);
-										$o->anscount = $db->loadResult();
-										if ($o->anscount == "") $o->anscount = 0;
-									}
-									$gper=0; $ansper=0; $gperid = 0;
-									foreach ($qopts as $opts) {
-										if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-										if ($qans == $opts->id && $opts->correct) {
-											$anscor=true;
+							if ($q->q_type == "multi") {
+								echo '<div class="mpollmod-question">';
+								$anscor=false;
+								echo '<div class="mpollmod-question-text">'.$q->q_text.'</div>';
+								echo '<div class="mpollmod-options">';
+								switch ($q->q_type) {
+									case 'multi':
+										$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
+										$db->setQuery( $qnum );
+										$qnums = $db->loadAssoc();
+										$numr=$qnums['count(res_qid)'];
+										$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
+										$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
+										$db->setQuery( $query );
+										$qopts = $db->loadObjectList();
+										$tph=0;
+										foreach ($qopts as &$o) {
+											$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->opt_id.' GROUP BY res_ans';
+											$db->setQuery($qa);
+											$o->anscount = $db->loadResult();
+											if ($o->anscount == "") $o->anscount = 0;
 										}
-										echo '<div class="mpollmod-opt">';
-										
-										echo '<div class="mpollmod-opt-text">';
-										if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->opt_txt.'</div>';
-										else echo $opts->opt_txt;
-										echo '</div>';
-										echo '<div class="mpollmod-opt-count">';
-										if ($params->get( 'resultsas', "count" ) == "count") {
-											echo ($opts->anscount);
-										} else {
-											echo (int)($per*100)."%";
-										}
-										echo '</div>';
-										echo '<div class="mpollmod-opt-bar-box"><div class="mpollmod-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
-										echo '</div>';
-										if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
-										if ($qans==$opts->opt_id) {
+										$gper=0; $ansper=0; $gperid = 0;
+										foreach ($qopts as $opts) {
+											if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
+											if ($qans == $opts->id && $opts->correct) {
+												$anscor=true;
+											}
+											echo '<div class="mpollmod-opt">';
+								
+											echo '<div class="mpollmod-opt-text">';
+											if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->opt_txt.'</div>';
+											else echo $opts->opt_txt;
+											echo '</div>';
+											echo '<div class="mpollmod-opt-count">';
+											if ($params->get( 'resultsas', "count" ) == "count") {
+												echo ($opts->anscount);
+											} else {
+												echo (int)($per*100)."%";
+											}
+											echo '</div>';
+											echo '<div class="mpollmod-opt-bar-box"><div class="mpollmod-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
+											echo '</div>';
+											if ($gper < $per) {
+												$gper = $per; $gperid = $opts->id;
+											}
+											if ($qans==$opts->opt_id) {
 											if ($qdata->q_expl) $expl=$qdata->q_expl;
 											else $expl=$opts->opt_expl;
-										}
-									}
-									break;
-									
+											}
+											}
+											break;
+												
+											}
+												
+											echo '</div></div>';
 							}
 							
-							echo '</div></div>';
 						}
 					}
 					if ($pdata['poll_results_msg_mod']) echo $pdata['poll_results_msg_mod'];

@@ -14,6 +14,9 @@ $function	= JRequest::getCmd('function', 'jSelectNewsfeed');
 				<th class="title">
 					Title
 				</th>
+				<th class="title">
+					Category
+				</th>
 				<th width="1%" class="nowrap">
 					ID
 				</th>
@@ -25,6 +28,9 @@ $function	= JRequest::getCmd('function', 'jSelectNewsfeed');
 				<td>
 					<a class="pointer" onclick="if (window.parent) window.parent.<?php echo $this->escape($function);?>('<?php echo $item->poll_id; ?>', '<?php echo $this->escape(addslashes($item->poll_name)); ?>');">
 						<?php echo $this->escape($item->poll_name); ?></a>
+				</td>
+				<td>
+					<?php echo $item->category_title; ?>
 				</td>
 				<td align="center">
 					<?php echo (int) $item->poll_id; ?>

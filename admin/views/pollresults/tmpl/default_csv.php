@@ -31,6 +31,7 @@ for ($i=0, $n=count( $this->items ); $i < $n; $i++)
 		}
 		if ($qu->q_type == 'textbox') { $contents .= $row[$qnum]; }
 		if ($qu->q_type == 'textar') { $contents .= $row[$qnum]; }
+		if ($qu->q_type == 'email') { $contents .= $row[$qnum]; }
 		if ($qu->q_type == 'cbox') { if ($row[$qnum] == 'on') $contents .= 'Checked'; else $contents .= 'Unchecked'; }
 		if ($qu->q_type == 'mcbox') {
 			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qu->q_id.' ORDER BY ordering ASC';

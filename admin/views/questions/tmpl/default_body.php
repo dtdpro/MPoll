@@ -31,6 +31,7 @@ defined('_JEXEC') or die('Restricted Access');
 				case "multi": echo 'Radio Select'; break;
 				case "cbox": echo 'Check Box'; break;
 				case "mcbox": echo 'Multi Checkbox'; break;
+				case "attach": echo 'File Attachment'; break;
 			} ?>
 		</td>
 		<td>

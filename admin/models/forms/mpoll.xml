@@ -60,6 +60,16 @@
 			required="false"
 			default=""
 		/>
+		<field
+			name="poll_emailsubject"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_EMAILSUBJECT_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_EMAILSUBJECT_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
 	</fieldset>
 	<fieldset name="details">
 		<field
@@ -70,7 +80,7 @@
 			class="inputbox"
 			filter="safehtml"
 			buttons="true"
-			hide="readmore,pagebreak,article"
+			hide="readmore,pagebreak"
 		/>
 		<field
 			name="poll_results_msg_before"
@@ -80,7 +90,7 @@
 			class="inputbox"
 			filter="safehtml"
 			buttons="true"
-			hide="readmore,pagebreak,article"
+			hide="readmore,pagebreak"
 		/>
 		<field
 			name="poll_results_msg_after"
@@ -90,7 +100,7 @@
 			class="inputbox"
 			filter="safehtml"
 			buttons="true"
-			hide="readmore,pagebreak,article"
+			hide="readmore,pagebreak"
 		/>
 		<field
 			name="poll_results_msg_mod"
@@ -100,7 +110,7 @@
 			class="inputbox"
 			filter="safehtml"
 			buttons="true"
-			hide="readmore,pagebreak,article"
+			hide="readmore,pagebreak"
 		/>
 	</fieldset>
 	<fieldset name="publishing">
@@ -133,19 +143,19 @@
 			<option	value="0">No</option>
 		</field>
 		<field
-			name="poll_reqreq"
+			name="poll_regreq"
 			type="radio"
 			label="COM_MPOLL_MPOLL_FIELD_REGREQ_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_REGREQ_DESC"
 			size="1"
 			class="inputbox"
-			required="true"
+			required="false"
 			default="1">
 			<option	value="1">Yes</option>
 			<option	value="0">No</option>
 		</field>
 		<field
-			name="poll_reqreqmsg"
+			name="poll_regreqmsg"
 			type="textarea"
 			label="COM_MPOLL_MPOLL_FIELD_REGREQMSG_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_REGREQMSG_DESC"
