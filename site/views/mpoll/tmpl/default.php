@@ -106,14 +106,17 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		
 		
 		//output text field
-		if ($qdata->q_type == 'textbox' || $qdata->q_type == 'email') { echo '<input type="text" size="40" name="q'.$qdata->q_id.'"><br>'; }
+		if ($qdata->q_type == 'textbox' || $qdata->q_type == 'email') { echo '<input type="text" size="40" name="q'.$qdata->q_id.'"><br />'; }
 		
 		//output text box
-		if ($qdata->q_type == 'textar') { echo '<textarea cols="60" rows="3" name="q'.$qdata->q_id.'"></textarea><br>'; }
+		if ($qdata->q_type == 'textar') { echo '<textarea cols="60" rows="3" name="q'.$qdata->q_id.'"></textarea><br />'; }
 		
 		//File Attachment
-		if ($qdata->q_type == 'attach') { echo '<input id="q'.$qdata->q_id.'" name="q'.$qdata->q_id.'" type="file" size="40" /><br />Max Size: '.ini_get('upload_max_filesize'); }
+		if ($qdata->q_type == 'attach') { echo '<input id="q'.$qdata->q_id.'" name="q'.$qdata->q_id.'" type="file" size="40" />'; }
 
+		//Hint
+		if ($qdata->q_hint) { echo $qdata->q_hint; }
+		
 		//add in verification if nedded
 		if ($qdata->q_req && $qdata->q_type != 'mcbox') { $req_o[] = $numopts;}
 		echo '</p>';

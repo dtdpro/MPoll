@@ -42,6 +42,19 @@
 			cols="80"
 			class="inputbox"
 			required="true"
+			filter="safehtml"
+			default=""
+		/>
+		<field
+			name="q_hint"
+			type="textarea"
+			label="COM_MPOLL_QUESTION_FIELD_HINT_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_HINT_DESC"
+			rows="3"
+			cols="80"
+			class="inputbox"
+			required="false"
+			filter="safehtml"
 			default=""
 		/>
 		<field
