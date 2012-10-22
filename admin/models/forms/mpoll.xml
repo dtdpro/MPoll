@@ -71,6 +71,62 @@
 			default=""
 		/>
 	</fieldset>
+	<fieldset name="confirmation">
+		<field
+			name="poll_confemail"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_CONFEMAIL_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFEMAIL_DESC"
+			size="1"
+			class="inputbox"
+			required="false"
+			default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
+			name="poll_conffromemail"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_CONFFROMEMAIL_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFFROMEMAIL_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+		<field
+			name="poll_conffromname"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_CONFFROMNAME_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFFROMNAME_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+		<field
+			name="poll_confsubject"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_CONFSUBJECT_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFSUBJECT_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+	</fieldset>
+	<fieldset name="confcontent">
+		<field
+			name="poll_confmsg"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_CONFMSG_LABEL"
+			description="COM_MPOLL_MPOLL_FIELDB_CONFMSG_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak"
+		/>
+	</fieldset>
 	<fieldset name="details">
 		<field
 			name="poll_desc"

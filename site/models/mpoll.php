@@ -67,13 +67,17 @@ class MPollModelMPoll extends JModel
 				$db->setQuery( $q );
 				$db->query();
 				
+				if (strpos($ans,"ERROR:") === FALSE && $ans != "") {
+					$anse = '<a href="'.JURI::base(  ).$ans.'">Download</a>';
+				} else {
+					$anse = $ans;
+				}
+				
+				if ($pollinfo['poll_confemail']) {
+					$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$anse,$pollinfo['poll_confmsg']);
+				}
 				if ($pollinfo['poll_emailto']) {
 					
-					if (strpos($ans,"ERROR:") === FALSE && $ans != "") {
-						$anse = '<a href="'.JURI::base(  ).$ans.'">Download</a>';
-					} else {
-						$anse = $ans;
-					}
 					$email .= '<br />'.$anse.'<br /><br />';
 				}
 				
@@ -81,15 +85,17 @@ class MPollModelMPoll extends JModel
 				
 			} else if ($ques['q_type'] != 'mcbox') {
 				$ans = JRequest::getVar('q'.$ques['q_id']);
-				if ($pollinfo['poll_emailto']) {
+				if ($pollinfo['poll_emailto'] || $poll['poll_confemail']) {
 					if ($ques['q_type'] == "multi") {
 						$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$ans;
-						$db->setQuery($qo); $opt = $db->loadObect();
+						$db->setQuery($qo); $opt = $db->loadObject();
 						if ($opt->opt_other) $result = $otherans;
-						else $result = $opt->opt_text;
+						else $result = $opt->opt_txt;
 						$email .= '<br />'.$result.'<br /><br />';
+						$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$result,$pollinfo['poll_confmsg']);
 					} else {
 						$email .= '<br />'.$ans.'<br /><br />';
+						$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$ans,$pollinfo['poll_confmsg']);
 					}
 				}
 				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
@@ -99,15 +105,17 @@ class MPollModelMPoll extends JModel
 				$ansarr = JRequest::getVar('q'.$ques['q_id']); 
 				$ans = implode(' ',$ansarr);
 				$otherans=$db->getEscaped(JRequest::getVar('q'.$ques['q_id'].'o'));
-				if ($pollinfo['poll_emailto']) {
+				if ($pollinfo['poll_emailto'] || $polinfo['poll_confemail']) {
 					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.implode(',',$ansarr).')';
 					$db->setQuery($qo); $opts = $db->loadResultArray();
 					foreach ($opt as $o) {
 						if ($o->opt_other) $result = $otherans;
-						else $result = $o->opt_text;
+						else $result = $o->opt_txt;
 						$email .= '<br />'.$result;
+						$cfans .= $result.', ';
 					}
 					$email .= '<br /><br />';
+					$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$cfans,$pollinfo['poll_confmsg']);
 				}
 				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
 				$db->setQuery( $q );
@@ -127,6 +135,20 @@ class MPollModelMPoll extends JModel
 			$mail->setSender($emllist[0],$emllist[0]);
 			$mail->setSubject($pollinfo['poll_emailsubject']);
 			$mail->setBody( $email );
+			$sent = $mail->Send();
+		}
+		
+		if ($pollinfo['poll_confemail'] && $user->id) {
+			$pollinfo['poll_confmsg'] = str_replace("{name}",$user->name,$pollinfo['poll_confmsg']);
+			$pollinfo['poll_confmsg'] = str_replace("{username}",$user->username,$pollinfo['poll_confmsg']);
+			$pollinfo['poll_confmsg'] = str_replace("{email}",$user->email,$pollinfo['poll_confmsg']);
+			$mail = &JFactory::getMailer();
+			$mail->IsHTML(true);
+			$emllist = Array();
+			$mail->addRecipient($user->email,$user->name);
+			$mail->setSender($pollinfo['poll_conffromemail'],$pollinfo['poll_conffromname']);
+			$mail->setSubject($pollinfo['poll_confsubject']);
+			$mail->setBody( $pollinfo['poll_confmsg'] );
 			$sent = $mail->Send();
 		}
 		return 0;

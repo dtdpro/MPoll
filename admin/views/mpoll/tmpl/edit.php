@@ -25,17 +25,29 @@ $params = $this->form->getFieldsets('params');
 	</div>
 
 	<div class="width-40 fltrt">
-		<?php echo JHtml::_('sliders.start', 'mpollrev-slider'); ?>
-			<?php echo JHtml::_('sliders.panel', JText::_('COM_MPOLL_MPOLL_PUBLISHING'), 'publishing-details'); ?>
-		<fieldset class="panelform">
+		<fieldset class="adminform">
+			<legend><?php echo JText::_( 'COM_MPOLL_MPOLL_PUBLISHING' ); ?></legend>
 			<ul class="adminformlist">
 <?php foreach($this->form->getFieldset('publishing') as $field): ?>
 				<li><?php echo $field->label;echo $field->input;?></li>
 <?php endforeach; ?>
 			</ul>
 		</fieldset>
-		<?php echo JHtml::_('sliders.end'); ?>
+		<fieldset class="adminform">
+			<legend><?php echo JText::_( 'COM_MPOLL_MPOLL_CONFIRMATION' ); ?></legend>
+			<ul class="adminformlist">
+<?php foreach($this->form->getFieldset('confirmation') as $field): ?>
+				<li><?php echo $field->label;echo $field->input;?></li>
+<?php endforeach; ?>
+			</ul>
+			<?php foreach($this->form->getFieldset('confcontent') as $field): ?>
+				<?php echo '<div>'.$field->label.'<div class="clr"></div>'.$field->input.'</div>';?>
+			<?php endforeach; ?>
+			<div style="clear:both">use {i##} with quesion id as ## for form content<br />{name} for users full name<br />{email} for users email<br />{username} for users username</div>
+		</fieldset>
 	</div>
+
+
 
 	<div>
 		<input type="hidden" name="task" value="mpoll.edit" />
