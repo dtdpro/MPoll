@@ -85,7 +85,7 @@ class MPollModelMPoll extends JModel
 				
 			} else if ($ques['q_type'] != 'mcbox') {
 				$ans = JRequest::getVar('q'.$ques['q_id']);
-				if ($pollinfo['poll_emailto'] || $poll['poll_confemail']) {
+				if ($pollinfo['poll_emailto'] || $pollinfo['poll_confemail']) {
 					if ($ques['q_type'] == "multi") {
 						$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$ans;
 						$db->setQuery($qo); $opt = $db->loadObject();
@@ -105,7 +105,7 @@ class MPollModelMPoll extends JModel
 				$ansarr = JRequest::getVar('q'.$ques['q_id']); 
 				$ans = implode(' ',$ansarr);
 				$otherans=$db->getEscaped(JRequest::getVar('q'.$ques['q_id'].'o'));
-				if ($pollinfo['poll_emailto'] || $polinfo['poll_confemail']) {
+				if ($pollinfo['poll_emailto'] || $pollinfo['poll_confemail']) {
 					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.implode(',',$ansarr).')';
 					$db->setQuery($qo); $opts = $db->loadResultArray();
 					foreach ($opt as $o) {
