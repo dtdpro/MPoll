@@ -43,7 +43,8 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_questions` (
   `ordering` smallint(6) NOT NULL,
   `q_text` text NOT NULL,
   `q_hint` text NOT NULL,
-  `q_type` enum('textar','textbox','multi','cbox','mcbox','email','attach') NOT NULL,
+  `q_default` varchar(255) NOT NULL,
+  `q_type` enum('textar','textbox','multi','cbox','mcbox','email','attach','message') NOT NULL,
   `q_req` tinyint(1) NOT NULL DEFAULT '1',
   `published` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`q_id`)

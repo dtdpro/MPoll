@@ -151,7 +151,7 @@ class MPollModelMPoll extends JModel
 			$mail->setBody( $pollinfo['poll_confmsg'] );
 			$sent = $mail->Send();
 		}
-		return 0;
+		return $lastid;
 	}
 	
 	function getCasted($pollid) {
@@ -199,6 +199,17 @@ class MPollModelMPoll extends JModel
 		$data = $db->loadAssoc();
 		if ($data) return $data['count(*)'];
 		else return 0;
+	}
+	
+	function applyAnswers($qdata,$cmplid) {
+		$db =& JFactory::getDBO();
+		$user =& JFactory::getUser();
+		foreach ($qdata as &$q) {
+			$qa = 'SELECT res_ans FROM #__mpoll_results WHERE res_user = '.$user->id.' && res_qid = '.$q->q_id.' && res_cm='.$cmplid;
+			$db->setQuery($qa);
+			$q->answer=$db->loadResult();
+		}
+		return $qdata;
 	}
 	
 	public static function canUpload($file,&$err)

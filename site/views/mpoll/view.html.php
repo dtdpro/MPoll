@@ -25,6 +25,7 @@ class MPollViewMPoll extends JView
 		$resultsas = $params->get('resultsas');
 		$rtmpl = $params->get('rtmpl');
 		$itemid = JRequest::getVar( 'Itemid' );
+		$cmplid = JRequest::getVar( 'cmplid' );
 		$casting = JRequest::getVar( 'casting' );
 		//check if logged in, logging in is REQUIRED
 		$user =& JFactory::getUser();
@@ -42,6 +43,7 @@ class MPollViewMPoll extends JView
 		if ($pdata['poll_only']) {
 			if (!$guest) $casted=$model->getCasted($pollid);
 			else $casted=false;
+			
 		} else {
 			$casted=false;
 		}
@@ -58,14 +60,16 @@ class MPollViewMPoll extends JView
 			parent::display($tpl);
 		} else if ($casting && $task=='ballot' && !$casted) {
 			//save vote results
-			$se=$model->saveBallot($pollid);
-			$url = 'index.php?option=com_mpoll&task=results&poll='.$pollid;
-			$urle = 'index.php?option=com_mpoll&task=ballot&poll='.$pollid;
+			$cmplid=$model->saveBallot($pollid);
+			$url = 'index.php?option=com_mpoll&task=results&poll='.$pollid.'&cmplid='.$cmplid;
+			$urle = 'index.php?option=com_mpoll&task=ballot&poll='.$pollid.'&cmplid='.$cmplid;
 			if ($rtmpl) $url .= '&tmpl='.$rtmpl;
 			if ($model->errmsg) $mainframe->redirect(JRoute::_($urle,false),$model->errmsg,"error");
 			else $mainframe->redirect(JRoute::_($url,false));
 		} else if (($casted && $task=='ballot') || $task=='results') { 
 			$task='results';
+			
+			if ($cmplid) $qdata = $model->applyAnswers($qdata,$cmplid);
 			$fcast = $model->getFirstCast($pollid);
 			$this->assignRef('fcast',$fcast);
 			$lcast = $model->getLastCast($pollid);

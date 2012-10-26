@@ -58,6 +58,16 @@
 			default=""
 		/>
 		<field
+			name="q_default"
+			type="text"
+			label="COM_MPOLL_OPTION_FIELD_DEFAULT_LABEL"
+			description="COM_MPOLL_OPTION_FIELD_DEFAULT_DESC"
+			size="40"
+			class="inputbox"
+			required="true"
+			default=""
+		/>
+		<field
 			name="q_type"
 			type="list"
 			extension="com_mpoll"

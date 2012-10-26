@@ -30,7 +30,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		//Question #
 		echo '<p>';
 	
-		//Question text if not a single checkbox
+		//Question text/Message  if not a single checkbox
 		if ($qdata->q_type != 'cbox') {
 			echo '<strong>';
 			echo $qdata->q_text;
@@ -39,7 +39,9 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		
 		//output checkbox
 		if ($qdata->q_type == 'cbox') { 
-			echo '<label><input type="checkbox" size="40" name="q'.$qdata->q_id.'">'.$qdata->q_text.'</label><br />';
+			echo '<label><input type="checkbox" size="40" name="q'.$qdata->q_id.'"';
+			if ($qdata->q_default == "1") { echo ' checked="checked"'; }
+			echo '>'.$qdata->q_text.'</label><br />';
 		}
 		
 		//verification msg area
@@ -57,7 +59,9 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				echo '> '.$opts['opt_txt'].'</label>';
 				if ($opts['opt_other']) {
 					echo ' <div id="q'.$qdata->q_id.'other'.$opts['opt_id'].'" style="display: inline;" >';
-					echo '<input type="text" size="30" onfocus="document.evalf.q'.$qdata->q_id.'['.($numopts).'].checked=true;" name="q'.$qdata->q_id.'o"></div>';
+					echo '<input type="text" size="30" onfocus="document.evalf.q'.$qdata->q_id.'['.($numopts).'].checked=true;" name="q'.$qdata->q_id.'o"';
+					if ($qdata->q_default == $opts['opt_id']) { echo ' checked="checked"'; }
+					echo '></div>';
 				}
 				echo '<br />';
 				$numopts++;
@@ -94,6 +98,9 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			$hasother=false;
 			foreach ($qopts as $opts) {
 				$options .= '<option value="'.$opts['opt_id'].'"';
+				if ($qdata->q_default == $opts['opt_id']) {
+					echo ' selected';
+				}
 				$options .= '>'.$opts['opt_txt'].'</option>';
 				if ($opts['opt_other']) $hasother=true;
 			}
@@ -106,10 +113,22 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		
 		
 		//output text field
-		if ($qdata->q_type == 'textbox' || $qdata->q_type == 'email') { echo '<input type="text" size="40" name="q'.$qdata->q_id.'"><br />'; }
+		if ($qdata->q_type == 'textbox' || $qdata->q_type == 'email') { 
+			echo '<input type="text" size="40" name="q'.$qdata->q_id.'"';
+			if ($qdata->q_default) {
+				echo ' value="'.$qdata->q_default.'"';
+			}
+			echo '><br />'; 
+		}
 		
 		//output text box
-		if ($qdata->q_type == 'textar') { echo '<textarea cols="60" rows="3" name="q'.$qdata->q_id.'"></textarea><br />'; }
+		if ($qdata->q_type == 'textar') { 
+			echo '<textarea cols="60" rows="3" name="q'.$qdata->q_id.'">';
+			if ($qdata->q_default) {
+				echo ' value="'.$qdata->q_default.'"';
+			}
+			echo '</textarea><br />'; 
+		}
 		
 		//File Attachment
 		if ($qdata->q_type == 'attach') { echo '<input id="q'.$qdata->q_id.'" name="q'.$qdata->q_id.'" type="file" size="40" />'; }
@@ -210,6 +229,30 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
 	if (($this->showlist == 'both' || $this->showlist == 'after')) echo $jumplist;
 	echo '<h2 class="componentheading">'.$this->pdata['poll_name'].'</h2>';
+	foreach ($this->qdata as $q) {
+		if ($q->answer) {
+			if ($q->q_type != 'mcbox') {
+				if ($q->q_type == "multi") {
+					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$q->answer;
+					$db->setQuery($qo); $opt = $db->loadObject();
+					$result = $opt->opt_txt;
+					$this->pdata['poll_results_msg_before'] = str_replace("{i".$q->q_id."}",$result,$this->pdata['poll_results_msg_before']);
+				} else {
+					$this->pdata['poll_results_msg_before'] = str_replace("{i".$q->q_id."}",$q->answer,$this->pdata['poll_results_msg_before']);
+				}
+			} else {
+				$ansarr = $q->answer;
+				$ans = implode(' ',$ansarr);
+				$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.implode(',',$ans).')';
+				$db->setQuery($qo); $opts = $db->loadResultArray();
+				foreach ($opt as $o) {
+					$result = $o->opt_txt;
+					$cfans .= $result.', ';
+				}
+				$this->pdata['poll_results_msg_before'] = str_replace("{i".$q->q_id."}",$cfans,$this->pdata['poll_results_msg_before']);
+			}
+		}
+	}
 	if ($this->pdata['poll_results_msg_before']) echo $this->pdata['poll_results_msg_before'];
 	if ($this->pdata['poll_showresults']) {
 		foreach ($this->qdata as $q) {
