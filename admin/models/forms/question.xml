@@ -64,7 +64,7 @@
 			description="COM_MPOLL_OPTION_FIELD_DEFAULT_DESC"
 			size="40"
 			class="inputbox"
-			required="true"
+			required="false"
 			default=""
 		/>
 		<field
