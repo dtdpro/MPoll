@@ -39,6 +39,7 @@
 			cols="80"
 			class="inputbox"
 			required="true"
+			filter="safehtml"
 			default=""
 		/>
 		<field

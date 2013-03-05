@@ -32,9 +32,9 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	
 		//Question text/Message  if not a single checkbox
 		if ($qdata->q_type != 'cbox') {
-			echo '<strong>';
+			if ($qdata->q_type != 'message') echo '<strong>';
 			echo $qdata->q_text;
-			echo '</strong>';
+			if ($qdata->q_type != 'message') echo '</strong>';
 		}
 		
 		//output checkbox
