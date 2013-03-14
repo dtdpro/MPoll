@@ -51,6 +51,18 @@
 			<option value="0">JOPTION_SELECT_CATEGORY</option>
 		</field>
 		<field
+			name="poll_pagetype"
+			type="list"
+			extension="com_mpoll"
+			class="inputbox"
+			default="poll"
+			label="COM_MPOLL_MPOLL_FIELD_PAGETYPE_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_PAGETYPE_DESC"
+			required="true">
+			<option value="form">Form</option>
+			<option value="poll">Poll</option>
+		</field>
+		<field
 			name="poll_emailto"
 			type="text"
 			label="COM_MPOLL_MPOLL_FIELD_EMAILTO_LABEL"

@@ -42,10 +42,14 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_questions` (
   `q_poll` int(11) NOT NULL,
   `ordering` smallint(6) NOT NULL,
   `q_text` text NOT NULL,
+  `q_pretext` TEXT NOT NULL,
   `q_hint` text NOT NULL,
   `q_default` varchar(255) NOT NULL,
-  `q_type` enum('textar','textbox','multi','cbox','mcbox','email','attach','message') NOT NULL,
+  `q_type` varchar(20) NOT NULL,
   `q_req` tinyint(1) NOT NULL DEFAULT '1',
+  `q_min` INT NOT NULL,
+  `q_max` INT NOT NULL,
+  `q_match` INT NOT NULL,
   `published` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`q_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
@@ -57,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_questions_opts` (
   `ordering` int(11) NOT NULL,
   `opt_other` tinyint(1) NOT NULL DEFAULT '0',
   `opt_correct` tinyint(1) NOT NULL DEFAULT '0',
+  `opt_disabled` tinyint(1) NOT NULL DEFAULT '0',
   `opt_color` varchar(10) NOT NULL DEFAULT '#000000',
   `published` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`opt_id`)

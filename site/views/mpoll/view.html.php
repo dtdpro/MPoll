@@ -31,16 +31,16 @@ class MPollViewMPoll extends JView
 		$user =& JFactory::getUser();
 		$guest = $user->guest ? true : false;
 		$pdata=$model->getPoll($pollid); 
-		$polllist = $model->getPolls($pdata['poll_cat']);
+		$polllist = $model->getPolls($pdata->poll_cat);
 		if (empty($pdata)) { $task='notfound'; $msg='This Poll is currently unavailble.'; }
 		else {
 			//date stuff
-			if ((strtotime($pdata['poll_start']) > strtotime(date("Y-m-d H:i:s"))) && $pdata['poll_start'] != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
-			if ((strtotime($pdata['poll_end']) < strtotime(date("Y-m-d H:i:s"))) && $pdata['poll_start'] != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
+			if ((strtotime($pdata->poll_start) > strtotime(date("Y-m-d H:i:s"))) && $pdata->poll_start != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
+			if ((strtotime($pdata->poll_end) < strtotime(date("Y-m-d H:i:s"))) && $pdata->poll_start != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
 			
 		}
-		$qdata=$model->getQuestions($pollid);
-		if ($pdata['poll_only']) {
+		$qdata=$model->getQuestions($pollid,true);
+		if ($pdata->poll_only) {
 			if (!$guest) $casted=$model->getCasted($pollid);
 			else $casted=false;
 			
@@ -60,7 +60,7 @@ class MPollViewMPoll extends JView
 			parent::display($tpl);
 		} else if ($casting && $task=='ballot' && !$casted) {
 			//save vote results
-			$cmplid=$model->saveBallot($pollid);
+			$cmplid=$model->save($pollid);
 			$url = 'index.php?option=com_mpoll&task=results&poll='.$pollid.'&cmplid='.$cmplid;
 			$urle = 'index.php?option=com_mpoll&task=ballot&poll='.$pollid.'&cmplid='.$cmplid;
 			if ($rtmpl) $url .= '&tmpl='.$rtmpl;

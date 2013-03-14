@@ -7,7 +7,7 @@
 	<authorUrl>http://www.ditzthedaisy.com</authorUrl>
 	<copyright>(c)2008-2013</copyright>
 	<license>GPL v2</license>
-	<version>1.16.2</version>
+	<version>1.17.0</version>
     <releaseDate>2013.03.05</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
@@ -19,7 +19,8 @@
 		<filename>controller.php</filename>
 		<folder>views</folder>
 		<folder>models</folder>
-		<folder>images</folder>>
+		<folder>images</folder>
+		<folder>lib</folder>
 	</files>
 	<install>
 		<sql>
@@ -36,6 +37,7 @@
 		<filename>mpoll.css</filename>
 		<folder>images</folder>
 		<folder>upload</folder>
+		<folder>scripts</folder>
 	</media>	
 	<administration>
 		<!-- Administration Menu Section -->

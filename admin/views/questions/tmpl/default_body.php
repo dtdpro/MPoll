@@ -33,6 +33,7 @@ defined('_JEXEC') or die('Restricted Access');
 				case "mcbox": echo 'Multi Checkbox'; break;
 				case "attach": echo 'File Attachment'; break;
 				case "message": echo 'Message'; break;
+				case "header": echo 'Header'; break;
 			} ?>
 		</td>
 		<td>

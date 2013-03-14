@@ -10,12 +10,22 @@ require_once (JPATH_COMPONENT.DS.'controller.php');
 if($controller = JRequest::getVar('controller')) {
 	require_once (JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php');
 }
-// Create the controller
 
+// Load StyleSheet for template, based on config
 $doc = &JFactory::getDocument();
 $doc->addStyleSheet('media/com_mpoll/mpoll.css');
+//jQuery
+if (!JFactory::getApplication()->get('jquery')) {
+	JFactory::getApplication()->set('jquery', true);
+	// add jQuery
+	$doc->addScript('media/com_mpoll/scripts/jquery.js');
+}
+$doc->addScript('media/com_mpoll/scripts/jquery.validate.js');
+$doc->addScript('media/com_mpoll/scripts/additional-methods.js');
+$doc->addScript('media/com_mpoll/scripts/jquery.metadata.js');
+$doc->addScript('media/com_mpoll/scripts/jquery.simplemodal.js');
 
-
+// Create the controller
 $classname	= 'MPollController'.$controller;
 $controller = new $classname( );
 		
@@ -24,6 +34,5 @@ $controller->execute( JRequest::getVar('task'));
 
 // Redirect if set by the controller
 $controller->redirect();
-//if (JRequest::getVar('view') != 'certif') echo '<h5>ContinuEd FrontEnd v0.6.3.24beta &#8226; &copy;2008 Corona Productions &#8226; For Development Use Only &#8226; Not for review &#8226; Do not take internally</h5>';
 ?>
 

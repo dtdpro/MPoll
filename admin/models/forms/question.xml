@@ -58,6 +58,18 @@
 			default=""
 		/>
 		<field
+			name="q_pretext"
+			type="textarea"
+			label="COM_MPOLL_QUESTION_FIELD_PRETEXT_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_PRETEXT_DESC"
+			rows="3"
+			cols="80"
+			class="inputbox"
+			required="false"
+			filter="safehtml"
+			default=""
+		/>
+		<field
 			name="q_default"
 			type="text"
 			label="COM_MPOLL_OPTION_FIELD_DEFAULT_LABEL"
@@ -84,6 +96,7 @@
 			<option value="mcbox">Multi Checkbox</option>
 			<option value="attach">File Attachment</option>
 			<option value="message">Message</option>
+			<option value="header">Header</option>
 		</field>
 		<field
 			name="q_req"
@@ -97,6 +110,26 @@
 			<option	value="1">Yes</option>
 			<option	value="0">No</option>
 		</field>
+		<field
+			name="q_min"
+			type="text"
+			extension="com_continued"
+			class="inputbox"
+			size="6"
+			label="COM_MPOLL_QUESTION_FIELD_MIN_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_MIN_DESC"
+			required="true"
+			default="0" />
+		<field
+			name="q_max"
+			type="text"
+			extension="com_continued"
+			class="inputbox"
+			size="6"
+			label="COM_MPOLL_QUESTION_FIELD_MAX_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_MAX_DESC"
+			required="true"
+			default="0" />
 	</fieldset>
 	
 

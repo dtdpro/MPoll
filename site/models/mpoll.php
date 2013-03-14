@@ -15,143 +15,208 @@ class MPollModelMPoll extends JModel
 		$user =& JFactory::getUser();
 		$query = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.' && published > 0 && access IN ('.implode(",",$user->getAuthorisedViewLevels()).')';
 		$db->setQuery( $query );
-		$pdata = $db->loadAssoc();
+		$pdata = $db->loadObject();
 		return $pdata;
 	}
-	function getQuestions($courseid)
+	function getQuestions($pollid,$options=false)
 	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_questions ';
-		$query .= 'WHERE published > 0 && q_poll = '.$courseid.' ORDER BY ordering ASC';
+		$query .= 'WHERE published > 0 && q_poll = '.$pollid.' ORDER BY ordering ASC';
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
+		if ($options) {
+			foreach ($qdata as &$q) {
+				if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown") {
+					$qo="SELECT opt_txt as text, opt_id as value, opt_disabled FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
+					$db->setQuery($qo);
+					$q->options = $db->loadObjectList();
+				}
+			}
+		}
+		foreach ($qdata as &$u) {
+			$value=$u->q_default;
+			if ($u->q_type == 'mlimit' || $u->q_type == 'multi' || $u->q_type == 'dropdown' || $u->q_type == 'mcbox' || $u->q_type == 'mlist') {
+				$u->value=explode(" ",$value);
+			} else if ($u->q_type == 'cbox' || $u->q_type == 'yesno') {
+				$u->value=$value;
+			} else if ($u->q_type == 'birthday') {
+				$u->value=$value;
+			} else if ($u->q_type != 'captcha') {
+				$u->value=$value;
+			}
+		}
 		return $qdata;
 	}
-	function saveBallot($pollid) {
-		$db =& JFactory::getDBO();
-		$user =& JFactory::getUser();
-		$userid = $user->id;
-		$pollinfo=$this->getPoll($pollid);
-		$email = '';
-		//save completed
-		$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll) VALUES ('.$userid.','.$pollid.')';
-		$db->setQuery( $qc );
-		$db->query();
-		$lastid = $db->insertid();
-		//saev answers
-		$query = 'SELECT * FROM #__mpoll_questions WHERE published > 0 && q_poll = '.$pollid;
-		$db->setQuery( $query );
-		$qdata = $db->loadAssocList(); 
-		foreach ($qdata as $ques) {
-			if ($pollinfo['poll_emailto']) $email .= '<b>'.$ques['q_text'].'</b>';
-			$otherans=$db->getEscaped(JRequest::getVar('q'.$ques['q_id'].'o'));
-			if ($ques['q_type'] == 'attach') {
-				$userfile = JRequest::getVar('q'.$ques['q_id'], null, 'files', 'array');
-				if (!empty($userfile['name'])) {
-					// Build the appropriate paths
-					$config		= JFactory::getConfig();
-					$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $lastid."_".$ques['q_id']."_".$userfile['name'];
-					$tmp_src	= $userfile['tmp_name'];
-					
-					// Move uploaded file
-					jimport('joomla.filesystem.file');
-					if ($this->canUpload($userfile,$err)) {
-						$uploaded = JFile::upload($tmp_src, $tmp_dest);
-						$ans = '/media/com_mpoll/upload/' . $lastid."_".$ques['q_id']."_".$userfile['name'];
-					} else {
-						$this->errmsg = $err;
-						$ans = 'ERROR: '.$err;
-					}
-				} else { $ans = ""; }
-				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$lastid.'")';
-				$db->setQuery( $q );
-				$db->query();
-				
-				if (strpos($ans,"ERROR:") === FALSE && $ans != "") {
-					$anse = '<a href="'.JURI::base(  ).$ans.'">Download</a>';
+	
+	public function save($pollid)
+	{
+		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		// Initialise variables;
+		$data		= JRequest::getVar('jform', array(), 'post', 'array');
+		$dispatcher = JDispatcher::getInstance();
+		$isNew = true;
+		$db		= $this->getDbo();
+		$app=Jfactory::getApplication();
+		$session=JFactory::getSession();
+		$user = JFactory::getUser();
+		$date = new JDate('now');
+		$pollinfo = $this->getPoll($pollid);
+		// Include the content plugins for the on save events.
+		JPluginHelper::importPlugin('content');
+	
+		// Allow an exception to be thrown.
+		try
+		{	
+			//save completed
+			$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll) VALUES ('.$user->id.','.$pollid.')';
+			$db->setQuery( $qc );
+			$db->query();
+			$subid = $db->insertid();
+			
+			//setup item and bind data
+			$fids = array();
+			$optfs = array();
+			$flist = $this->getQuestions($pollid,false);
+			foreach ($flist as $d) {
+				$fieldname = 'q_'.$d->q_id;
+				if ($d->q_type == 'attach') {
+					$userfile = JRequest::getVar('q_'.$d->q_id, null, 'files', 'array');
+					if (!empty($userfile['name'])) {
+						// Build the appropriate paths
+						$config		= JFactory::getConfig();
+						$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".$d->q_id."_".$userfile['name'];
+						$tmp_src	= $userfile['tmp_name'];
+						
+						// Move uploaded file
+						jimport('joomla.filesystem.file');
+						if ($this->canUpload($userfile,$err)) {
+							$uploaded = JFile::upload($tmp_src, $tmp_dest);
+							$item->$fieldname = '/media/com_mpoll/upload/' . $subid."_".$d->q_id."_".$userfile['name'];
+						} else {
+							$this->errmsg = $err;
+							$item->$fieldname = 'ERROR: '.$err;
+						}
+					} else { $item->$fieldname = ""; }
+				} else if ($d->q_type == 'captcha') {
+					$capfield=$fieldname;
+				} else if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
+					$item->$fieldname = implode(" ",$data[$fieldname]);
+				} else if ($d->q_type=='cbox') {
+					$item->$fieldname = ($data[$fieldname]=='on') ? "1" : "0";
+				} else if ($d->q_type=='birthday') {
+					$fmonth = (int)$data[$fieldname.'_month'];
+					$fday = (int)$data[$fieldname.'_day'];
+					if ($fmonth < 10) $fmonth = "0".$fmonth;
+					if ($fday < 10) $fday = "0".$fday;
+					$item->$fieldname = $fmonth.$fday;
 				} else {
-					$anse = $ans;
+					$item->$fieldname = $data[$fieldname];
 				}
-				
-				if ($pollinfo['poll_confemail']) {
-					$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$anse,$pollinfo['poll_confmsg']);
+				if ($d->q_type=="mcbox" || $d->q_type=="mlist" || $d->q_type=="multi" || $d->q_type=="dropdown") $optfs[]=$fieldname;
+				if ($d->q_type != 'captcha') $fids[]=$d->uf_id;
+			}
+			$item->site_url = JURI::base();
+			if ($capfield) {
+				include_once 'components/com_mcor/lib/securimage/securimage.php';
+				$securimage = new Securimage();
+				$securimage->session_name = $session->getName();
+				$securimage->case_sensitive  = false;
+				if ($securimage->check($data[$capfield]) == false) {
+					$this->setError('Security Code Incorrect');
+					return false;
 				}
-				if ($pollinfo['poll_emailto']) {
-					
-					$email .= '<br />'.$anse.'<br /><br />';
-				}
-				
-					
-				
-			} else if ($ques['q_type'] != 'mcbox') {
-				$ans = JRequest::getVar('q'.$ques['q_id']);
-				if ($pollinfo['poll_emailto'] || $pollinfo['poll_confemail']) {
-					if ($ques['q_type'] == "multi") {
-						$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$ans;
-						$db->setQuery($qo); $opt = $db->loadObject();
-						if ($opt->opt_other) $result = $otherans;
-						else $result = $opt->opt_txt;
-						$email .= '<br />'.$result.'<br /><br />';
-						$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$result,$pollinfo['poll_confmsg']);
-					} else {
-						$email .= '<br />'.$ans.'<br /><br />';
-						$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$ans,$pollinfo['poll_confmsg']);
-					}
-				}
-				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
-				$db->setQuery( $q );
-				$db->query();
-			} else {
-				$ansarr = JRequest::getVar('q'.$ques['q_id']); 
-				$ans = implode(' ',$ansarr);
-				$otherans=$db->getEscaped(JRequest::getVar('q'.$ques['q_id'].'o'));
-				if ($pollinfo['poll_emailto'] || $pollinfo['poll_confemail']) {
-					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.implode(',',$ansarr).')';
-					$db->setQuery($qo); $opts = $db->loadResultArray();
-					foreach ($opt as $o) {
-						if ($o->opt_other) $result = $otherans;
-						else $result = $o->opt_txt;
-						$email .= '<br />'.$result;
-						$cfans .= $result.', ';
-					}
-					$email .= '<br /><br />';
-					$pollinfo['poll_confmsg'] = str_replace("{i".$ques['q_id']."}",$cfans,$pollinfo['poll_confmsg']);
-				}
-				$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_ans_other,res_cm) VALUES ("'.$userid.'","'.$pollid.'","'.$ques['q_id'].'","'.$ans.'","'.$otherans.'","'.$lastid.'")';
-				$db->setQuery( $q );
-				$db->query();
+			}
+	
+			$odsql = "SELECT * FROM #__mpoll_questions_opts";
+			$db->setQuery($odsql);
+			$optionsdata = array();
+			$optres = $db->loadObjectList();
+			foreach ($optres as $o) {
+				$optionsdata[$o->opt_id]=$o->opt_txt;
 			}
 			
-		}
-		
-		if ($pollinfo['poll_emailto']) {
-			$mail = &JFactory::getMailer();
-			$mail->IsHTML(true);
-			$emllist = Array();
-			$emllist = explode(",",$pollinfo['poll_emailto']);
-			foreach ($emllist as $e) {
-				$mail->addRecipient($e,$e);
+			// Results email
+			if ($pollinfo->poll_emailto) {
+				$flist = $this->getQuestions($pollid,false);
+				$resultsemail = "";
+				foreach ($flist as $d) {
+					$fieldname = 'q_'.$d->q_id;
+					$resultsemail .= "<b>".$d->q_text.'</b><br />';
+					if ($d->q_type=="attach") {
+						if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
+					} else if (in_array($fieldname,$optfs)) {
+						if ($d->q_type == "mcbox") { 
+							foreach (explode($item->$fieldname," ") as $i) {
+								$resultsemail .= $optionsdata[$i].'<br />';
+							}
+						} else {
+							$resultsemail .= $optionsdata[$item->$fieldname].'<br />';
+						}
+						$resultsemail .= '<br />';
+					} else {
+						$resultsemail .= $item->$fieldname.'<br />';
+					}
+				}
+				$emllist = Array();
+				$emllist = explode(",",$pollinfo->poll_emailto);
+				
+				$mail = &JFactory::getMailer();
+				$sent = $mail->sendMail ($emllist[0], $emllist[0], $emllist, $pollinfo->poll_emailsubject, $resultsemail, true);
 			}
-			$mail->setSender($emllist[0],$emllist[0]);
-			$mail->setSubject($pollinfo['poll_emailsubject']);
-			$mail->setBody( $email );
-			$sent = $mail->Send();
+			
+			//confirmation email
+			if ($pollinfo->poll_confemail && $user->id) {
+				$flist = $this->getQuestions($pollid,false);
+				$confemail = $pollinfo->poll_confmsg;
+				$confemail = str_replace("{name}",$user->name,$confemail);
+				$confemail = str_replace("{username}",$user->username,$confemail);
+				$confemail = str_replace("{email}",$user->email,$confemail);
+				foreach ($flist as $d) {
+					$fieldname = 'q_'.$d->q_id;
+					if ($d->q_type=="attach") {
+						
+					} else if (in_array($fieldname,$optfs)) {
+						$youropts="";
+						if ($d->q_type == "mcbox") {
+							foreach (explode($item->$fieldname," ") as $i) {
+								$youropts .= $optionsdata[$i].' ';
+							}
+						} else {
+							$youropts = $optionsdata[$item->$fieldname];
+						}
+						$confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
+					} else {
+						$confemail = str_replace("{i".$d->q_id."}",$item->$fieldname,$confemail);
+					}
+				}
+				$mail = &JFactory::getMailer();
+				$sent = $mail->sendMail ($pollinfo->poll_conffromemail, $pollinfo->poll_conffromname, $user->email, $pollinfo->poll_confsubject, $confemail, true);
+			}
+			
+			// Save poll info
+			$flist = $this->getQuestions($pollid,false);
+			foreach ($flist as $fl) {
+				$fieldname = 'q_'.$fl->q_id;
+				if ($fl->q_type != "captcha") {
+					$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_cm) VALUES ("'.$user->id.'","'.$pollid.'","'.$fl->q_id.'","'.$item->$fieldname.'","'.$subid.'")';
+					$db->setQuery( $q );
+					if (!$db->query()) {
+						$this->setError("Error saving additional information");
+						return false;
+					}
+				}
+			}
+				
 		}
-		
-		if ($pollinfo['poll_confemail'] && $user->id) {
-			$pollinfo['poll_confmsg'] = str_replace("{name}",$user->name,$pollinfo['poll_confmsg']);
-			$pollinfo['poll_confmsg'] = str_replace("{username}",$user->username,$pollinfo['poll_confmsg']);
-			$pollinfo['poll_confmsg'] = str_replace("{email}",$user->email,$pollinfo['poll_confmsg']);
-			$mail = &JFactory::getMailer();
-			$mail->IsHTML(true);
-			$emllist = Array();
-			$mail->addRecipient($user->email,$user->name);
-			$mail->setSender($pollinfo['poll_conffromemail'],$pollinfo['poll_conffromname']);
-			$mail->setSubject($pollinfo['poll_confsubject']);
-			$mail->setBody( $pollinfo['poll_confmsg'] );
-			$sent = $mail->Send();
+		catch (Exception $e)
+		{
+			$this->setError($e->getMessage());
+				
+			return false;
 		}
-		return $lastid;
+	
+		return true;
 	}
 	
 	function getCasted($pollid) {
