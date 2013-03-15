@@ -14,12 +14,11 @@ public function __construct($config = array())
 	{
 		if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
-				'poll_id', 'p.poll_id',
-				'poll_name', 'p.poll_name',
-				'poll_cat', 'p.poll_cat', 'category_title',
-				'published', 'p.published',
-				'access', 'p.access', 'access_level',
-				'ordering', 'a.ordering',
+				'poll_id', 
+				'poll_name', 
+				'category_title', 
+				'published', 
+				'access_level',
 			);
 		}
 
@@ -49,7 +48,7 @@ public function __construct($config = array())
 		$this->setState('params', $params);
 
 		// List state information.
-		parent::populateState('p.poll_name', 'asc');
+		parent::populateState('poll_name', 'asc');
 	}
 	
 	protected function getListQuery() 

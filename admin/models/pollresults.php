@@ -7,37 +7,74 @@ jimport( 'joomla.application.component.model' );
 
 class MPollModelPollResults extends JModel
 {
-	function getResponses($cid,$questions)
+	function getResponses($pollid,$questions)
 	{
 		$db =& JFactory::getDBO();
-		$q = 'SELECT DISTINCT r.*,m.*';
-		foreach ($questions as $qu) {
-			$q .= ',q'.$qu->q_id;
-			if ($qu->q_type=='multi' || $qu->q_type=='dropdown') $q .= 'a.opt_txt';
-			else $q .= '.res_ans';
-			$q .= ' as q'.$qu->q_id.'ans';
-			$q .= ',q'.$qu->q_id.'.res_ans_other as q'.$qu->q_id.'anso';
-		}
+		
+		//Get Completions
+		$q = 'SELECT *';
 		$q .= ' FROM #__mpoll_completed as r';
-		//$q .= ' LEFT JOIN #__mpoll_courses as c ON r.course = c.id';
-		$q .= ' LEFT JOIN #__users as m ON r.cm_user = m.id';
-		foreach ($questions as $qu) {
-			$q .= ' LEFT JOIN #__mpoll_results as q'.$qu->q_id.' ON q'.$qu->q_id.'.res_qid = '.$qu->q_id.' && r.cm_id = q'.$qu->q_id.'.res_cm';
-			if ($qu->q_type=='multi' || $qu->q_type=='dropdown') $q .= ' LEFT JOIN #__mpoll_questions_opts as q'.$qu->q_id.'a ON q'.$qu->q_id.'a.opt_id=q'.$qu->q_id.'.res_ans ';
-		}
-		$q .= ' WHERE r.cm_poll = '.$cid.' ORDER BY r.cm_time DESC';
+		$q .= ' WHERE r.cm_poll = '.$pollid.' ORDER BY r.cm_time DESC';
 		$db->setQuery($q);
-		$data = $db->loadAssocList();
+		$data = $db->loadObjectList();
+		
+		//Get Results
+		foreach ($data as &$d) {
+			$qd = "SELECT * FROM #__mpoll_results WHERE res_cm = ".$d->cm_id;
+			$db->setQuery($qd);
+			$cmd = $db->loadObjectList();
+			foreach ($cmd as $c) {
+				$fn='q_'.$c->res_qid;
+				$d->$fn=$c->res_ans;
+			}
+		}
+		
 		return $data;
 	}	
-	function getQuestions($cid)
+	
+	function getOptions($questions) {
+		$db =& JFactory::getDBO();
+		
+		//Get QIDs
+		$qids=array();
+		foreach ($questions as $q) {
+			$qids[]=$q->q_id;
+		}
+		
+		$qo = "SELECT * FROM #__mpoll_questions_opts WHERE opt_qid IN(".implode(",",$qids).")";
+		$db->setQuery($qo);
+		$ores = $db->loadObjectList();
+		
+		$odata = array();
+		foreach ($ores as $o) {
+			$odata[$o->opt_id] = $o->opt_txt;
+		}
+		
+		return $odata;
+	}
+	
+	function getQuestions($pollid)
 	{
 		$query  = ' SELECT * FROM #__mpoll_questions ';
-		$query .= 'WHERE q_poll ='.$cid.' ';
+		$query .= 'WHERE q_type NOT IN ("captcha","message","header") && q_poll ='.$pollid.' ';
 		$query .= 'ORDER BY ordering ASC';
 		$db =& JFactory::getDBO();
 		$db->setQuery($query);
 		$data = $db->loadObjectList();
 		return $data;
 	}	
+	
+	function getUsers() {
+		$db =& JFactory::getDBO();
+		$qo = "SELECT * FROM #__users";
+		$db->setQuery($qo);
+		$ures = $db->loadObjectList();
+		
+		$udata = array();
+		foreach ($ures as $u) {
+			$udata[$u->id] = $u;
+		}
+		
+		return $udata;
+	}
 }

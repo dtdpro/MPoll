@@ -4,6 +4,8 @@
 defined('_JEXEC') or die('Restricted Access');
 // load tooltip behavior
 JHtml::_('behavior.tooltip');
+$listOrder	= $this->escape($this->state->get('list.ordering'));
+$listDirn	= $this->escape($this->state->get('list.direction'));
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_mpoll'); ?>" method="post" name="adminForm">
 	<fieldset id="filter-bar">
@@ -31,9 +33,115 @@ JHtml::_('behavior.tooltip');
 	<div class="clr"> </div>
 	
 	<table class="adminlist">
-		<thead><?php echo $this->loadTemplate('head');?></thead>
-		<tfoot><?php echo $this->loadTemplate('foot');?></tfoot>
-		<tbody><?php echo $this->loadTemplate('body');?></tbody>
+		<thead>
+			<tr>
+				<th width="5">
+					<?php echo JHtml::_('grid.sort','COM_MPOLL_MPOLL_HEADING_ID','poll_id', $listDirn, $listOrder); ?>
+				</th>
+				<th width="20">
+					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->items); ?>);" />
+				</th>			
+				<th>
+					<?php echo JHtml::_('grid.sort','COM_MPOLL_MPOLL_HEADING_TITLE','poll_name', $listDirn, $listOrder); ?>
+				</th>	
+				<th width="200">
+					<?php echo JHtml::_('grid.sort','COM_MPOLL_MPOLL_HEADING_CAT','category_title', $listDirn, $listOrder); ?>
+				</th>	
+				<th width="50">
+					<?php echo JText::_( 'COM_MPOLL_MPOLL_HEADING_PTYPE' ); ?>
+				</th>	
+				<th width="100">
+					<?php echo JHtml::_('grid.sort','JPUBLISHED','state', $listDirn, $listOrder); ?>
+				</th>	
+				<th width="75">
+					<?php echo JHtml::_('grid.sort','JGRID_HEADING_ACCESS','access_level', $listDirn, $listOrder); ?>
+				</th>
+				<th width="100">
+					<?php echo JText::_( 'COM_MPOLL_MPOLL_HEADING_QUESTIONS' ); ?>
+				</th>
+				<th width="150">
+					<?php echo JText::_( 'COM_MPOLL_MPOLL_HEADING_AVAILABILITY' ); ?>
+				</th>
+				<th width="100">
+					<?php echo JText::_( 'COM_MPOLL_MPOLL_HEADING_NUMSUBS' ); ?>
+				</th>
+				<th width="100">
+					<?php echo JText::_( 'COM_MPOLL_MPOLL_HEADING_RESULTS' ); ?>
+				</th>
+			</tr>
+		</thead>
+		<tfoot><tr><td colspan="11"><?php echo $this->pagination->getListFooter(); ?></td></tr></tfoot>
+		<tbody>
+		<?php foreach($this->items as $i => $item): 
+
+			?>
+			<tr class="row<?php echo $i % 2; ?>">
+				<td>
+					<?php echo $item->poll_id; ?>
+				</td>
+				<td>
+					<?php echo JHtml::_('grid.id', $i, $item->poll_id); ?>
+				</td>
+				<td>
+						<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=mpoll.edit&poll_id='.(int) $item->poll_id); ?>">
+						<?php echo $this->escape($item->poll_name); ?></a>
+					<p class="smallsub"><?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($item->poll_alias));?></p>
+				</td>
+				<td align="center">
+					<?php echo $item->category_title; ?>
+				</td>
+				<td align="center">
+					<?php 
+						switch ($item->poll_pagetype) {
+							case "poll": echo "Poll"; break;
+							case "form": echo "Form"; break;
+						}
+ 					?>
+				</td>
+				<td class="center">
+					<?php echo JHtml::_('jgrid.published', $item->published, $i, 'mpolls.', true);?>
+				</td>
+				<td align="center">
+					<?php echo $item->access_level; ?>
+				</td>
+		        <td align="center">
+					<?php 
+					
+					echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=questions&filter_poll='.$item->poll_id).'">Questions'; 
+					$db =& JFactory::getDBO();
+					$query = 'SELECT count(*) FROM #__mpoll_questions WHERE q_poll="'.$item->poll_id.'"';
+					$db->setQuery( $query );
+					echo ' ['.$db->loadResult().']</a>'; 
+				
+				?>
+				</td>
+				<td>
+					<?php 
+						if ($item->poll_start == '0000-00-00 00:00:00') echo 'Always';
+						else { 
+							echo 'B: '.date("M d, Y",strtotime($item->poll_start)).'<br />E: '.date("M d, Y",strtotime($item->poll_end)); 
+						}
+					?>
+				</td>
+				<td align="center">
+					<?php 
+					
+					$db =& JFactory::getDBO();
+					$query = 'SELECT count(*) FROM #__mpoll_completed WHERE cm_poll="'.$item->poll_id.'"';
+					$db->setQuery( $query );
+					echo $db->loadResult(); 
+				
+				?>
+				</td>
+				<td>
+					<?php 
+						echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=pollresults&poll='.$item->poll_id).'">Results</a>';
+						echo ' | <a href="'.JRoute::_('index.php?option=com_mpoll&view=tally&poll='.$item->poll_id).'">Tally</a>';
+					?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
 	</table>
 	<div>
 		<input type="hidden" name="task" value="" />

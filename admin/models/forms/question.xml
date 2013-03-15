@@ -34,42 +34,6 @@
 			description="JFIELD_ORDERING_DESC" 
 		/>
 		<field
-			name="q_text"
-			type="textarea"
-			label="COM_MPOLL_QUESTION_FIELD_NAME_LABEL"
-			description="COM_MPOLL_QUESTION_FIELD_NAME_DESC"
-			rows="3"
-			cols="80"
-			class="inputbox"
-			required="true"
-			filter="safehtml"
-			default=""
-		/>
-		<field
-			name="q_hint"
-			type="textarea"
-			label="COM_MPOLL_QUESTION_FIELD_HINT_LABEL"
-			description="COM_MPOLL_QUESTION_FIELD_HINT_DESC"
-			rows="3"
-			cols="80"
-			class="inputbox"
-			required="false"
-			filter="safehtml"
-			default=""
-		/>
-		<field
-			name="q_pretext"
-			type="textarea"
-			label="COM_MPOLL_QUESTION_FIELD_PRETEXT_LABEL"
-			description="COM_MPOLL_QUESTION_FIELD_PRETEXT_DESC"
-			rows="3"
-			cols="80"
-			class="inputbox"
-			required="false"
-			filter="safehtml"
-			default=""
-		/>
-		<field
 			name="q_default"
 			type="text"
 			label="COM_MPOLL_OPTION_FIELD_DEFAULT_LABEL"
@@ -92,11 +56,13 @@
 			<option value="textbox">Text Field</option>
 			<option value="email">EMail</option>
 			<option value="multi">Radio Select</option>
+			<option value="dropdown">Dropdown Select</option>
 			<option value="cbox">Check Box</option>
 			<option value="mcbox">Multi Checkbox</option>
 			<option value="attach">File Attachment</option>
 			<option value="message">Message</option>
 			<option value="header">Header</option>
+			<option value="captcha">Captcha</option>
 		</field>
 		<field
 			name="q_req"
@@ -131,7 +97,45 @@
 			required="true"
 			default="0" />
 	</fieldset>
+	<fieldset name="content">
+		<field
+			name="q_text"
+			type="textarea"
+			label="COM_MPOLL_QUESTION_FIELD_NAME_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_NAME_DESC"
+			rows="5"
+			cols="80"
+			class="inputbox"
+			required="true"
+			filter="safehtml"
+			default=""
+		/>
+		<field
+			name="q_pretext"
+			type="textarea"
+			label="COM_MPOLL_QUESTION_FIELD_PRETEXT_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_PRETEXT_DESC"
+			rows="5"
+			cols="80"
+			class="inputbox"
+			required="false"
+			filter="safehtml"
+			default=""
+		/>
+		<field
+			name="q_hint"
+			type="textarea"
+			label="COM_MPOLL_QUESTION_FIELD_HINT_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_HINT_DESC"
+			rows="5"
+			cols="80"
+			class="inputbox"
+			required="false"
+			filter="safehtml"
+			default=""
+		/>
 	
+	</fieldset>
 
 </form>
 

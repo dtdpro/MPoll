@@ -7,7 +7,7 @@ abstract class MPollHelper
 {
 	public static function addSubmenu($submenu) 
 	{
-		JSubMenuHelper::addEntry(JText::_('COM_MPOLL_SUBMENU_POLLS'), 'index.php?option=com_mpoll', $submenu == 'Polls');
+		JSubMenuHelper::addEntry(JText::_('COM_MPOLL_SUBMENU_MPOLLS'), 'index.php?option=com_mpoll', $submenu == 'Polls');
 		JSubMenuHelper::addEntry(JText::_('COM_MPOLL_SUBMENU_CATEGORIES'), 'index.php?option=com_categories&view=categories&extension=com_mpoll', $submenu == 'categories');
 		// set some global property
 		$document = JFactory::getDocument();

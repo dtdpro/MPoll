@@ -8,7 +8,7 @@ $db =& JFactory::getDBO();
 	<thead>
 		<tr>
 			<th>
-				<?php echo JText::_( 'User' ); ?>
+				<?php echo JText::_( 'Users Name' ); ?>
 			</th>
 			<th>
 				<?php echo JText::_( 'Completed On' ); ?>
@@ -23,49 +23,40 @@ $db =& JFactory::getDBO();
 	<?php
 	$k = 0;
 	$cq = 1;
-	for ($i=0, $n=count( $this->items ); $i < $n; $i++)
+	foreach ($this->items as $i)
 	{
-		$row = &$this->items[$i];
-		
 		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td>
 				<?php 
-				if ($row['cm_user'] == 0) echo 'Guest';
-				else echo $row['username']; ?>
+				if ($i->cm_user == 0) echo 'Guest';
+				else echo $this->users[$i->cm_user]->name; ?>
 			</td>
 			<td>
-				<?php echo $row['cm_time']; ?>
+				<?php echo $i->cm_time; ?>
 			</td>
 			<?php
             	foreach ($this->questions as $qu) {
+            		$fn='q_'.$qu->q_id;
 					echo '<td>';
 					$qnum = 'q'.$qu->q_id.'ans';
 					if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') { 
-						if ($row[$qnum.'o']) echo '<em>Other:</em> '.$row[$qnum.'o'];
-						else echo $row[$qnum];
+						echo $this->options[$i->$fn];
 					}
-					if ($qu->q_type == 'textbox') { echo $row[$qnum]; }
-					if ($qu->q_type == 'textar') { echo $row[$qnum]; }
+					if ($qu->q_type == 'textbox') { echo $i->$fn; }
+					if ($qu->q_type == 'textar') { echo $i->$fn; }
 					if ($qu->q_type == 'attach') { 
-						if (strpos($row[$qnum],"ERROR:") === FALSE && $row[$qnum] != "") {
-							echo '<a href="'.$row[$qnum].'">Right Click Download</a>';
+						if (strpos($i->$fn,"ERROR:") === FALSE && $i->$fn != "") {
+							echo '<a href="'.$i->$fn.'">Right Click Download</a>';
 						} else {
-							echo $row[$qnum];
+							echo $i->$fn;
 						}
 					}
-					if ($qu->q_type == 'email') { echo $row[$qnum]; }
-					if ($qu->q_type == 'cbox') { if ($row[$qnum] == 'on') echo 'Checked'; else echo 'Unchecked'; }
+					if ($qu->q_type == 'email') { echo $i->$fn; }
+					if ($qu->q_type == 'cbox') { if ($i->$fn) echo 'Yes'; else echo 'No'; }
 					if ($qu->q_type == 'mcbox') {
-						$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qu->q_id.' ORDER BY ordering ASC';
-						$db->setQuery( $query );
-						$qopts = $db->loadAssocList();
-						$answers = explode(' ',$row[$qnum]);
-						foreach ($qopts as $opts) {
-							if (in_array($opts['opt_id'],$answers)) { 
-								if ($opts['opt_other']) echo '<em>Other:</em> '.$row[$qnum.'o'].'<br />';
-								else echo $opts['opt_txt'].'<br />'; 
-							} 
+						foreach ($i->$fn as $o) {
+							echo $this->options[$o].'<br />';  
 						}
 					}
 					echo '</td>';
@@ -75,7 +66,6 @@ $db =& JFactory::getDBO();
 		</tr>
 		<?php
 		$k = 1 - $k;
-		$cq = $row->disporder+1;
 	}
 	?>
 	</table>

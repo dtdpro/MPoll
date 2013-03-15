@@ -11,7 +11,7 @@ class MPollController extends JController
 		JRequest::setVar('view', JRequest::getCmd('view', 'mpolls'));
 
 		// call parent behavior
-		parent::display($cachable);
+		parent::display();
 
 		// Set the submenu
 		MPollHelper::addSubmenu('Polls');

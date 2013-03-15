@@ -11,8 +11,7 @@ class JFormFieldModal_MPoll extends JFormField
 	protected function getInput()
 	{
 		// Load the javascript
-		JHtml::_('behavior.framework');
-		JHtml::_('behavior.modal', 'input.modal');
+		JHtml::_('behavior.modal', 'a.modal');
 
 		// Build the script.
 		$script = array();
@@ -24,17 +23,6 @@ class JFormFieldModal_MPoll extends JFormField
 
 		// Add the script to the document head.
 		JFactory::getDocument()->addScriptDeclaration(implode("\n", $script));
-
-		// Build the script.
-		$script = array();
-		$script[] = '	window.addEvent("domready", function() {';
-		$script[] = '		var div = new Element("div").setStyle("display", "none").injectBefore(document.id("menu-types"));';
-		$script[] = '		document.id("menu-types").injectInside(div);';
-		$script[] = '	});';
-
-		// Add the script to the document head.
-		JFactory::getDocument()->addScriptDeclaration(implode("\n", $script));
-
 
 		// Get the title of the linked chart
 		$db = JFactory::getDBO();
@@ -52,12 +40,26 @@ class JFormFieldModal_MPoll extends JFormField
 		if (empty($title)) {
 			$title = JText::_('COM_MPOLL_SELECT_A_POLL');
 		}
-
+		$title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+		
 		$link = 'index.php?option=com_mpoll&amp;view=mpolls&amp;layout=modal&amp;tmpl=component&amp;function=jSelectChart_'.$this->id;
 
-		JHtml::_('behavior.modal', 'a.modal');
-		$html = "\n".'<div class="fltlft"><input type="text" id="'.$this->id.'_name" value="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8').'" disabled="disabled" /></div>';
-		$html .= '<div class="button2-left"><div class="blank"><a class="modal" title="'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'"  href="'.$link.'" rel="{handler: \'iframe\', size: {x: 800, y: 450}}">'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'</a></div></div>'."\n";
+		$html	= array();
+		
+		// The current user display field.
+		$html[] = '<div class="fltlft">';
+		$html[] = '  <input type="text" id="'.$this->id.'_name" value="'.$title.'" disabled="disabled" size="35" />';
+		$html[] = '</div>';
+		
+		// The user select button.
+		$html[] = '<div class="button2-left">';
+		$html[] = '  <div class="blank">';
+		$html[] = '	<a class="modal" title="'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'"  href="'.$link.'&amp;'.JSession::getFormToken().'=1" rel="{handler: \'iframe\', size: {x: 800, y: 450}}">'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'</a>';
+		$html[] = '  </div>';
+		$html[] = '</div>';
+		
+		
+		
 		// The active newsfeed id field.
 		if (0 == (int)$this->value) {
 			$value = '';
@@ -71,8 +73,8 @@ class JFormFieldModal_MPoll extends JFormField
 			$class = ' class="required modal-value"';
 		}
 
-		$html .= '<input type="hidden" id="'.$this->id.'_id"'.$class.' name="'.$this->name.'" value="'.$value.'" />';
+		$html[] = '<input type="hidden" id="'.$this->id.'_id"'.$class.' name="'.$this->name.'" value="'.$value.'" />';
 
-		return $html;
+		return implode("\n", $html);
 	}
 }

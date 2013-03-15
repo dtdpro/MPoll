@@ -34,6 +34,14 @@ $params = $this->form->getFieldsets('params');
 			</ul>
 		</fieldset>
 		<fieldset class="adminform">
+			<legend><?php echo JText::_( 'COM_MPOLL_MPOLL_RESULTS' ); ?></legend>
+			<ul class="adminformlist">
+<?php foreach($this->form->getFieldset('results') as $field): ?>
+				<li><?php echo $field->label;echo $field->input;?></li>
+<?php endforeach; ?>
+			</ul>
+		</fieldset>
+		<fieldset class="adminform">
 			<legend><?php echo JText::_( 'COM_MPOLL_MPOLL_CONFIRMATION' ); ?></legend>
 			<ul class="adminformlist">
 <?php foreach($this->form->getFieldset('confirmation') as $field): ?>

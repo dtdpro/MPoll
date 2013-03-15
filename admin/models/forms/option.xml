@@ -44,7 +44,7 @@
 		/>
 		<field
 			name="opt_other"
-			type="radio"
+			type="hidden"
 			label="COM_MPOLL_OPTION_FIELD_OTHER_LABEL"
 			description="COM_MPOLL_OPTION_FIELD_OTHER_DESC"
 			size="1"

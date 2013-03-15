@@ -3,11 +3,11 @@
 	<name>mod_mpoll</name>
 	<author>DtD Productions</author>
 	<creationDate>March 2009</creationDate>
-	<copyright>Copyright (C) 2009 DTD Productsion</copyright>
+	<copyright>Copyright (C) 2013 DTD Productsion</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@dtdpro.com</authorEmail>
 	<authorUrl>www.dtdpro.com</authorUrl>
-	<version>1.6</version>
+	<version>1.7.0</version>
 	<description>MOD_MPOLL_DESC</description>
 	<files>
 		<filename module="mod_mpoll">mod_mpoll.php</filename>
@@ -23,23 +23,44 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic" addfieldpath="/administrator/components/com_mpoll/models/fields">
-				<field name="poll" type="modal_mpoll" label="MOD_MPOLL_FIELD_POLL_LABEL" description="" required="true" />
-				<field name="moduleclass_sfx" type="text" default="" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC" />
-				<field name="showtitle" type="radio" default="1" label="MOD_MPOLL_FIELD_SHOWTITLE_LABEL" description="">
+				<field name="poll" type="modal_mpoll" label="MOD_MPOLL_FIELD_POLL_LABEL" description="MOD_MPOLL_FIELD_POLL_DESC" required="true" />
+				<field name="showtitle" type="radio" default="1" label="MOD_MPOLL_FIELD_SHOWTITLE_LABEL" description="MOD_MPOLL_FIELD_SHOWTITLE_DESC">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>
-				<field name="showresults" type="radio" default="1" label="MOD_MPOLL_FIELD_SHOWRESULTS_LABEL" description="">
+				<field name="showresults" type="radio" default="1" label="MOD_MPOLL_FIELD_SHOWRESULTS_LABEL" description="MOD_MPOLL_FIELD_SHOWRESULTS_DESC">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>
-				<field name="showresultslink" type="radio" default="0" label="MOD_MPOLL_FIELD_SHOWRESULTSBTN_LABEL" description="">
+				<field name="showresultslink" type="radio" default="0" label="MOD_MPOLL_FIELD_SHOWRESULTSBTN_LABEL" description="MOD_MPOLL_FIELD_SHOWRESULTSBTN_DESC">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>
-				<field name="resultsas" type="radio" default="count" label="MOD_MPOLL_FIELD_RESULTSAS_LABEL" description="">
+				<field name="resultsas" type="radio" default="count" label="MOD_MPOLL_FIELD_RESULTSAS_LABEL" description="MOD_MPOLL_FIELD_RESULTSAS_DESC">
 					<option value="count">Count</option>
 					<option value="percent">Percentages</option>
+				</field>
+			</fieldset>
+			<fieldset
+				name="advanced">
+				<field
+					name="layout"
+					type="modulelayout"
+					label="JFIELD_ALT_LAYOUT_LABEL"
+					description="JFIELD_ALT_MODULE_LAYOUT_DESC" />
+				<field
+					name="moduleclass_sfx"
+					type="text"
+					label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
+					description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC" />
+				<field
+					name="cache"
+					type="list"
+					default="0"
+					label="COM_MODULES_FIELD_CACHING_LABEL"
+					description="COM_MODULES_FIELD_CACHING_DESC">
+					<option
+						value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
 				</field>
 			</fieldset>
 		</fields>

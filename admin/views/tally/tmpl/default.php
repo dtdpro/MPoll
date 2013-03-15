@@ -10,6 +10,7 @@ $db =& JFactory::getDBO();
 		echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
 		switch ($q->q_type) {
 			case 'multi':
+			case 'dropdown':
 				$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
 				$db->setQuery( $qnum );
 				$qnums = $db->loadAssoc();

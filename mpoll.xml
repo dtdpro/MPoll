@@ -11,7 +11,7 @@
     <releaseDate>2013.03.05</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
-
+	<scriptfile>script.php</scriptfile>
 	<files folder="site"> 
 		<filename>index.html</filename>
 		<filename>mpoll.php</filename>
@@ -42,7 +42,11 @@
 	<administration>
 		<!-- Administration Menu Section -->
 		<menu img="../media/com_mpoll/images/mpoll-16x16.png">COM_MPOLL_MENU</menu>
-
+		<submenu>
+			<menu view="mpolls" img="../media/com_mpoll/images/mpoll-16x16.png">COM_MPOLL_SUBMENU_MPOLLS</menu>
+			<menu link="option=com_categories&amp;extension=com_mpoll" view="categories" img="class:category" alt="MPoll/Categories">COM_MPOLL_SUBMENU_CATEGORIES</menu>
+		</submenu>
+		
 		
 		<files folder="admin">
 			<filename>index.html</filename>

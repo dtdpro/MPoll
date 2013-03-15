@@ -15,9 +15,13 @@ class MPollViewPollResults extends JView
 		$model = $this->getModel('pollresults');
 		$questions = $model->getQuestions($pid);
 		$items = $model->getResponses($pid,$questions);
+		$opts = $model->getOptions($questions);
+		$users = $model->getUsers();
 		
-		$this->assignRef('questions',		$questions);
-		$this->assignRef('items',		$items);
+		$this->assignRef('questions',$questions);
+		$this->assignRef('items',$items);
+		$this->assignRef('options',$opts);
+		$this->assignRef('users',$users);
 		parent::display($tpl);
 	}
 }

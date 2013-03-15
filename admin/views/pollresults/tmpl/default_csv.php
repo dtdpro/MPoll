@@ -12,46 +12,42 @@ foreach ($this->questions as $qu) {
 	$contents .= ",\"".$qu->ordering." ".$qu->q_text."\"";
 }
 $contents .= "\n";
-for ($i=0, $n=count( $this->items ); $i < $n; $i++)
+foreach ($this->items as $i)
 {
-	$row = &$this->items[$i];
 	$contents .= "\"";
-	if ($row['cm_user'] == 0) $contents .= 'Guest';
-	else $contents .= $row['name']; 
+	if ($i->cm_user == 0) $contents .= 'Guest';
+	else $contents .= $this->users[$i->cm_user]->name; 
 	$contents .= "\",";
-	$contents .= "\"".$row['email']."\",";
-	$contents .= "\"".$row['cm_time']."\"";
+	$contents .= "\"".$this->users[$i->cm_user]->email."\",";
+	$contents .= "\"".$i->cm_time."\"";
 
     foreach ($this->questions as $qu) {
-		$contents .= ",\"";
+    	$fn='q_'.$qu->q_id;
+    	$contents .= ",\"";
 		$qnum = 'q'.$qu->q_id.'ans';
-		if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') { 
-			if ($row[$qnum.'o']) $contents .= 'Other: '.$row[$qnum.'o'];
-			else $contents .= $row[$qnum];
-		}
-		if ($qu->q_type == 'textbox') { $contents .= $row[$qnum]; }
-		if ($qu->q_type == 'textar') { $contents .= $row[$qnum]; }
-		if ($qu->q_type == 'email') { $contents .= $row[$qnum]; }
-		if ($qu->q_type == 'cbox') { if ($row[$qnum] == 'on') $contents .= 'Checked'; else $contents .= 'Unchecked'; }
-		if ($qu->q_type == 'mcbox') {
-			$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qu->q_id.' ORDER BY ordering ASC';
-			$db->setQuery( $query );
-			$qopts = $db->loadAssocList();
-			$answers = explode(' ',$row[$qnum]);
-			foreach ($qopts as $opts) {
-				if (in_array($opts['opt_id'],$answers)) { 
-					if ($opts['opt_other']) $contents .= '<em>Other:</em> '.$row[$qnum.'o'].'<br />';
-					else $contents .= $opts['opt_txt'].'<br />'; 
-				} 
-			}
-		}
+    	if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') {
+    		$contents .= $this->options[$i->$fn];
+    	}
+    	if ($qu->q_type == 'textbox') { $contents .= $i->$fn; }
+    	if ($qu->q_type == 'textar') { $contents .= $i->$fn; }
+    	if ($qu->q_type == 'attach') {
+    		if (strpos($i->$fn,"ERROR:") === FALSE && $i->$fn != "") {
+    			$contents .= $i->$fn;
+    		} else {
+    			$contents .= $i->$fn;
+    		}
+    	}
+    	if ($qu->q_type == 'email') { $contents .= $i->$fn; }
+    	if ($qu->q_type == 'cbox') { if ($i->$fn) $contents .= 'Yes'; else $contents .= 'No'; }
+    	if ($qu->q_type == 'mcbox') {
+    		foreach ($i->$fn as $o) {
+    			$contents .= $this->options[$o].' ';
+    		}
+    	}
 		$contents .= "\"";
 	}
 	
 	$contents .= "\n";
-		
-	$k = 1 - $k;
-	$cq = $row->disporder+1;
 }
 JFile::write($path.$filename,$contents);
 

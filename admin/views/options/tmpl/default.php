@@ -5,9 +5,11 @@ defined('_JEXEC') or die('Restricted Access');
 // load tooltip behavior
 JHtml::_('behavior.tooltip');
 
+
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 $saveOrder	= $listOrder == 'o.ordering';
+$ordering	= ($listOrder == 'o.ordering');
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=options'); ?>" method="post" name="adminForm">
 	<fieldset id="filter-bar">
@@ -29,9 +31,67 @@ $saveOrder	= $listOrder == 'o.ordering';
 	<div class="clr"> </div>
 	
 	<table class="adminlist">
-		<thead><?php echo $this->loadTemplate('head');?></thead>
-		<tfoot><?php echo $this->loadTemplate('foot');?></tfoot>
-		<tbody><?php echo $this->loadTemplate('body');?></tbody>
+		<thead>
+			<tr>
+				<th width="5">
+					<?php echo JText::_('COM_MPOLL_OPTION_HEADING_ID'); ?>
+				</th>
+				<th width="20">
+					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->items); ?>);" />
+				</th>			
+				<th>
+					<?php echo JText::_('COM_MPOLL_OPTION_HEADING_TITLE'); ?>
+				</th>	
+				<th width="100">
+					<?php echo JText::_('JPUBLISHED'); ?>
+				</th>	
+				<th width="50">
+					<?php echo JText::_( 'COM_MPOLL_OPTION_HEADING_CORRECT' ); ?>
+				</th>
+				<th width="10%">
+					<?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ORDERING', 'o.ordering', $listDirn, $listOrder); ?>
+					<?php echo JHtml::_('grid.order',  $this->items, 'filesave.png', 'options.saveorder'); ?>
+				</th>
+			</tr>
+		</thead>
+		<tfoot><tr><td colspan="7"><?php echo $this->pagination->getListFooter(); ?></td></tr></tfoot>
+		<tbody>
+		<?php foreach($this->items as $i => $item):	?>
+				<tr class="row<?php echo $i % 2; ?>">
+					<td>
+						<?php echo $item->opt_id; ?>
+					</td>
+					<td>
+						<?php echo JHtml::_('grid.id', $i, $item->opt_id); ?>
+					</td>
+					<td>
+							<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=option.edit&opt_id='.(int) $item->opt_id); ?>">
+							<?php echo $this->escape($item->opt_txt); ?></a>
+					</td>
+					<td class="center">
+						<?php echo JHtml::_('jgrid.published', $item->published, $i, 'options.', true);?>
+					</td>
+					<td align="center">
+						<?php echo ($item->opt_correct) ? "Yes" : "No"; ?>
+					</td>
+			        <td class="order">
+							<?php if ($saveOrder) :?>
+								<?php if ($listDirn == 'asc') : ?>
+									<span><?php echo $this->pagination->orderUpIcon($i, ($item->opt_qid == @$this->items[$i-1]->opt_qid), 'options.orderup', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
+									<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, ($item->opt_qid == @$this->items[$i+1]->opt_qid), 'options.orderdown', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
+								<?php elseif ($listDirn == 'desc') : ?>
+									<span><?php echo $this->pagination->orderUpIcon($i, ($item->opt_qid == @$this->items[$i-1]->opt_qid), 'options.orderdown', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
+									<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, ($item->opt_qid == @$this->items[$i+1]->opt_qid), 'options.orderup', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
+								<?php endif; ?>
+							<?php endif; ?>
+							<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
+							<input type="text" name="order[]" size="5" value="<?php echo $item->ordering;?>" <?php echo $disabled ?> class="text-area-order" />
+			
+					</td>
+				
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
 	</table>
 	<div>
 		<input type="hidden" name="task" value="" />

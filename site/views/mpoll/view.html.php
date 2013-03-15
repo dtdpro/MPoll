@@ -60,12 +60,14 @@ class MPollViewMPoll extends JView
 			parent::display($tpl);
 		} else if ($casting && $task=='ballot' && !$casted) {
 			//save vote results
-			$cmplid=$model->save($pollid);
-			$url = 'index.php?option=com_mpoll&task=results&poll='.$pollid.'&cmplid='.$cmplid;
-			$urle = 'index.php?option=com_mpoll&task=ballot&poll='.$pollid.'&cmplid='.$cmplid;
-			if ($rtmpl) $url .= '&tmpl='.$rtmpl;
-			if ($model->errmsg) $mainframe->redirect(JRoute::_($urle,false),$model->errmsg,"error");
-			else $mainframe->redirect(JRoute::_($url,false));
+			if ($cmplid=$model->save($pollid)) {
+				$url = 'index.php?option=com_mpoll&task=results&poll='.$pollid.'&cmplid='.$cmplid;
+				if ($rtmpl) $url .= '&tmpl='.$rtmpl;
+				$mainframe->redirect(JRoute::_($url,false));
+			} else {
+				$urle = 'index.php?option=com_mpoll&task=ballot&poll='.$pollid.'&cmplid='.$cmplid;
+				$mainframe->redirect(JRoute::_($urle,false),$model->getError(),"error");
+			}
 		} else if (($casted && $task=='ballot') || $task=='results') { 
 			$task='results';
 			

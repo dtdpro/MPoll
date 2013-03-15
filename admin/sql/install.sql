@@ -6,13 +6,14 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_completed` (
   PRIMARY KEY (`cm_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `#__mpoll_polls` (
+CREATE TABLE IF NOT EXISTS `cdev_mpoll_polls` (
   `poll_id` int(11) NOT NULL AUTO_INCREMENT,
   `poll_name` varchar(255) NOT NULL,
   `poll_alias` varchar(255) NOT NULL,
   `poll_desc` text NOT NULL,
   `poll_start` datetime NOT NULL,
   `poll_end` datetime NOT NULL,
+  `poll_pagetype` varchar(50) NOT NULL DEFAULT 'poll',
   `published` tinyint(1) NOT NULL,
   `poll_only` tinyint(4) NOT NULL DEFAULT '1',
   `poll_regreq` tinyint(4) NOT NULL DEFAULT '0',

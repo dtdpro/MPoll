@@ -8,4 +8,6 @@ ALTER TABLE  `#__mpoll_questions` CHANGE  `q_type`  `q_type` VARCHAR( 20 ) CHARA
 
 ALTER TABLE  `#__mpoll_questions` ADD  `q_pretext` TEXT NOT NULL AFTER  `q_text`;
 
-ALTER TABLE  `#__mpoll_polls` ADD  `poll_pagetype` VARCHAR( 50 ) NOT NULL AFTER  `poll_end`;
+ALTER TABLE  `#__mpoll_polls` ADD  `poll_pagetype` VARCHAR( 50 ) NOT NULL DEFAULT 'poll' AFTER  `poll_end`;
+
+ALTER TABLE  `#__mpoll_polls` ADD  `poll_resultsemail` BOOLEAN NOT NULL DEFAULT FALSE AFTER  `poll_cat`

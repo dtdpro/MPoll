@@ -21,6 +21,7 @@ class MPollModelMPoll extends JModel
 	function getQuestions($pollid,$options=false)
 	{
 		$db =& JFactory::getDBO();
+		$app=Jfactory::getApplication();
 		$query = 'SELECT * FROM #__mpoll_questions ';
 		$query .= 'WHERE published > 0 && q_poll = '.$pollid.' ORDER BY ordering ASC';
 		$db->setQuery( $query );
@@ -35,9 +36,12 @@ class MPollModelMPoll extends JModel
 			}
 		}
 		foreach ($qdata as &$u) {
-			$value=$u->q_default;
+			$fn='q_'.$u->q_id;
+			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,'');
+			if(!$value && $udata->$fn) $value = $udata->$fn;
+			else if (!$value) $value=$u->q_default;
 			if ($u->q_type == 'mlimit' || $u->q_type == 'multi' || $u->q_type == 'dropdown' || $u->q_type == 'mcbox' || $u->q_type == 'mlist') {
-				$u->value=explode(" ",$value);
+				$u->value=explode(" ",$value); 
 			} else if ($u->q_type == 'cbox' || $u->q_type == 'yesno') {
 				$u->value=$value;
 			} else if ($u->q_type == 'birthday') {
@@ -77,27 +81,12 @@ class MPollModelMPoll extends JModel
 			//setup item and bind data
 			$fids = array();
 			$optfs = array();
+			$upfile=array();
 			$flist = $this->getQuestions($pollid,false);
 			foreach ($flist as $d) {
 				$fieldname = 'q_'.$d->q_id;
 				if ($d->q_type == 'attach') {
-					$userfile = JRequest::getVar('q_'.$d->q_id, null, 'files', 'array');
-					if (!empty($userfile['name'])) {
-						// Build the appropriate paths
-						$config		= JFactory::getConfig();
-						$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".$d->q_id."_".$userfile['name'];
-						$tmp_src	= $userfile['tmp_name'];
-						
-						// Move uploaded file
-						jimport('joomla.filesystem.file');
-						if ($this->canUpload($userfile,$err)) {
-							$uploaded = JFile::upload($tmp_src, $tmp_dest);
-							$item->$fieldname = '/media/com_mpoll/upload/' . $subid."_".$d->q_id."_".$userfile['name'];
-						} else {
-							$this->errmsg = $err;
-							$item->$fieldname = 'ERROR: '.$err;
-						}
-					} else { $item->$fieldname = ""; }
+					$upfile[]=$fieldname;
 				} else if ($d->q_type == 'captcha') {
 					$capfield=$fieldname;
 				} else if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
@@ -115,10 +104,13 @@ class MPollModelMPoll extends JModel
 				}
 				if ($d->q_type=="mcbox" || $d->q_type=="mlist" || $d->q_type=="multi" || $d->q_type=="dropdown") $optfs[]=$fieldname;
 				if ($d->q_type != 'captcha') $fids[]=$d->uf_id;
+				if ($d->cf_type != 'captcha' || $d->cf_type != 'password') $app->setUserState('mpoll.poll'.$pollid.'.'.$fieldname, $item->$fieldname);
 			}
 			$item->site_url = JURI::base();
+			
+			//Check CAPTCHA
 			if ($capfield) {
-				include_once 'components/com_mcor/lib/securimage/securimage.php';
+				include_once 'components/com_mpoll/lib/securimage/securimage.php';
 				$securimage = new Securimage();
 				$securimage->session_name = $session->getName();
 				$securimage->case_sensitive  = false;
@@ -126,6 +118,27 @@ class MPollModelMPoll extends JModel
 					$this->setError('Security Code Incorrect');
 					return false;
 				}
+			}
+			
+			//Upload
+			foreach ($upfile as $u) {
+				$userfile = JRequest::getVar($u, null, 'files', 'array');
+				if (!empty($userfile['name'])) {
+					// Build the appropriate paths
+					$config		= JFactory::getConfig();
+					$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$userfile['name'];
+					$tmp_src	= $userfile['tmp_name'];
+				
+					// Move uploaded file
+					jimport('joomla.filesystem.file');
+					if ($this->canUpload($userfile,$err)) {
+						$uploaded = JFile::upload($tmp_src, $tmp_dest);
+						$item->$u = '/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$userfile['name'];
+					} else {
+						$this->setError($err);
+						return false;
+					}
+				} else { $item->$u = ""; }
 			}
 	
 			$odsql = "SELECT * FROM #__mpoll_questions_opts";
@@ -137,12 +150,14 @@ class MPollModelMPoll extends JModel
 			}
 			
 			// Results email
-			if ($pollinfo->poll_emailto) {
+			if ($pollinfo->poll_resultsemail) {
 				$flist = $this->getQuestions($pollid,false);
 				$resultsemail = "";
 				foreach ($flist as $d) {
-					$fieldname = 'q_'.$d->q_id;
-					$resultsemail .= "<b>".$d->q_text.'</b><br />';
+					if ($d->q_type != "captcha") {
+						$fieldname = 'q_'.$d->q_id;
+						$resultsemail .= "<b>".$d->q_text.'</b><br />';
+					}
 					if ($d->q_type=="attach") {
 						if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
 					} else if (in_array($fieldname,$optfs)) {
@@ -154,7 +169,7 @@ class MPollModelMPoll extends JModel
 							$resultsemail .= $optionsdata[$item->$fieldname].'<br />';
 						}
 						$resultsemail .= '<br />';
-					} else {
+					} else if ($d->q_type != "captcha") {
 						$resultsemail .= $item->$fieldname.'<br />';
 					}
 				}
@@ -186,7 +201,7 @@ class MPollModelMPoll extends JModel
 							$youropts = $optionsdata[$item->$fieldname];
 						}
 						$confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
-					} else {
+					} else if ($d->q_type != "captcha") {
 						$confemail = str_replace("{i".$d->q_id."}",$item->$fieldname,$confemail);
 					}
 				}
@@ -216,7 +231,7 @@ class MPollModelMPoll extends JModel
 			return false;
 		}
 	
-		return true;
+		return $subid;
 	}
 	
 	function getCasted($pollid) {

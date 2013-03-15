@@ -280,7 +280,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			}
 			echo '>';
 			echo '<span class="uf_note">';
-			echo '<a href="#" onclick="document.getElementById(\'captcha_img\').src = \''.JURI::base(true).'/components/com_mue/lib/securimage/securimage_show.php?\' + Math.random(); return false">Reload Image</a>';
+			echo '<a href="#" onclick="document.getElementById(\'captcha_img\').src = \''.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php?\' + Math.random(); return false">Reload Image</a>';
 			echo '</span>';
 			echo '</div>';
 		}
@@ -349,13 +349,14 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	if ($this->pdata->poll_results_msg_before) echo $this->pdata->poll_results_msg_before;
 	if ($this->pdata->poll_showresults) {
 		foreach ($this->qdata as $q) {
-			if ($q->q_type == "mcbox" || $q->q_type == "multi") {
+			if ($q->q_type == "mcbox" || $q->q_type == "multi" || $q->q_type == "dropdown") {
 				echo '<div class="mpollcom-question">';
 				$anscor=false;
 				echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
 				switch ($q->q_type) {
 					case 'multi':
 					case 'mcbox':
+					case 'dropdown':
 						$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
 						$db->setQuery( $qnum );
 						$qnums = $db->loadAssoc();
