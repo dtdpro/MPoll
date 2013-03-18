@@ -26,12 +26,8 @@ $db =& JFactory::getDBO();
 					$o->anscount = $db->loadResult();
 					if ($o->anscount == "") $o->anscount = 0;
 				}
-				$gper=0; $ansper=0; $gperid = 0;
 				foreach ($qopts as $opts) {
 					if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-					if ($qans == $opts->id && $opts->correct) {
-						$anscor=true;
-					}
 					echo '<div class="mpollcom-opt">';
 					
 					echo '<div class="mpollcom-opt-text">';
@@ -43,11 +39,6 @@ $db =& JFactory::getDBO();
 					echo '</div>';
 					echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
 					echo '</div>';
-					if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
-					if ($qans==$opts->opt_id) {
-						if ($qdata->q_expl) $expl=$qdata->q_expl;
-						else $expl=$opts->opt_expl;
-					}
 				}
 				break;
 				

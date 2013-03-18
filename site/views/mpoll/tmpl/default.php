@@ -324,7 +324,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	echo '<h2 class="componentheading">'.$this->pdata->poll_name.'</h2>';
 	foreach ($this->qdata as $q) {
 		if ($q->answer) {
-			if ($q->q_type != 'mcbox') {
+			if ($q->q_type != 'mcbox' && $q->q_type != "mlist") {
 				if ($q->q_type == "multi") {
 					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$q->answer;
 					$db->setQuery($qo); $opt = $db->loadObject();
@@ -358,32 +358,24 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 					case 'mcbox':
 					case 'mlist':
 					case 'dropdown':
-						$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
-						$db->setQuery( $qnum );
-						$qnums = $db->loadAssoc();
-						$numr=$qnums['count(res_qid)'];
-						$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
-						$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
-						$db->setQuery( $query );
-						$qopts = $db->loadObjectList();
-						$tph=0;
-						foreach ($qopts as &$o) {
-							$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans LIKE "%'.$o->opt_id.'%" GROUP BY res_qid';
+						//$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
+						//$db->setQuery( $qnum );
+						//$qnums = $db->loadAssoc();
+						$numr=0; //$qnums['count(res_qid)'];
+						foreach ($q->options as &$o) {
+							$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans LIKE "%'.$o->value.'%" GROUP BY res_qid';
 							$db->setQuery($qa);
 							$o->anscount = $db->loadResult();
 							if ($o->anscount == "") $o->anscount = 0;
+							$numr = $numr + (int)$o->anscount;
 						}
-						$gper=0; $ansper=0; $gperid = 0;
-						foreach ($qopts as $opts) {
-							if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-							if ($qans == $opts->id && $opts->correct) {
-								$anscor=true;
-							}
+						foreach ($q->options as $opts) {
+							if ($numr != 0) $per = ($opts->anscount)/($numr); else $per=1;
 							echo '<div class="mpollcom-opt">';
 							
 							echo '<div class="mpollcom-opt-text">';
-							if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->opt_txt.'</div>';
-							else echo $opts->opt_txt;
+							if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->text.'</div>';
+							else echo $opts->text;
 							echo '</div>';
 							echo '<div class="mpollcom-opt-count">';
 							if ($this->resultsas == "percent") echo (int)($per*100)."%";
@@ -391,11 +383,6 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 							echo '</div>';
 							echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
 							echo '</div>';
-							if ($gper < $per) { $gper = $per; $gperid = $opts->id; }
-							if ($qans==$opts->opt_id) {
-								if ($qdata->q_expl) $expl=$qdata->q_expl;
-								else $expl=$opts->opt_expl;
-							}
 						}
 						break;
 					default: break;
