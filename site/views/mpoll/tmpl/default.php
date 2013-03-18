@@ -349,13 +349,14 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	if ($this->pdata->poll_results_msg_before) echo $this->pdata->poll_results_msg_before;
 	if ($this->pdata->poll_showresults) {
 		foreach ($this->qdata as $q) {
-			if ($q->q_type == "mcbox" || $q->q_type == "multi" || $q->q_type == "dropdown") {
+			if ($q->q_type == "mcbox" || $q->q_type == "multi" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
 				echo '<div class="mpollcom-question">';
 				$anscor=false;
 				echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
 				switch ($q->q_type) {
 					case 'multi':
 					case 'mcbox':
+					case 'mlist':
 					case 'dropdown':
 						$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
 						$db->setQuery( $qnum );

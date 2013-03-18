@@ -28,7 +28,7 @@ class MPollModelMPoll extends JModel
 		$qdata = $db->loadObjectList();
 		if ($options) {
 			foreach ($qdata as &$q) {
-				if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown") {
+				if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
 					$qo="SELECT opt_txt as text, opt_id as value, opt_disabled FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
 					$db->setQuery($qo);
 					$q->options = $db->loadObjectList();
@@ -161,8 +161,9 @@ class MPollModelMPoll extends JModel
 					if ($d->q_type=="attach") {
 						if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
 					} else if (in_array($fieldname,$optfs)) {
-						if ($d->q_type == "mcbox") { 
-							foreach (explode($item->$fieldname," ") as $i) {
+						if ($d->q_type == "mcbox" || $d->q_type=="mlist") { 
+							$ans = explode(" ",$item->$fieldname);
+							foreach ($ans as $i) {
 								$resultsemail .= $optionsdata[$i].'<br />';
 							}
 						} else {
@@ -193,8 +194,9 @@ class MPollModelMPoll extends JModel
 						
 					} else if (in_array($fieldname,$optfs)) {
 						$youropts="";
-						if ($d->q_type == "mcbox") {
-							foreach (explode($item->$fieldname," ") as $i) {
+						if ($d->q_type == "mcbox" || $d->q_type=="mlist") {
+							$ans = explode(" ",$item->$fieldname);
+							foreach ($ans as $i) {
 								$youropts .= $optionsdata[$i].' ';
 							}
 						} else {

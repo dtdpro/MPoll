@@ -39,8 +39,9 @@ foreach ($this->items as $i)
     	}
     	if ($qu->q_type == 'email') { $contents .= $i->$fn; }
     	if ($qu->q_type == 'cbox') { if ($i->$fn) $contents .= 'Yes'; else $contents .= 'No'; }
-    	if ($qu->q_type == 'mcbox') {
-    		foreach ($i->$fn as $o) {
+    	if ($qu->q_type == 'mcbox' || $qu->q_type=="mlist") {
+    		$i->$fn = explode(" ",$i->$fn);
+			foreach ($i->$fn as $o) {
     			$contents .= $this->options[$o].' ';
     		}
     	}

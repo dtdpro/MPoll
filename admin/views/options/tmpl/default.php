@@ -46,6 +46,9 @@ $ordering	= ($listOrder == 'o.ordering');
 					<?php echo JText::_('JPUBLISHED'); ?>
 				</th>	
 				<th width="50">
+					<?php echo JText::_( 'COM_MPOLL_OPTION_HEADING_DISABLED' ); ?>
+				</th>
+				<th width="50">
 					<?php echo JText::_( 'COM_MPOLL_OPTION_HEADING_CORRECT' ); ?>
 				</th>
 				<th width="10%">
@@ -54,7 +57,7 @@ $ordering	= ($listOrder == 'o.ordering');
 				</th>
 			</tr>
 		</thead>
-		<tfoot><tr><td colspan="7"><?php echo $this->pagination->getListFooter(); ?></td></tr></tfoot>
+		<tfoot><tr><td colspan="8"><?php echo $this->pagination->getListFooter(); ?></td></tr></tfoot>
 		<tbody>
 		<?php foreach($this->items as $i => $item):	?>
 				<tr class="row<?php echo $i % 2; ?>">
@@ -72,7 +75,10 @@ $ordering	= ($listOrder == 'o.ordering');
 						<?php echo JHtml::_('jgrid.published', $item->published, $i, 'options.', true);?>
 					</td>
 					<td align="center">
-						<?php echo ($item->opt_correct) ? "Yes" : "No"; ?>
+						<?php echo ($item->opt_disabled) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
+					</td>
+			       <td align="center">
+						<?php echo ($item->opt_correct) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
 			        <td class="order">
 							<?php if ($saveOrder) :?>

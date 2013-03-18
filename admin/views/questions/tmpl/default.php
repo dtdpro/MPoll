@@ -93,10 +93,11 @@ $ordering	= ($listOrder == 'q.ordering');
 							case "message": echo 'Message'; break;
 							case "header": echo 'Header'; break;
 							case "captcha": echo 'Captcha'; break;
+							case "mlist": echo 'Multi Select'; break;
 						} ?>
 					</td>
 					<td align="center">
-						<?php echo ($item->q_req) ? "Yes" : "No"; ?>
+						<?php echo ($item->q_req) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
 			        <td class="order">
 							<?php if ($saveOrder) :?>
@@ -114,7 +115,7 @@ $ordering	= ($listOrder == 'q.ordering');
 					</td>
 			        <td align="center">
 						<?php 
-						if ($item->q_type=='multi' || $item->q_type=='mcbox' || $item->q_type=='dropdown') {
+						if ($item->q_type=='mlist' ||$item->q_type=='multi' || $item->q_type=='mcbox' || $item->q_type=='dropdown') {
 							echo '<a href="'.JRoute::_('index.php?option=com_mpoll&view=options&filter_question='.$item->q_id).'">Options'; 
 							$db =& JFactory::getDBO();
 							$query = 'SELECT count(*) FROM #__mpoll_questions_opts WHERE opt_qid="'.$item->q_id.'"';

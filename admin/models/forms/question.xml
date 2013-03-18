@@ -57,6 +57,7 @@
 			<option value="email">EMail</option>
 			<option value="multi">Radio Select</option>
 			<option value="dropdown">Dropdown Select</option>
+			<option value="mlist">Multi Select</option>
 			<option value="cbox">Check Box</option>
 			<option value="mcbox">Multi Checkbox</option>
 			<option value="attach">File Attachment</option>

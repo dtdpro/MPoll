@@ -54,7 +54,8 @@ $db =& JFactory::getDBO();
 					}
 					if ($qu->q_type == 'email') { echo $i->$fn; }
 					if ($qu->q_type == 'cbox') { if ($i->$fn) echo 'Yes'; else echo 'No'; }
-					if ($qu->q_type == 'mcbox') {
+					if ($qu->q_type == 'mcbox' || $qu->q_type=="mlist") {
+						$i->$fn = explode(" ",$i->$fn);
 						foreach ($i->$fn as $o) {
 							echo $this->options[$o].'<br />';  
 						}
