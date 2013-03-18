@@ -2,14 +2,14 @@
 defined('_JEXEC') or die('Restricted access'); 
 $db =& JFactory::getDBO();
 ?>
-<form name="mpollf<?php echo $pdata['poll_id']; ?>">
+<form name="mpollf<?php echo $pdata->poll_id; ?>">
 
 <?php 
 if ($showtitle) {
-	echo '<div class="mpollmod-title">'.$pdata['poll_name'].'</div>';
+	echo '<div class="mpollmod-title">'.$pdata->poll_name.'</div>';
 }
 ?>
-	<div id="mpollmod<?php echo $pdata['poll_id']; ?>" class="mpollmod-pollbody">
+	<div id="mpollmod<?php echo $pdata->poll_id; ?>" class="mpollmod-pollbody">
 			<?php
 				if ($status != 'closed' && $status != 'done') {
 					foreach ($qdatap as $qdata) {
@@ -36,12 +36,11 @@ if ($showtitle) {
 						
 						//output radio select
 						if ($qdata->q_type == 'multi') {
-							$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' && published = 1 ORDER BY ordering ASC';
-							$db->setQuery( $query );
-							$qopts = $db->loadAssocList();
 							$numopts=0;
-							foreach ($qopts as $opts) {
-								echo '<div class="mpollmod-answer"><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts['opt_id'].'" id="q'.$qdata->q_id.$opts['opt_id'].'"> <label for="q'.$qdata->q_id.$opts['opt_id'].'">'.$opts['opt_txt'].'</label></div>';
+							foreach ($qdata->options as $opts) {
+								echo '<div class="mpollmod-answer"><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts->value.'" id="q'.$qdata->q_id.$opts->value.'"';
+								if ($opts->opt_disabled) echo " disabled";
+								echo '> <label for="q'.$qdata->q_id.$opts->value.'">'.$opts->text.'</label></div>';
 								$numopts++;
 							}
 						} 
@@ -69,37 +68,37 @@ if ($showtitle) {
 					}
 					echo '<p align="center">';
 					if ($status == 'open') {
-						echo '<a href="javascript:checkRq'.$pdata['poll_id'].'();" class="button">Submit</a>';
+						echo '<a href="javascript:checkRq'.$pdata->poll_id.'();" class="button">Submit</a>';
 					} else { 
-						echo 'Log in to Vote'; 
+						echo $pdata->poll_regreqmsg; 
 					}
 					if ($params->get( 'showresultslink', 0 )) {
-						echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']).'" class="button">Results</a>';
+						echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="button">Results</a>';
 					}
 					echo '</p>';
 					
 					$cnt = count($req_q);
 					?>
 					<script type='text/javascript'>
-					function checkRq<?php echo $pdata['poll_id']; ?>() {
-						ev = document.mpollf<?php echo $pdata['poll_id']; ?>;
+					function checkRq<?php echo $pdata->poll_id; ?>() {
+						ev = document.mpollf<?php echo $pdata->poll_id; ?>;
 						erMsg = '<span style="color:#800000"><b>Answer is Required</b></span>';
 						erMsgEml = '<span style="color:#800000"><b>A valid email address is required</b></span>';
 						cks = false; errs = false;
 					<?
 					for ($i=0; $i<$cnt; $i++) {
-						if ($req_t[$i] == 'textbox') { echo "	if(isEmpty".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
-						if ($req_t[$i] == 'email') { echo "	if(isEmpty".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg') || isNotEmail".$pdata['poll_id']."(ev.".$req_q[$i].", erMsgEml,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
-						if ($req_t[$i] == 'multi') { echo "	if(isNCheckedR".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,".$req_o[$i].",'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
-						if ($req_t[$i] == 'cbox') { echo "	if(isChecked".$pdata['poll_id']."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
+						if ($req_t[$i] == 'textbox') { echo "	if(isEmpty".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
+						if ($req_t[$i] == 'email') { echo "	if(isEmpty".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg') || isNotEmail".$pdata->poll_id."(ev.".$req_q[$i].", erMsgEml,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
+						if ($req_t[$i] == 'multi') { echo "	if(isNCheckedR".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,".$req_o[$i].",'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
+						if ($req_t[$i] == 'cbox') { echo "	if(isChecked".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
 						
 					} 
 				
 				?>
-					if (!errs) MPollAJAX<?php echo $pdata['poll_id']; ?>();
+					if (!errs) MPollAJAX<?php echo $pdata->poll_id; ?>();
 					}
 					
-					function isNotEmail<?php echo $pdata['poll_id']; ?>(elem, helperMsg,msgl){
+					function isNotEmail<?php echo $pdata->poll_id; ?>(elem, helperMsg,msgl){
 
 						var emailExp=/^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-Z0-9]{2,4}$/;
 						if (!elem.value.match(emailExp)) { 
@@ -112,7 +111,7 @@ if ($showtitle) {
 							return false;
 					}
 
-					function isEmpty<?php echo $pdata['poll_id']; ?>(elem, helperMsg,msgl){
+					function isEmpty<?php echo $pdata->poll_id; ?>(elem, helperMsg,msgl){
 						if(elem.value.length == 0){
 							document.getElementById(msgl).innerHTML = helperMsg;
 							document.getElementById(msgl).style.display='block';
@@ -124,7 +123,7 @@ if ($showtitle) {
 							return false;
 					}
 					
-					function isNCheckedR<?php echo $pdata['poll_id']; ?>(elem, helperMsg,cnt,msgl){
+					function isNCheckedR<?php echo $pdata->poll_id; ?>(elem, helperMsg,cnt,msgl){
 						var isit = false;
 						for (var i=0; i<cnt; i++) {
 							if(elem[i].checked){ isit = true; }
@@ -139,7 +138,7 @@ if ($showtitle) {
 						document.getElementById(msgl).style.display='none';
 							return false;
 					}
-					function isChecked<?php echo $pdata['poll_id']; ?>(elem, helperMsg,msgl) {
+					function isChecked<?php echo $pdata->poll_id; ?>(elem, helperMsg,msgl) {
 						if (elem.checked) {
 							document.getElementById(msgl).innerHTML = '';
 							document.getElementById(msgl).style.display='none';
@@ -151,7 +150,7 @@ if ($showtitle) {
 							return true; 
 						}
 					}
-					function getCheckedValue<?php echo $pdata['poll_id']; ?>(radioObj) {
+					function getCheckedValue<?php echo $pdata->poll_id; ?>(radioObj) {
 						if(!radioObj)
 							return "";
 						var radioLength = radioObj.length;
@@ -168,7 +167,7 @@ if ($showtitle) {
 						return "";
 					}
 	
-					function MPollAJAX<?php echo $pdata['poll_id']; ?>(){
+					function MPollAJAX<?php echo $pdata->poll_id; ?>(){
 						var ajaxRequest;  // The variable that makes Ajax possible!
 						
 						try{
@@ -191,17 +190,17 @@ if ($showtitle) {
 						// Create a function that will receive data sent from the server
 						ajaxRequest.onreadystatechange = function(){
 							if(ajaxRequest.readyState == 4){
-								var ajaxDisplay = document.getElementById('mpollmod<?php echo $pdata['poll_id']; ?>');
+								var ajaxDisplay = document.getElementById('mpollmod<?php echo $pdata->poll_id; ?>');
 								ajaxDisplay.innerHTML = ajaxRequest.responseText;
 							}
 						}
 						var queryString = "?";
 						<?php
-						echo "queryString += 'poll=".$pdata['poll_id']."&showresults=".$params->get( 'showresults', 1 )."&showresultslink=".$params->get( 'showresultslink', 0 )."&resultsas=".$params->get( 'resultsas', "count" )."';\n";
-						if ($params->get( 'showresultslink', 0 )) echo "queryString += '&resultslink=".urlencode(JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']))."';\n";
+						echo "queryString += 'poll=".$pdata->poll_id."&showresults=".$params->get( 'showresults', 1 )."&showresultslink=".$params->get( 'showresultslink', 0 )."&resultsas=".$params->get( 'resultsas', "count" )."';\n";
+						if ($params->get( 'showresultslink', 0 )) echo "queryString += '&resultslink=".urlencode(JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id))."';\n";
 						foreach ($qdatap as $qdata) {
 							if ($qdata->q_type == 'multi') {
-								echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + getCheckedValue".$pdata['poll_id']."(ev.q".$qdata->q_id.");\n";
+								echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + getCheckedValue".$pdata->poll_id."(ev.q".$qdata->q_id.");\n";
 							}
 							else echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + encodeURIComponent(ev.q".$qdata->q_id.".value);\n";
 						} 
@@ -211,8 +210,8 @@ if ($showtitle) {
 					}
 					</script><?php 
 				} else if ($status == 'done') {
-					if ($pdata['poll_results_msg_before']) echo $pdata['poll_results_msg_before'];
-					if ($pdata['poll_showresults'] && $params->get( 'showresults', 1 )) {
+					if ($pdata->poll_results_msg_before) echo $pdata->poll_results_msg_before;
+					if ($pdata->poll_showresults && $params->get( 'showresults', 1 )) {
 						foreach ($qdatap as $q) {
 							if ($q->q_type == "multi") {
 								echo '<div class="mpollmod-question">';
@@ -225,28 +224,21 @@ if ($showtitle) {
 										$db->setQuery( $qnum );
 										$qnums = $db->loadAssoc();
 										$numr=$qnums['count(res_qid)'];
-										$query  = 'SELECT o.* FROM #__mpoll_questions_opts as o ';
-										$query .= 'WHERE o.opt_qid = '.$q->q_id.' ORDER BY ordering ASC';
-										$db->setQuery( $query );
-										$qopts = $db->loadObjectList();
 										$tph=0;
-										foreach ($qopts as &$o) {
-											$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->opt_id.' GROUP BY res_ans';
+										foreach ($q->options as &$o) {
+											$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->value.' GROUP BY res_ans';
 											$db->setQuery($qa);
 											$o->anscount = $db->loadResult();
 											if ($o->anscount == "") $o->anscount = 0;
 										}
 										$gper=0; $ansper=0; $gperid = 0;
-										foreach ($qopts as $opts) {
+										foreach ($q->options as $opts) {
 											if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-											if ($qans == $opts->id && $opts->correct) {
-												$anscor=true;
-											}
 											echo '<div class="mpollmod-opt">';
 								
 											echo '<div class="mpollmod-opt-text">';
-											if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->opt_txt.'</div>';
-											else echo $opts->opt_txt;
+											if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->text.'</div>';
+											else echo $opts->text;
 											echo '</div>';
 											echo '<div class="mpollmod-opt-count">';
 											if ($params->get( 'resultsas', "count" ) == "count") {
@@ -258,11 +250,7 @@ if ($showtitle) {
 											echo '<div class="mpollmod-opt-bar-box"><div class="mpollmod-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
 											echo '</div>';
 											if ($gper < $per) {
-												$gper = $per; $gperid = $opts->id;
-											}
-											if ($qans==$opts->opt_id) {
-											if ($qdata->q_expl) $expl=$qdata->q_expl;
-											else $expl=$opts->opt_expl;
+												$gper = $per; $gperid = $opts->value;
 											}
 											}
 											break;
@@ -274,10 +262,10 @@ if ($showtitle) {
 							
 						}
 					}
-					if ($pdata['poll_results_msg_mod']) echo $pdata['poll_results_msg_mod'];
+					if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
 					
 					if ($params->get( 'showresultslink', 0 )) {
-						echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata['poll_id']).'" class="button">Results</a></p>';
+						echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll=').'" class="button">Results</a></p>';
 					}
 				}
 				
