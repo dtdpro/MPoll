@@ -46,6 +46,7 @@ class MPollViewMPolls extends JView
 		if ($canDo->get('core.create')) 
 		{
 			JToolBarHelper::addNew('mpoll.add', 'JTOOLBAR_NEW');
+			JToolBarHelper::custom('mpolls.copy', 'copy.png', 'copy_f2.png','JTOOLBAR_COPY', true);
 		}
 		if ($canDo->get('core.edit')) 
 		{

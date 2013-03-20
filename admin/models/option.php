@@ -127,4 +127,48 @@ class MPollModelOption extends JModelAdmin
 		$condition[] = 'opt_qid = '.(int) $table->opt_qid;
 		return $condition;
 	}
+	
+	public function copy(&$pks)
+	{
+		// Initialise variables.
+		$user = JFactory::getUser();
+		$pks = (array) $pks;
+		$table = $this->getTable();
+	
+		// Include the content plugins for the on delete events.
+		JPluginHelper::importPlugin('content');
+	
+		// Iterate the items to delete each one.
+		foreach ($pks as $i => $pk)
+		{
+	
+			if ($table->load($pk))
+			{
+				$table->opt_id=0;
+	
+				$this->_db->setQuery('SELECT MAX(ordering) FROM #__mpoll_questions_opts WHERE opt_qid = '.$table->opt_qid);
+				$max = $this->_db->loadResult();
+				$table->ordering = $max+1;
+	
+				if (!$table->check()) {
+					$this->setError($table->getError());
+					return false;
+				}
+				if (!$table->store()) {
+					$this->setError($table->getError());
+					return false;
+				} 
+			}
+			else
+			{
+				$this->setError($table->getError());
+				return false;
+			}
+		}
+	
+		// Clear the component's cache
+		$this->cleanCache();
+	
+		return true;
+	}
 }

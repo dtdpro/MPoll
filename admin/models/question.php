@@ -124,4 +124,70 @@ class MPollModelQuestion extends JModelAdmin
 		$condition[] = 'q_poll = '.(int) $table->q_poll;
 		return $condition;
 	}
+	
+	public function copy(&$pks)
+	{
+		// Initialise variables.
+		$user = JFactory::getUser();
+		$pks = (array) $pks;
+		$table = $this->getTable();
+		$otable=$this->getTable("Option","MPollTable");
+	
+		// Include the content plugins for the on delete events.
+		JPluginHelper::importPlugin('content');
+	
+		// Iterate the items to delete each one.
+		foreach ($pks as $i => $pk)
+		{
+	
+			if ($table->load($pk))
+			{
+				$table->q_id=0;
+				
+				$this->_db->setQuery('SELECT MAX(ordering) FROM #__mpoll_questions WHERE q_poll = '.$table->q_poll);
+				$max = $this->_db->loadResult();
+				$table->ordering = $max+1;
+				
+				if (!$table->check()) {
+					$this->setError($table->getError());
+					return false;
+				}
+				if (!$table->store()) {
+					$this->setError($table->getError());
+					return false;
+				} else {
+	
+					$newquestion=$table->q_id;
+					$oldquestion=$pk;
+
+					if ($table->q_type == 'mlist' || $table->q_type == 'multi' || $table->q_type == 'mcbox' || $table->q_type == 'dropdown') {
+						$qoq='SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$oldquestion;
+						$this->_db->setQuery($qoq);
+						$qos = $this->_db->loadObjectList();
+						foreach($qos as $qo) {
+							if ($otable->load($qo->opt_id)) {
+								$otable->opt_id=0;
+								$otable->opt_qid=$newquestion;
+								if (!$otable->store()) {
+									$this->setError($otable->getError());
+									return false;
+								}
+							}
+
+						}
+					}
+				}
+			}
+			else
+			{
+				$this->setError($table->getError());
+				return false;
+			}
+		}
+	
+		// Clear the component's cache
+		$this->cleanCache();
+	
+		return true;
+	}
 }

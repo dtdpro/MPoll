@@ -16,4 +16,63 @@ class MPollControllerMPolls extends JControllerAdmin
 		$model = parent::getModel($name, $prefix, array('ignore_request' => true));
 		return $model;
 	}
+	
+	protected function allowAdd($data = array())
+	{
+		$user = JFactory::getUser();
+		return ($user->authorise('core.create', $this->option) || count($user->getAuthorisedCategories($this->option, 'core.create')));
+	}
+	
+	function copy()
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or die(JText::_('JINVALID_TOKEN'));
+	
+		// Access check.
+		if (!$this->allowAdd())
+		{
+			// Set the internal error and also the redirect error.
+			$this->setError(JText::_('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED'));
+			$this->setMessage($this->getError(), 'error');
+		
+			$this->setRedirect(
+					JRoute::_(
+							'index.php?option=' . $this->option . '&view=' . $this->view_list
+							. $this->getRedirectToListAppend(), false
+					)
+			);
+		
+			return false;
+		}
+		
+		// Get items to remove from the request.
+		$cid = JRequest::getVar('cid', array(), '', 'array');
+	
+		if (!is_array($cid) || count($cid) < 1)
+		{
+			JError::raiseWarning(500, JText::_($this->text_prefix . '_NO_ITEM_SELECTED'));
+		}
+		else
+		{
+			// Get the model.
+			$model = $this->getModel();
+				
+			// Make sure the item ids are integers
+			jimport('joomla.utilities.arrayhelper');
+			JArrayHelper::toInteger($cid);
+				
+			// Remove the items.
+			if ($model->copy($cid))
+			{
+				$this->setMessage(JText::plural($this->text_prefix . '_N_ITEMS_COPIED', count($cid)));
+			}
+			else
+			{
+				$this->setMessage($model->getError());
+			}
+		}
+	
+		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->view_list, false));
+	}
+	
 }

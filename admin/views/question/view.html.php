@@ -79,7 +79,7 @@ class MPollViewQuestion extends JView
 			}
 			if ($canDo->get('core.create')) 
 			{
-				JToolBarHelper::custom('question.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
+				//JToolBarHelper::custom('question.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
 			}
 			JToolBarHelper::cancel('question.cancel', 'JTOOLBAR_CLOSE');
 		}

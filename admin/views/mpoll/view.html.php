@@ -79,7 +79,7 @@ class MPollViewMPoll extends JView
 			}
 			if ($canDo->get('core.create')) 
 			{
-				JToolBarHelper::custom('mpoll.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
+				//JToolBarHelper::custom('mpoll.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
 			}
 			JToolBarHelper::cancel('mpoll.cancel', 'JTOOLBAR_CLOSE');
 		}
