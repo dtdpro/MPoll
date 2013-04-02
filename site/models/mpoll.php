@@ -29,7 +29,7 @@ class MPollModelMPoll extends JModel
 		if ($options) {
 			foreach ($qdata as &$q) {
 				if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
-					$qo="SELECT opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
+					$qo="SELECT opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
 					$db->setQuery($qo);
 					$q->options = $db->loadObjectList();
 				}
@@ -38,10 +38,12 @@ class MPollModelMPoll extends JModel
 		foreach ($qdata as &$u) {
 			$fn='q_'.$u->q_id;
 			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,'');
+			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other','');
 			if(!$value && $udata->$fn) $value = $udata->$fn;
 			else if (!$value) $value=$u->q_default;
 			if ($u->q_type == 'mlimit' || $u->q_type == 'multi' || $u->q_type == 'dropdown' || $u->q_type == 'mcbox' || $u->q_type == 'mlist') {
 				$u->value=explode(" ",$value); 
+				$u->other = $other;
 			} else if ($u->q_type == 'cbox' || $u->q_type == 'yesno') {
 				$u->value=$value;
 			} else if ($u->q_type == 'birthday') {
@@ -102,9 +104,17 @@ class MPollModelMPoll extends JModel
 				} else {
 					$item->$fieldname = $data[$fieldname];
 				}
-				if ($d->q_type=="mcbox" || $d->q_type=="mlist" || $d->q_type=="multi" || $d->q_type=="dropdown") $optfs[]=$fieldname;
+				if ($d->q_type=="mcbox" || $d->q_type=="mlist" || $d->q_type=="multi" || $d->q_type=="dropdown") { 
+					$optfs[]=$fieldname;
+					$other->$fieldname=$data[$fieldname."_other"];
+				}
 				if ($d->q_type != 'captcha') $fids[]=$d->uf_id;
-				if ($d->cf_type != 'captcha' || $d->cf_type != 'password') $app->setUserState('mpoll.poll'.$pollid.'.'.$fieldname, $item->$fieldname);
+				if ($d->cf_type != 'captcha' || $d->cf_type != 'password') {
+					$app->setUserState('mpoll.poll'.$pollid.'.'.$fieldname, $item->$fieldname);
+					if ($other->$fieldname) { 
+						$app->setUserState('mpoll.poll'.$pollid.'.'.$fieldname.'_other', $other->$fieldname);
+					}
+				}
 			}
 			$item->site_url = JURI::base();
 			
@@ -167,7 +177,9 @@ class MPollModelMPoll extends JModel
 								$resultsemail .= $optionsdata[$i].'<br />';
 							}
 						} else {
-							$resultsemail .= $optionsdata[$item->$fieldname].'<br />';
+							$resultsemail .= $optionsdata[$item->$fieldname];
+							if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
+							$resultsemail .= '<br />';
 						}
 						$resultsemail .= '<br />';
 					} else if ($d->q_type != "captcha") {
@@ -201,6 +213,7 @@ class MPollModelMPoll extends JModel
 							}
 						} else {
 							$youropts = $optionsdata[$item->$fieldname];
+							if ($other->$fieldname) $youropts .= ': '.$other->$fieldname;
 						}
 						$confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
 					} else if ($d->q_type != "captcha") {
@@ -216,7 +229,7 @@ class MPollModelMPoll extends JModel
 			foreach ($flist as $fl) {
 				$fieldname = 'q_'.$fl->q_id;
 				if ($fl->q_type != "captcha") {
-					$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_cm) VALUES ("'.$user->id.'","'.$pollid.'","'.$fl->q_id.'","'.$item->$fieldname.'","'.$subid.'")';
+					$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_cm,res_ans_other) VALUES ("'.$user->id.'","'.$pollid.'","'.$fl->q_id.'","'.$db->getEscaped($item->$fieldname).'","'.$subid.'","'.$db->getEscaped($other->$fieldname).'")';
 					$db->setQuery( $q );
 					if (!$db->query()) {
 						$this->setError("Error saving additional information");

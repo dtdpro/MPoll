@@ -143,6 +143,7 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 		<?php endforeach; ?>
 		</tbody>
 	</table>
+	
 	<div>
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />

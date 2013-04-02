@@ -71,7 +71,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '<div class="mform-radio">';
 			if (!empty($f->value)) $checked = ($f->value == '1') ? ' checked="checked"' : '';
 			else $checked = '';
-			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="uf_radio"';
+			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_radio"';
 			if ($f->q_req && $f->q_type=="cbox") { echo ' validate="{required:true, messages:{required:\'This Field is required\'}}"'; }
 			echo $checked.'/>'."\n";
 			echo '<label for="jform_'.$sname.'">';
@@ -86,7 +86,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			foreach ($f->options as $o) {
 				if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 				else $checked = '';
-				echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="uf_radio" id="jform_'.$sname.$o->value.'"';
+				echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="mf_radio" id="jform_'.$sname.$o->value.'"';
 				if ($f->q_req && $first) {
 					echo ' validate="{required:true';
 					if ($f->q_min) echo ', minlength:'.$f->q_min;
@@ -106,20 +106,24 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '</div>';
 		}
 	
-		//radio, limitable select
+		//radio
 		if ($f->q_type=="multi") {
 			echo '<div class="mform-radio">';
 			$first=true;
 			foreach ($f->options as $o) {
 				if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 				else $checked = '';
-				echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="uf_radio"';
+				echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="mf_radio"';
 				if ($f->q_req && $first) { echo ' validate="{required:true, messages:{required:\'This Field is required\'}}"'; $first=false;}
 				if ($o->opt_disabled) $checked .= ' disabled';
 				echo $checked.'/>'."\n";
 				echo '<label for="jform_'.$sname.$o->value.'">';
 				echo ' '.$o->text;
-				echo '</label><br />'."\n";
+				if ($o->opt_other) {
+					echo ' <input type="text" value="'.$f->other.'" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="mf_other">';
+				}
+				echo '</label>';
+				echo '<br />'."\n";
 					
 			}
 			echo '</div>';

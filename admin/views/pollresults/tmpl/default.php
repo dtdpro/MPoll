@@ -38,10 +38,12 @@ $db =& JFactory::getDBO();
 			<?php
             	foreach ($this->questions as $qu) {
             		$fn='q_'.$qu->q_id;
+            		$fno='q_'.$qu->q_id.'_other';
 					echo '<td>';
 					$qnum = 'q'.$qu->q_id.'ans';
 					if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') { 
 						echo $this->options[$i->$fn];
+						if ($i->$fno) { echo ': '.$i->$fno; }
 					}
 					if ($qu->q_type == 'textbox') { echo $i->$fn; }
 					if ($qu->q_type == 'textar') { echo $i->$fn; }

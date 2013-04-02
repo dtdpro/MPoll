@@ -25,7 +25,9 @@ class MPollModelPollResults extends JModel
 			$cmd = $db->loadObjectList();
 			foreach ($cmd as $c) {
 				$fn='q_'.$c->res_qid;
+            	$fno='q_'.$c->res_qid.'_other';
 				$d->$fn=$c->res_ans;
+				$d->$fno=$c->res_ans_other;
 			}
 		}
 		

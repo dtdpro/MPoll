@@ -8,5 +8,6 @@ jimport('joomla.application.component.controllerform');
 
 class MPollControllerMPoll extends JControllerForm
 {
+	
 
 }

@@ -23,10 +23,12 @@ foreach ($this->items as $i)
 
     foreach ($this->questions as $qu) {
     	$fn='q_'.$qu->q_id;
+        $fno='q_'.$qu->q_id.'_other';
     	$contents .= ",\"";
 		$qnum = 'q'.$qu->q_id.'ans';
     	if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') {
     		$contents .= $this->options[$i->$fn];
+			if ($i->$fno) { $contents .= ': '.$i->$fno; }
     	}
     	if ($qu->q_type == 'textbox') { $contents .= $i->$fn; }
     	if ($qu->q_type == 'textar') { $contents .= $i->$fn; }
