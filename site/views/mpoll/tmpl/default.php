@@ -178,7 +178,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				echo ' data-rule-required="true"';
 				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
 				if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
-				if ($f->q_type=="email") echo ' data-rule-email:true';
+				if ($f->q_type=="email") echo ' data-rule-email="true"';
 				if ($f->q_match) echo ' data-rule-equalTo="#jform_'.$f->q_match.'"';
 				echo ' data-msg-required="This Field is required"';
 				if ($f->q_min) echo ' data-msg-minlength="Min length '.$f->q_min.' characters"';
@@ -205,7 +205,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="textar") {
 			echo '<div class="mform-field">';
 			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field"';
-			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required"This Field is required"'; }
+			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>'.$f->value.'</textarea>';
 			echo '</div>';
 		}
