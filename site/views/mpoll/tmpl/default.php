@@ -19,7 +19,6 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	?>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		jQuery.metadata.setType("attr", "validate");
 		jQuery("#mpollform").validate({
 			errorClass:"mf_error",
 			validClass:"mf_valid",
@@ -72,7 +71,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			if (!empty($f->value)) $checked = ($f->value == '1') ? ' checked="checked"' : '';
 			else $checked = '';
 			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_radio"';
-			if ($f->q_req && $f->q_type=="cbox") { echo ' validate="{required:true, messages:{required:\'This Field is required\'}}"'; }
+			if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo $checked.'/>'."\n";
 			echo '<label for="jform_'.$sname.'">';
 			echo ' '.$f->q_text.'</label><br />'."\n";
@@ -88,13 +87,12 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				else $checked = '';
 				echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="mf_radio" id="jform_'.$sname.$o->value.'"';
 				if ($f->q_req && $first) {
-					echo ' validate="{required:true';
-					if ($f->q_min) echo ', minlength:'.$f->q_min;
-					if ($f->q_max) echo ', maxlength:'.$f->q_max;
-					echo ', messages:{required:\'This Field is required\'';
-					if ($f->q_min) echo ', minlength:\'Select at least '.$f->q_min.'\'';
-					if ($f->q_max) echo ', maxlength:\'Select at most '.$f->q_max.'\'';
-					echo '}}"';
+					echo ' data-rule-required="true"';
+					if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+					if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+					echo ' data-msg-required="This Field is required"';
+					if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
+					if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
 					$first=false;
 				}
 				if ($o->opt_disabled) $checked .= ' disabled';
@@ -114,7 +112,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 				else $checked = '';
 				echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="mf_radio"';
-				if ($f->q_req && $first) { echo ' validate="{required:true, messages:{required:\'This Field is required\'}}"'; $first=false;}
+				if ($f->q_req && $first) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; $first=false;}
 				if ($o->opt_disabled) $checked .= ' disabled';
 				echo $checked.'/>'."\n";
 				echo '<label for="jform_'.$sname.$o->value.'">';
@@ -133,7 +131,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="dropdown") {
 			echo '<div class="mform-field">';
 			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field mf_select" size="1"';
-			if ($f->q_req) { echo ' validate="{required:true, messages:{required:\'This Field is required\'}}"'; }
+			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>';
 			foreach ($f->options as $o) {
 				if (!empty($f->value)) $selected = in_array($o->value,$f->value) ? ' selected="selected"' : '';
@@ -151,13 +149,12 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '<div class="mform-field">';
 			echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="mf_field mf_mselect" size="4" multiple="multiple"';
 			if ($f->q_req) {
-				echo ' validate="{required:true';
-				if ($f->q_min) echo ', minlength:'.$f->q_min;
-				if ($f->q_max) echo ', maxlength:'.$f->q_max;
-				echo ', messages:{required:\'This Field is required\'';
-				if ($f->q_min) echo ', minlength:\'Select at least '.$f->q_min.'\'';
-				if ($f->q_max) echo ', maxlength:\'Select at most '.$f->q_max.'\'';
-				echo '}}"';
+				echo ' data-rule-required="true"';
+				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+				if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+				echo ' data-msg-required="This Field is required"';
+				if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
+				if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
 				$first=false;
 			}
 			echo '>';
@@ -174,29 +171,20 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	
 	
 		//text field, phone #, email, username
-		if ($f->q_type=="textbox" || $f->q_type=="email" || $f->q_type=="username" || $f->q_type=="phone" || $f->q_type=="code") {
+		if ($f->q_type=="textbox" || $f->q_type=="email" || $f->q_type=="username" || $f->q_type=="phone") {
 			echo '<div class="mform-field">';
 			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field" type="text"';
 			if ($f->q_req) {
-				echo ' validate="{required:true';
-				if ($f->q_min) echo ', minlength:'.$f->q_min;
-				if ($f->q_max) echo ', maxlength:'.$f->q_max;
-				if ($f->q_type=="email") echo ', email:true';
-				if ($f->q_match) echo ', equalTo: \'#jform_'.$f->q_match.'\'';
-				if ($f->q_type == "code") echo ',remote: { url: \''.JURI::base( true ).'/components/com_mcor/helpers/chkcode.php?regtype='.$this->typeinfo[0]->ct_id.'\', type: \'post\'}';
-				echo ', messages:{required:\'This Field is required\'';
-				if ($f->q_min) echo ', minlength:\'Min length '.$f->q_min.' characters\'';
-				if ($f->q_max) echo ', maxlength:\'Max length '.$f->q_max.' characters\'';
-				if ($f->q_type=="email") echo ', email:\'Email address must be valid\'';
-				if ($f->q_match) echo ', equalTo: \'Fields must match\'';
-				if ($f->q_type=="code") echo ', remote:\'Invalid code\'';
-				echo '}}"';
-			} else if ($f->q_type == "code") {
-				echo ' validate="{';
-				echo 'remote: { url: \''.JURI::base( true ).'/components/com_mcor/helpers/chkcode.php?regtype='.$this->typeinfo[0]->ct_id.'\', type: \'post\'}';
-				echo ', messages:{';
-				echo 'remote:\'Invalid code\'';
-				echo '}}"';
+				echo ' data-rule-required="true"';
+				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+				if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+				if ($f->q_type=="email") echo ' data-rule-email:true';
+				if ($f->q_match) echo ' data-rule-equalTo="#jform_'.$f->q_match.'"';
+				echo ' data-msg-required="This Field is required"';
+				if ($f->q_min) echo ' data-msg-minlength="Min length '.$f->q_min.' characters"';
+				if ($f->q_max) echo ' data-msg-maxlength="Max length '.$f->q_max.' characters"';
+				if ($f->q_type=="email") echo ' data-msg-email="Email address must be valid"';
+				if ($f->q_match) echo ' data-msg-equalTo="Fields must match"';
 			}
 			echo '>';
 			echo '</div>';
@@ -206,11 +194,10 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="password") {
 			echo '<div class="mform-field">';
 			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_field" size="20" type="password" ';
-			echo 'validate="{required:true, minlength:8';
-			if ($f->q_match) echo ', equalTo: \'#jform_'.$f->q_match.'\'';
-			echo ', messages:{required:\'This Field is required\', minlength:\'Minimum length 8 characters\'';
-			if ($f->q_match) echo ', equalTo: \'Fields must match\'';
-			echo '}}">';
+			echo 'data-rule-required="true" data-rule-minlength="8"';
+			if ($f->q_match) echo ' data-rule-equalTo="#jform_'.$f->q_match.'"';
+			echo ' data-msg-required="This Field is required" data-msg-minlength="Minimum length 8 characters"';
+			if ($f->q_match) echo ' data-msg-equalTo="Fields must match"';
 			echo '</div>';
 		}
 	
@@ -218,7 +205,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="textar") {
 			echo '<div class="mform-field">';
 			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field"';
-			if ($f->q_req) { echo ' validate="{required:true, messages:{required:\'This Field is required\'}}"'; }
+			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required"This Field is required"'; }
 			echo '>'.$f->value.'</textarea>';
 			echo '</div>';
 		}
@@ -278,9 +265,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '<img id="captcha_img" src="'.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
 			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field" type="text"';
 			if ($f->q_req) {
-				echo ' validate="{required:true';
-				echo ', messages:{required:\'This Field is required\'';
-				echo '}}"';
+				echo ' data-rule-required="true"';
+				echo ' data-msg-required="This Field is required"';
 			}
 			echo '>';
 			echo '<span class="uf_note">';
@@ -338,13 +324,13 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 					$this->pdata->poll_results_msg_before = str_replace("{i".$q->q_id."}",$q->answer,$this->pdata->poll_results_msg_before);
 				}
 			} else {
-				$ansarr = $q->answer;
-				$ans = implode(' ',$ansarr);
-				$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.implode(',',$ans).')';
-				$db->setQuery($qo); $opts = $db->loadResultArray();
-				foreach ($opt as $o) {
-					$result = $o->opt_txt;
-					$cfans .= $result.', ';
+				if ($q->answer) {
+					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.str_replace(' ',',',$q->answer).')';
+					$db->setQuery($qo); $opts = $db->loadResultArray();
+					foreach ($opts as $o) {
+						$result = $o->opt_txt;
+						$cfans .= $result.', ';
+					}
 				}
 				$this->pdata->poll_results_msg_before = str_replace("{i".$q->q_id."}",$cfans,$this->pdata->poll_results_msg_before);
 			}
