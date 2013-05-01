@@ -22,7 +22,6 @@ if (!JFactory::getApplication()->get('jquery')) {
 }
 $doc->addScript('media/com_mpoll/scripts/jquery.validate.js');
 $doc->addScript('media/com_mpoll/scripts/additional-methods.js');
-$doc->addScript('media/com_mpoll/scripts/jquery.metadata.js');
 $doc->addScript('media/com_mpoll/scripts/jquery.simplemodal.js');
 
 // Create the controller
