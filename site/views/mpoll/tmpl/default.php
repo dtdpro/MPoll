@@ -38,7 +38,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	} 
 	echo $this->pdata->poll_desc;
 	echo '<div id="mpoll-form-'.$this->pdata->poll_pagetype.'">';
-	echo '<form name="mpollform" id="mpollform" method="post" action="" onSubmit="return checkRq();" enctype="multipart/form-data"><input type="hidden" name="stepnext" value="">';
+	echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data"><input type="hidden" name="stepnext" value="">';
 	
 	foreach($this->qdata as $f) {
 		echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-row">';
