@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `#___mpoll_polls` (
   `poll_showresults` tinyint(1) NOT NULL DEFAULT '1',
   `access` int(11) NOT NULL DEFAULT '1',
   `poll_cat` int(11) NOT NULL,
+  `poll_resultsemail` BOOLEAN NOT NULL DEFAULT FALSE,
   `poll_emailto` varchar(255) NOT NULL,
   `poll_emailsubject` varchar(255) NOT NULL,
   `poll_confemail` tinyint(1) NOT NULL DEFAULT '0',
