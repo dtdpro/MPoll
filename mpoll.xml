@@ -7,8 +7,8 @@
 	<authorUrl>http://www.ditzthedaisy.com</authorUrl>
 	<copyright>(c)2008-2013</copyright>
 	<license>GPL v2</license>
-	<version>1.17.1</version>
-    <releaseDate>2013.04.02</releaseDate>
+	<version>1.17.2</version>
+    <releaseDate>2013.06.06</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
 	<scriptfile>script.php</scriptfile>

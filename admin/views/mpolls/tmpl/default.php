@@ -119,7 +119,7 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 					<?php 
 						if ($item->poll_start == '0000-00-00 00:00:00') echo 'Always';
 						else { 
-							echo 'B: '.date("M d, Y",strtotime($item->poll_start)).'<br />E: '.date("M d, Y",strtotime($item->poll_end)); 
+							echo 'B: '.$item->poll_start.'<br />E: '.$item->poll_end; 
 						}
 					?>
 				</td>
