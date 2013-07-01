@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id: mpoll.xml 62 2010-11-28 16:08:16Z chdemko $ -->
+<form>
+	<fieldset name="setup">
+		<field
+			name="poll_id"
+			type="hidden"
+		/>
+		<field
+			name="published"
+			type="list"
+			id="published"
+			class="inputbox"
+			label="JSTATUS"
+			description="JFIELD_PUBLISHED_DESC"
+			size="1"
+			default="1"
+			filter="integer">
+			<option	value="1">JPUBLISHED</option>
+			<option	value="0">JUNPUBLISHED</option>
+			<option	value="2">JARCHIVED</option>
+			<option	value="-2">JTRASHED</option>
+		</field>
+		<field
+			name="access"
+			type="accesslevel"
+			id="access"
+			class="inputbox"
+			label="JFIELD_ACCESS_LABEL"
+			description="JFIELD_ACCESS_DESC"
+			default="1"
+			filter="integer"/>
+		<field
+			name="poll_name"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_NAME_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_NAME_DESC"
+			size="40"
+			class="inputbox"
+			required="true"
+			default=""
+		/>
+		<field
+			name="poll_cat"
+			type="category"
+			extension="com_mpoll"
+			class="inputbox"
+			label="COM_MPOLL_MPOLL_FIELD_CATID_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CATID_DESC"
+			required="true">
+		</field>
+		<field
+			name="poll_pagetype"
+			type="list"
+			extension="com_mpoll"
+			class="inputbox"
+			default="poll"
+			label="COM_MPOLL_MPOLL_FIELD_PAGETYPE_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_PAGETYPE_DESC"
+			required="true">
+			<option value="form">Form</option>
+			<option value="poll">Poll</option>
+		</field>
+	</fieldset>
+	<fieldset name="results">
+		<field
+			name="poll_resultsemail"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_RESEMAIL_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_RESMAIL_DESC"
+			size="1"
+			class="inputbox"
+			required="false"
+			default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
+			name="poll_emailto"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_EMAILTO_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_EMAILTO_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+		<field
+			name="poll_emailsubject"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_EMAILSUBJECT_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_EMAILSUBJECT_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+	</fieldset>
+	<fieldset name="confirmation">
+		<field
+			name="poll_confemail"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_CONFEMAIL_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFEMAIL_DESC"
+			size="1"
+			class="inputbox"
+			required="false"
+			default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
+			name="poll_conffromemail"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_CONFFROMEMAIL_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFFROMEMAIL_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+		<field
+			name="poll_conffromname"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_CONFFROMNAME_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFFROMNAME_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+		<field
+			name="poll_confsubject"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_CONFSUBJECT_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_CONFSUBJECT_DESC"
+			size="40"
+			class="inputbox"
+			required="false"
+			default=""
+		/>
+	</fieldset>
+	<fieldset name="confcontent">
+		<field
+			name="poll_confmsg"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_CONFMSG_LABEL"
+			description="COM_MPOLL_MPOLL_FIELDB_CONFMSG_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak"
+		/>
+	</fieldset>
+	<fieldset name="details">
+		<field
+			name="poll_desc"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_DESC_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_DESC_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak"
+		/>
+		<field
+			name="poll_results_msg_before"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_RMSGB_LABEL"
+			description="COM_MPOLL_MPOLL_FIELDB_RMSG_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak"
+		/>
+		<field
+			name="poll_results_msg_after"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_RMSGA_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_RMSGA_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak"
+		/>
+		<field
+			name="poll_results_msg_mod"
+			type="editor"
+			label="COM_MPOLL_MPOLL_FIELD_RMSGM_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_RMSGM_DESC"
+			class="inputbox"
+			filter="safehtml"
+			buttons="true"
+			hide="readmore,pagebreak"
+		/>
+	</fieldset>
+	<fieldset name="publishing">
+		<field 
+			name="poll_start" type="calendar"
+			label="COM_MPOLL_MPOLL_FIELD_START_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_START_DESC"
+			filter="user_utc"
+			format="%Y-%m-%d %H:%M:%S"
+			size="22"
+		/>
+		<field 
+			name="poll_end" type="calendar"
+			label="COM_MPOLL_MPOLL_FIELD_END_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_END_DESC"
+			filter="user_utc"
+			format="%Y-%m-%d %H:%M:%S"
+			size="22"
+		/>
+		<field
+			name="poll_only"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_ONLY_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_ONLY_DESC"
+			size="1"
+			class="inputbox"
+			required="true"
+			default="1">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
+			name="poll_regreq"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_REGREQ_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_REGREQ_DESC"
+			size="1"
+			class="inputbox"
+			required="false"
+			default="1">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
+			name="poll_regreqmsg"
+			type="textarea"
+			label="COM_MPOLL_MPOLL_FIELD_REGREQMSG_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_REGREQMSG_DESC"
+			rows="3"
+			cols="30"
+			class="inputbox"
+			filter="safehtml"
+			buttons="false"
+		/>
+		<field
+			name="poll_accessreqmsg"
+			type="textarea"
+			label="COM_MPOLL_MPOLL_FIELD_ACCESSREQMSG_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_ACCESSREQMSG_DESC"
+			rows="3"
+			cols="30"
+			class="inputbox"
+			filter="safehtml"
+			buttons="false"
+		/>
+		<field
+			name="poll_showresults"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_DESC"
+			size="1"
+			class="inputbox"
+			required="true"
+			default="1">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field 
+			name="poll_created" 
+			type="calendar"
+			label="JGLOBAL_FIELD_CREATED_LABEL" 
+			description="JGLOBAL_FIELD_CREATED_DESC"
+			class="inputbox" 
+			size="22"
+			format="%Y-%m-%d %H:%M:%S"
+			filter="user_utc" 
+		/>
+		<field 
+			name="poll_created_by" 
+			type="user"
+			label="JGLOBAL_FIELD_CREATED_BY_LABEL" 
+			description="JGLOBAL_FIELD_CREATED_BY_Desc"
+		 />
+		<field 
+			name="poll_modified" 
+			type="calendar" 
+			class="readonly"
+			label="JGLOBAL_FIELD_MODIFIED_LABEL"
+			description="JGLOBAL_FIELD_MODIFIED_DESC"
+			size="22" 
+			readonly="true" 
+			format="%Y-%m-%d %H:%M:%S"
+			filter="user_utc" 
+		/>
+		<field 
+			name="poll_modified_by" 
+			type="user"
+			label="JGLOBAL_FIELD_MODIFIED_BY_LABEL"
+			class="readonly"
+			readonly="true"
+			filter="unset"  
+		/>
+	</fieldset>
+
+</form>
+
