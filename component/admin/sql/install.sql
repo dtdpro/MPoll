@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_questions_opts` (
   `ordering` int(11) NOT NULL,
   `opt_other` tinyint(1) NOT NULL DEFAULT '0',
   `opt_correct` tinyint(1) NOT NULL DEFAULT '0',
+  `opt_selectable` tinyint(1) NOT NULL DEFAULT '1',
   `opt_disabled` tinyint(1) NOT NULL DEFAULT '0',
   `opt_color` varchar(10) NOT NULL DEFAULT '#000000',
   `published` int(11) NOT NULL DEFAULT '1',

@@ -85,22 +85,28 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '<div class="mform-radio">';
 			$first = true;
 			foreach ($f->options as $o) {
-				if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
-				else $checked = '';
-				echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="mf_radio" id="jform_'.$sname.$o->value.'"';
-				if ($f->q_req && $first) {
-					echo ' data-rule-required="true"';
-					if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
-					if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
-					echo ' data-msg-required="This Field is required"';
-					if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
-					if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
-					$first=false;
+				if ($o->opt_selectable) {
+					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
+					else $checked = '';
+					echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="mf_radio" id="jform_'.$sname.$o->value.'"';
+					if ($f->q_req && $first) {
+						echo ' data-rule-required="true"';
+						if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+						if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+						echo ' data-msg-required="This Field is required"';
+						if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
+						if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
+						$first=false;
+					}
+					if ($o->opt_disabled) $checked .= ' disabled';
+					echo $checked.'/>'."\n";
+					echo '<label for="jform_'.$sname.$o->value.'">';
+					echo ' '.$o->text.'</label><br />'."\n";
+				} else {
+					echo '<div class="mform-radio-noselect';
+					echo ($first) ? ' mform-radio-noselecttop':'';
+					echo '">'.$o->text.'</div>';
 				}
-				if ($o->opt_disabled) $checked .= ' disabled';
-				echo $checked.'/>'."\n";
-				echo '<label for="jform_'.$sname.$o->value.'">';
-				echo ' '.$o->text.'</label><br />'."\n";
 					
 			}
 			echo '</div>';
@@ -111,19 +117,25 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '<div class="mform-radio">';
 			$first=true;
 			foreach ($f->options as $o) {
-				if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
-				else $checked = '';
-				echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="mf_radio"';
-				if ($f->q_req && $first) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; $first=false;}
-				if ($o->opt_disabled) $checked .= ' disabled';
-				echo $checked.'/>'."\n";
-				echo '<label for="jform_'.$sname.$o->value.'">';
-				echo ' '.$o->text;
-				if ($o->opt_other) {
-					echo ' <input type="text" value="'.$f->other.'" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="mf_other">';
+				if ($o->opt_selectable) {
+					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
+					else $checked = '';
+					echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="mf_radio"';
+					if ($f->q_req && $first) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; $first=false;}
+					if ($o->opt_disabled) $checked .= ' disabled';
+					echo $checked.'/>'."\n";
+					echo '<label for="jform_'.$sname.$o->value.'">';
+					echo ' '.$o->text;
+					if ($o->opt_other) {
+						echo ' <input type="text" value="'.$f->other.'" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="mf_other">';
+					}
+					echo '</label>';
+					echo '<br />'."\n";
+				} else {
+					echo '<div class="mform-radio-noselect';
+					echo ($first) ? ' mform-radio-noselecttop':'';
+					echo '">'.$o->text.'</div>';
 				}
-				echo '</label>';
-				echo '<br />'."\n";
 					
 			}
 			echo '</div>';
@@ -366,19 +378,21 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 							$numr = $numr + (int)$o->anscount;
 						}
 						foreach ($q->options as $opts) {
-							if ($numr != 0) $per = ($opts->anscount)/($numr); else $per=1;
-							echo '<div class="mpollcom-opt">';
-							
-							echo '<div class="mpollcom-opt-text">';
-							if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->text.'</div>';
-							else echo $opts->text;
-							echo '</div>';
-							echo '<div class="mpollcom-opt-count">';
-							if ($this->resultsas == "percent") echo (int)($per*100)."%";
-							else echo ($opts->anscount);
-							echo '</div>';
-							echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
-							echo '</div>';
+							if ($opts->opt_selectable) {
+								if ($numr != 0) $per = ($opts->anscount)/($numr); else $per=1;
+								echo '<div class="mpollcom-opt">';
+								
+								echo '<div class="mpollcom-opt-text">';
+								if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->text.'</div>';
+								else echo $opts->text;
+								echo '</div>';
+								echo '<div class="mpollcom-opt-count">';
+								if ($this->resultsas == "percent") echo (int)($per*100)."%";
+								else echo ($opts->anscount);
+								echo '</div>';
+								echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
+								echo '</div>';
+							}
 						}
 						break;
 					default: break;

@@ -1,0 +1,1 @@
+ALTER TABLE  `#__mpoll_questions_opts` ADD  `opt_selectable` BOOLEAN NOT NULL DEFAULT TRUE AFTER  `opt_correct`;

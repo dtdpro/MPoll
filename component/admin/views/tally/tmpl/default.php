@@ -27,18 +27,20 @@ $db =& JFactory::getDBO();
 					if ($o->anscount == "") $o->anscount = 0;
 				}
 				foreach ($qopts as $opts) {
-					if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-					echo '<div class="mpollcom-opt">';
-					
-					echo '<div class="mpollcom-opt-text">';
-					if ($opts->opt_correct) echo '<span class="mpollcom-opt-correct"><b>'.$opts->opt_txt.'</b></span>';
-					else echo $opts->opt_txt;
-					echo '</div>';
-					echo '<div class="mpollcom-opt-count">';
-					echo ($opts->anscount);
-					echo '</div>';
-					echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
-					echo '</div>';
+					if ($opts->opt_selectable) {
+						if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
+						echo '<div class="mpollcom-opt">';
+						
+						echo '<div class="mpollcom-opt-text">';
+						if ($opts->opt_correct) echo '<span class="mpollcom-opt-correct"><b>'.$opts->opt_txt.'</b></span>';
+						else echo $opts->opt_txt;
+						echo '</div>';
+						echo '<div class="mpollcom-opt-count">';
+						echo ($opts->anscount);
+						echo '</div>';
+						echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
+						echo '</div>';
+					}
 				}
 				break;
 				

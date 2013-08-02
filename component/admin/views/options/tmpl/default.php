@@ -46,6 +46,9 @@ $ordering	= ($listOrder == 'o.ordering');
 					<?php echo JText::_('JPUBLISHED'); ?>
 				</th>	
 				<th width="50">
+					<?php echo JText::_( 'COM_MPOLL_OPTION_HEADING_SELECTABLE' ); ?>
+				</th>
+				<th width="50">
 					<?php echo JText::_( 'COM_MPOLL_OPTION_HEADING_DISABLED' ); ?>
 				</th>
 				<th width="50">
@@ -73,6 +76,9 @@ $ordering	= ($listOrder == 'o.ordering');
 					</td>
 					<td class="center">
 						<?php echo JHtml::_('jgrid.published', $item->published, $i, 'options.', true);?>
+					</td>
+					<td align="center">
+						<?php echo ($item->opt_selectable) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
 					<td align="center">
 						<?php echo ($item->opt_disabled) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>

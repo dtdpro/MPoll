@@ -67,6 +67,18 @@
 			<option	value="0">No</option>
 		</field>
 		<field
+			name="opt_selectable"
+			type="radio"
+			label="COM_MPOLL_OPTION_FIELD_SELECTABLE_LABEL"
+			description="COM_MPOLL_OPTION_FIELD_SELECTABLE_DESC"
+			size="1"
+			class="inputbox"
+			required="true"
+			default="1">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
 			name="opt_disabled"
 			type="radio"
 			label="COM_MPOLL_OPTION_FIELD_DISABLED_LABEL"
