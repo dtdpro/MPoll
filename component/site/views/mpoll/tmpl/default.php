@@ -1,6 +1,6 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access'); 
-
+echo '<div id="system">';
 $db =& JFactory::getDBO();
 $user = JFactory::getUser();
 if ($this->showlist != 'never') {
@@ -32,7 +32,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 
 </script>
 	<?php 
-	echo '<h2 class="componentheading">'.$this->pdata->poll_name.'</h2>';
+	echo '<h2 class="title">'.$this->pdata->poll_name.'</h2>';
 	if ($this->pdata->poll_regreq == 1 && $user->id == 0) {
 		echo '<p align="center">'.$this->pdata->poll_regreqmsg.'</p>';
 	} else if ( !in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
@@ -329,7 +329,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
 	if (($this->showlist == 'both' || $this->showlist == 'after')) echo $jumplist;
-	echo '<h2 class="componentheading">'.$this->pdata->poll_name.'</h2>';
+	echo '<h2 class="title">'.$this->pdata->poll_name.'</h2>';
 	foreach ($this->qdata as $q) {
 		if ($q->answer) {
 			if ($q->q_type != 'mcbox' && $q->q_type != "mlist") {
@@ -425,4 +425,5 @@ function changePoll() {
 }
 </script>
 <?php } ?>
+</div>
 
