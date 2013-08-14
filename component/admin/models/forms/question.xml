@@ -35,7 +35,7 @@
 		/>
 		<field
 			name="q_default"
-			type="text"
+			type="FieldDefault"
 			label="COM_MPOLL_OPTION_FIELD_DEFAULT_LABEL"
 			description="COM_MPOLL_OPTION_FIELD_DEFAULT_DESC"
 			size="40"

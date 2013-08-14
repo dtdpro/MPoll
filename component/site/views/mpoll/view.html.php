@@ -32,12 +32,14 @@ class MPollViewMPoll extends JViewLegacy
 		$guest = $user->guest ? true : false;
 		$pdata=$model->getPoll($pollid); 
 		$polllist = $model->getPolls($pdata->poll_cat);
-		if (empty($pdata)) { $task='notfound'; $msg='This Poll is currently unavailble.'; }
+		if (empty($pdata)) { 
+			$task='notfound'; 
+			$msg='This Poll is currently unavailble.';
+		}
 		else {
 			//date stuff
 			if ((strtotime($pdata->poll_start) > strtotime(date("Y-m-d H:i:s"))) && $pdata->poll_start != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
 			if ((strtotime($pdata->poll_end) < strtotime(date("Y-m-d H:i:s"))) && $pdata->poll_start != '0000-00-00 00:00:00') { $task='notfound'; $msg='This Poll is currently unavailble.'; }
-			
 		}
 		$qdata=$model->getQuestions($pollid,true);
 		if ($pdata->poll_only) {

@@ -23,7 +23,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			errorClass:"mf_error",
 			validClass:"mf_valid",
 			errorPlacement: function(error, element) {
-		    	error.appendTo( element.parent("div").parent("div").next("div") );
+		    	error.appendTo( element.parent("div").parent("div").parent("div").next("div") );
 		    }
 	    });
 
@@ -43,10 +43,12 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data"><input type="hidden" name="stepnext" value="">';
 	
 	foreach($this->qdata as $f) {
-		echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-row">';
+		$sname = 'q_'.$f->q_id;
+		if ($ri==1) $ri=0;
+		else $ri=1;
+		echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-row row-'.$sname.' mpoll-form-'.$this->pdata->poll_pagetype.'-row'.($ri % 2).'">';
 		echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-label">';
 		if ($f->q_req) echo "*";
-		$sname = 'q_'.$f->q_id;
 		//field title
 		if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
 		echo '</div>';
@@ -70,6 +72,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		//checkbox
 		if ($f->q_type=="cbox") {
 			echo '<div class="mform-radio">';
+			echo '<div class="mform-radio-option">';
 			if (!empty($f->value)) $checked = ($f->value == '1') ? ' checked="checked"' : '';
 			else $checked = '';
 			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_radio"';
@@ -77,7 +80,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo $checked.'/>'."\n";
 			echo '<label for="jform_'.$sname.'">';
 			echo ' '.$f->q_text.'</label><br />'."\n";
-			echo '</div>';
+			echo '</div></div>';
 		}
 	
 		//multi checkbox
@@ -86,6 +89,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			$first = true;
 			foreach ($f->options as $o) {
 				if ($o->opt_selectable) {
+					echo '<div class="mform-radio-option">';
 					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 					else $checked = '';
 					echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="mf_radio" id="jform_'.$sname.$o->value.'"';
@@ -101,7 +105,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 					if ($o->opt_disabled) $checked .= ' disabled';
 					echo $checked.'/>'."\n";
 					echo '<label for="jform_'.$sname.$o->value.'">';
-					echo ' '.$o->text.'</label><br />'."\n";
+					echo ' '.$o->text.'</label></div>'."\n";
 				} else {
 					echo '<div class="mform-radio-noselect';
 					echo ($first) ? ' mform-radio-noselecttop':'';
@@ -118,6 +122,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			$first=true;
 			foreach ($f->options as $o) {
 				if ($o->opt_selectable) {
+					echo '<div class="mform-radio-option">';
 					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 					else $checked = '';
 					echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="mf_radio"';
@@ -130,7 +135,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 						echo ' <input type="text" value="'.$f->other.'" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="mf_other">';
 					}
 					echo '</label>';
-					echo '<br />'."\n";
+					echo '</div>'."\n";
 				} else {
 					echo '<div class="mform-radio-noselect';
 					echo ($first) ? ' mform-radio-noselecttop':'';
@@ -144,6 +149,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		//dropdown
 		if ($f->q_type=="dropdown") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-select">';
 			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field mf_select" size="1"';
 			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>';
@@ -155,12 +161,13 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				echo ' '.$o->text.'</option>';
 			}
 			echo '</select>';
-			echo '</div>';
+			echo '</div></div>';
 		}
 	
 		//multilist
 		if ($f->q_type=="mlist") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-select">';
 			echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="mf_field mf_mselect" size="4" multiple="multiple"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
@@ -180,13 +187,14 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				echo ' '.$o->text.'</option>';
 			}
 			echo '</select>';
-			echo '</div>';
+			echo '</div></div>';
 		}
 	
 	
 		//text field, phone #, email, username
 		if ($f->q_type=="textbox" || $f->q_type=="email" || $f->q_type=="username" || $f->q_type=="phone") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-text">';
 			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field" type="text"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
@@ -201,32 +209,35 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				if ($f->q_match) echo ' data-msg-equalTo="Fields must match"';
 			}
 			echo '>';
-			echo '</div>';
+			echo '</div></div>';
 		}
 	
 		//password
 		if ($f->q_type=="password") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-password">';
 			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_field" size="20" type="password" ';
 			echo 'data-rule-required="true" data-rule-minlength="8"';
 			if ($f->q_match) echo ' data-rule-equalTo="#jform_'.$f->q_match.'"';
 			echo ' data-msg-required="This Field is required" data-msg-minlength="Minimum length 8 characters"';
 			if ($f->q_match) echo ' data-msg-equalTo="Fields must match"';
-			echo '</div>';
+			echo '</div></div>';
 		}
 	
 		//text area
 		if ($f->q_type=="textar") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-textarea">';
 			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field"';
 			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>'.$f->value.'</textarea>';
-			echo '</div>';
+			echo '</div></div>';
 		}
 	
 		//Yes no
 		if ($f->q_type=="yesno") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-yesno">';
 			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field" size="1">';
 			$selected = ' selected="selected"';
 			echo '<option value="1"';
@@ -237,7 +248,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '>No</option>';
 	
 			echo '</select>';
-			echo '</div>';
+			echo '</div></div>';
 	
 		}
 	
@@ -245,6 +256,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		//Birthday
 		if ($f->q_type=="birthday") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-birthday">';
 			$selected = ' selected="selected"';
 			echo '<select id="jform_'.$sname.'_month" name="jform['.$sname.'_month]" class="mf_bday_month">';
 			echo '<option value="01"'; echo (substr($f->value,0,2) == "01") ? $selected : ''; echo '>01 - January</option>';
@@ -269,13 +281,14 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				echo '>'.$val.'</option>';
 			}
 			echo '</select>';
-			echo '</div>';
+			echo '</div></div>';
 		}
 	
 	
 		//captcha
 		if ($f->q_type=="captcha") {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-captcha">';
 			echo '<img id="captcha_img" src="'.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
 			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field" type="text"';
 			if ($f->q_req) {
@@ -283,20 +296,21 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				echo ' data-msg-required="This Field is required"';
 			}
 			echo '>';
-			echo '<span class="uf_note">';
+			echo '<div class="mf_note">';
 			echo '<a href="#" onclick="document.getElementById(\'captcha_img\').src = \''.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php?\' + Math.random(); return false">Reload Image</a>';
-			echo '</span>';
 			echo '</div>';
+			echo '</div></div>';
 		}
 		
 		//File Attachment
 		if ($f->q_type == 'attach') {
 			echo '<div class="mform-field">';
+			echo '<div class="mform-field-attach">';
 			echo '<input name="q_'.$f->q_id.'" id="jform_'.$sname.'" type="file" size="40" class="mf_file" />';
-			echo '</div>'; 
+			echo '</div></div>'; 
 		}
 	
-		if ($f->q_hint && $f->q_type!="captcha") echo '<span class="mf_note">'.$f->q_hint.'</span>';
+		if ($f->q_hint && $f->q_type!="captcha") echo '<div class="mf_note">'.$f->q_hint.'</div>';
 	
 		echo '</div>';
 		echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-error">';
