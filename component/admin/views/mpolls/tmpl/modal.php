@@ -7,15 +7,15 @@ JHtml::_('behavior.tooltip');
 
 $function	= JRequest::getCmd('function', 'jSelectNewsfeed');
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_mpoll'); ?>" method="post" name="adminForm">
+<form action="<?php echo JRoute::_('index.php?option=com_mpoll'); ?>" method="post" name="adminForm" id="adminform">
 	<fieldset id="filter-bar">
-		<div class="filter-search fltlft">
+		<div class="filter-search fltlft pull-left">
 			<label class="filter-search-lbl" for="filter_search"><?php echo JText::_('JSEARCH_FILTER_LABEL'); ?></label>
 			<input type="text" name="filter_search" id="filter_search" value="<?php echo $this->escape($this->state->get('filter.search')); ?>" title="Search" />
 			<button type="submit"><?php echo JText::_('JSEARCH_FILTER_SUBMIT'); ?></button>
 			<button type="button" onclick="document.id('filter_search').value='';this.form.submit();"><?php echo JText::_('JSEARCH_FILTER_CLEAR'); ?></button>
 		</div>
-		<div class="filter-select fltrt">
+		<div class="filter-select fltrt pull-right">
 			<select name="filter_published" class="inputbox" onchange="this.form.submit()">
 				<option value=""><?php echo JText::_('JOPTION_SELECT_PUBLISHED');?></option>
 				<?php echo JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.published'), true);?>
@@ -30,17 +30,14 @@ $function	= JRequest::getCmd('function', 'jSelectNewsfeed');
 			</select>
 		</div>
 	</fieldset>
-	<div class="clr"> </div>
+	<div class="clr clearfix"> </div>
 	
-	<table class="adminlist">
+	<table class="adminlist table table-striped">
 		<thead>
 			<tr>
 				<th width="5">
 					<?php echo JHtml::_('grid.sort','COM_MPOLL_MPOLL_HEADING_ID','poll_id', $listDirn, $listOrder); ?>
 				</th>
-				<th width="20">
-					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->items); ?>);" />
-				</th>			
 				<th>
 					<?php echo JHtml::_('grid.sort','COM_MPOLL_MPOLL_HEADING_TITLE','poll_name', $listDirn, $listOrder); ?>
 				</th>	
@@ -63,9 +60,6 @@ $function	= JRequest::getCmd('function', 'jSelectNewsfeed');
 			<tr class="row<?php echo $i % 2; ?>">
 				<td>
 					<?php echo $item->poll_id; ?>
-				</td>
-				<td>
-					<?php echo JHtml::_('grid.id', $i, $item->poll_id); ?>
 				</td>
 				<td>
 						<a class="pointer" onclick="if (window.parent) window.parent.<?php echo $this->escape($function);?>('<?php echo $item->poll_id; ?>', '<?php echo $this->escape(addslashes($item->poll_name)); ?>');">
