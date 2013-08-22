@@ -100,18 +100,19 @@ $ordering	= ($listOrder == 'q.ordering');
 						<?php echo ($item->q_req) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
 			        <td class="order">
+			        	<div class="input-prepend">
 							<?php if ($saveOrder) :?>
 								<?php if ($listDirn == 'asc') : ?>
-									<span><?php echo $this->pagination->orderUpIcon($i, ($item->q_poll == @$this->items[$i-1]->q_poll), 'questions.orderup', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
-									<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, ($item->q_poll == @$this->items[$i+1]->q_poll), 'questions.orderdown', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
+									<span class="add-on"><?php echo $this->pagination->orderUpIcon($i, ($item->q_poll == @$this->items[$i-1]->q_poll), 'questions.orderup', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
+									<span class="add-on"><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, ($item->q_poll == @$this->items[$i+1]->q_poll), 'questions.orderdown', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
 								<?php elseif ($listDirn == 'desc') : ?>
-									<span><?php echo $this->pagination->orderUpIcon($i, ($item->q_poll == @$this->items[$i-1]->q_poll), 'questions.orderdown', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
-									<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, ($item->q_poll == @$this->items[$i+1]->q_poll), 'questions.orderup', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
+									<span class="add-on"><?php echo $this->pagination->orderUpIcon($i, ($item->q_poll == @$this->items[$i-1]->q_poll), 'questions.orderdown', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
+									<span class="add-on"><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, ($item->q_poll == @$this->items[$i+1]->q_poll), 'questions.orderup', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
 								<?php endif; ?>
 							<?php endif; ?>
 							<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
-							<input type="text" name="order[]" size="5" value="<?php echo $item->ordering;?>" <?php echo $disabled ?> class="text-area-order" />
-			
+							<input type="text" name="order[]" size="5" value="<?php echo $item->ordering;?>" <?php echo $disabled ?> class="text-area-order width-20" />
+						</div>
 					</td>
 			        <td align="center">
 						<?php 

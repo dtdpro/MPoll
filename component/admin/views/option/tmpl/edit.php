@@ -18,7 +18,8 @@ $params = $this->form->getFieldsets('params');
 	}
 </script>
 <form action="<?php echo JRoute::_('index.php?option=com_mpoll&layout=edit&opt_id='.(int) $this->item->opt_id); ?>" method="post" name="adminForm" id="mpoll-form" class="form-validate">
-	<div class="width-60 fltlft">
+<div class="row-fluid">	
+<div class="width-60 fltlft span12">
 		<fieldset class="adminform">
 			<legend><?php echo JText::_( 'COM_MPOLL_OPTION_DETAILS' ); ?></legend>
 			<ul class="adminformlist">
@@ -29,9 +30,9 @@ $params = $this->form->getFieldsets('params');
 		</fieldset>
 
 	</div>
-	<div>
+
 		<input type="hidden" name="task" value="option.edit" />
 		<?php echo JHtml::_('form.token'); ?>
-	</div>
+</div>
 </form>
 
