@@ -15,9 +15,10 @@ class MPollViewMPoll extends JViewLegacy
 	public function display($tpl = null) 
 	{
 		// get the Data
-		$form = $this->get('Form');
-		$item = $this->get('Item');
-		$script = $this->get('Script');
+		$this->form = $this->get('Form');
+		$this->item = $this->get('Item');
+		$this->script = $this->get('Script');
+		$this->questions = $this->get('Questions');
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) 
@@ -25,10 +26,6 @@ class MPollViewMPoll extends JViewLegacy
 			JError::raiseError(500, implode('<br />', $errors));
 			return false;
 		}
-		// Assign the Data
-		$this->form = $form;
-		$this->item = $item;
-		$this->script = $script;
 
 		// Set the toolbar
 		$this->addToolBar();

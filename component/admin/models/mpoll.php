@@ -284,4 +284,12 @@ class MPollModelMPoll extends JModelAdmin
 	
 		return true;
 	}
+	
+	public function getQuestions() {
+		$query = 'SELECT q_id AS value, q_text AS text' .
+				' FROM #__mpoll_questions' .
+				' ORDER BY ordering';
+		$this->_db->setQuery($query);
+		return $this->_db->loadObjectList();
+	}
 }

@@ -22,7 +22,7 @@ $params = $this->form->getFieldsets('params');
 <div class="width-60 fltlft span12">
 		<fieldset class="adminform">
 			<legend><?php echo JText::_( 'COM_MPOLL_OPTION_DETAILS' ); ?></legend>
-			<ul class="adminformlist">
+			<ul class="adminformlist treeselect">
 <?php foreach($this->form->getFieldset('details') as $field): ?>
 				<li><?php echo $field->label;echo $field->input;?></li>
 <?php endforeach; ?>
