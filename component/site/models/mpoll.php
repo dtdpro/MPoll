@@ -68,6 +68,7 @@ class MPollModelMPoll extends JModelLegacy
 		$user = JFactory::getUser();
 		$date = new JDate('now');
 		$pollinfo = $this->getPoll($pollid);
+		$jconfig = JFactory::getConfig();
 		// Include the content plugins for the on save events.
 		JPluginHelper::importPlugin('content');
 	
@@ -190,7 +191,7 @@ class MPollModelMPoll extends JModelLegacy
 				$emllist = explode(",",$pollinfo->poll_emailto);
 				
 				$mail = &JFactory::getMailer();
-				$sent = $mail->sendMail ($emllist[0], $emllist[0], $emllist, $pollinfo->poll_emailsubject, $resultsemail, true);
+				$sent = $mail->sendMail ($jconfig->get( 'config.mailfrom' ), $jconfig->get( 'config.fromname' ), $emllist, $pollinfo->poll_emailsubject, $resultsemail, true);
 			}
 			
 			//confirmation email
