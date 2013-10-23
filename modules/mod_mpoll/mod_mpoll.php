@@ -8,9 +8,6 @@ require_once (dirname(__FILE__).'/helper.php');
 
 $tabclass_arr = array ('sectiontableentry2', 'sectiontableentry1');
 
-$menu 	= &JSite::getMenu();
-$items	= $menu->getItems('link', 'index.php?option=com_mpoll&task=ballot');
-
 $doc = &JFactory::getDocument();
 $doc->addStyleSheet('media/com_mpoll/mpoll.css');
 

@@ -46,7 +46,7 @@ $db =& JFactory::getDBO();
 						if ($i->$fno) { echo ': '.$i->$fno; }
 					}
 					if ($qu->q_type == 'textbox') { echo $i->$fn; }
-					if ($qu->q_type == 'textar') { echo $i->$fn; }
+					if ($qu->q_type == 'textar') { echo nl2br($i->$fn);; }
 					if ($qu->q_type == 'attach') { 
 						if (strpos($i->$fn,"ERROR:") === FALSE && $i->$fn != "") {
 							echo '<a href="'.$i->$fn.'">Right Click Download</a>';

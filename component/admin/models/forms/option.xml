@@ -97,6 +97,7 @@
 			description="COM_MPOLL_OPTION_FIELD_COLOR_DESC"
 			class="inputbox"
 			required="true"
+			default="#000000"
 		/>
 	</fieldset>
 	

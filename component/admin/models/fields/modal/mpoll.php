@@ -46,18 +46,25 @@ class JFormFieldModal_MPoll extends JFormField
 
 		$html	= array();
 		
-		// The current user display field.
-		$html[] = '<div class="fltlft">';
-		$html[] = '  <input type="text" id="'.$this->id.'_name" value="'.$title.'" disabled="disabled" size="35" />';
-		$html[] = '</div>';
+		if (version_compare(JVERSION, '3.0.0', '>=')) {
+			$html[] = '<span class="input-append">';
+			$html[] = '<input type="text" class="input-medium" id="'.$this->id.'_name" value="'.$title.'" disabled="disabled" size="35" />';
+			$html[] = '<a class="modal btn" title="'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'" href="'.$link.'&amp;'.JSession::getFormToken().'=1" rel="{handler: \'iframe\', size: {x: 900, y: 450}}"><i class="icon-file"></i> '.JText::_('JSELECT').'</a>';
+			$html[] = '</span>';
 		
-		// The user select button.
-		$html[] = '<div class="button2-left">';
-		$html[] = '  <div class="blank">';
-		$html[] = '	<a class="modal" title="'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'"  href="'.$link.'&amp;'.JSession::getFormToken().'=1" rel="{handler: \'iframe\', size: {x: 800, y: 450}}">'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'</a>';
-		$html[] = '  </div>';
-		$html[] = '</div>';
-		
+		} else {
+			// The current user display field.
+			$html[] = '<div class="fltlft">';
+			$html[] = '  <input type="text" id="'.$this->id.'_name" value="'.$title.'" disabled="disabled" size="35" />';
+			$html[] = '</div>';
+			
+			// The user select button.
+			$html[] = '<div class="button2-left">';
+			$html[] = '  <div class="blank">';
+			$html[] = '	<a class="modal" title="'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'"  href="'.$link.'&amp;'.JSession::getFormToken().'=1" rel="{handler: \'iframe\', size: {x: 800, y: 450}}">'.JText::_('COM_MPOLL_CHANGE_POLL_BUTTON').'</a>';
+			$html[] = '  </div>';
+			$html[] = '</div>';
+		}
 		
 		
 		// The active newsfeed id field.
