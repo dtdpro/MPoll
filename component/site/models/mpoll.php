@@ -71,16 +71,20 @@ class MPollModelMPoll extends JModelLegacy
 		$jconfig = JFactory::getConfig();
 		// Include the content plugins for the on save events.
 		JPluginHelper::importPlugin('content');
+		
+		if ($pollinfo->poll_regreq == 1 && $user->id == 0) {
+				$this->setError('Login required');
+				return false;
+		} else {
+			if ( !in_array($pollinfo->access,$user->getAuthorisedViewLevels())) {
+				$this->setError('Access denied');
+				return false;
+			}
+		}
 	
 		// Allow an exception to be thrown.
 		try
 		{	
-			//save completed
-			$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll) VALUES ('.$user->id.','.$pollid.')';
-			$db->setQuery( $qc );
-			$db->query();
-			$subid = $db->insertid();
-			
 			//setup item and bind data
 			$fids = array();
 			$optfs = array();
@@ -130,6 +134,12 @@ class MPollModelMPoll extends JModelLegacy
 					return false;
 				}
 			}
+			
+			//save completed
+			$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll) VALUES ('.$user->id.','.$pollid.')';
+			$db->setQuery( $qc );
+			$db->query();
+			$subid = $db->insertid();
 			
 			//Upload
 			foreach ($upfile as $u) {

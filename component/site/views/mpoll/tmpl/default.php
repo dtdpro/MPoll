@@ -331,6 +331,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		echo $this->pdata->poll_regreqmsg;
 	} else { 
 		if ( in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
+			echo JHtml::_('form.token');
 			echo '<input name="castvote" id="castvote" value="Submit" type="submit" class="button">';
 		} else {
 			echo $this->pdata->poll_accessreqmsg;
@@ -341,7 +342,6 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	echo '<input type="hidden" name="casting" value="true">';
 	echo '<input type="hidden" name="jform[CTypeID]" value="'.$this->typeinfo[0]->ct_id.'">';
 	echo '<input type="hidden" name="return" value="'.base64_encode($this->return).'">';
-	echo JHtml::_('form.token');
 	echo '</form>';
 	echo '<div style="clear:both;"></div>';
 	echo '</div>';
