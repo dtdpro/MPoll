@@ -68,12 +68,12 @@ if ($showtitle) {
 					}
 					echo '<p align="center">';
 					if ($status == 'open') {
-						echo '<a href="javascript:checkRq'.$pdata->poll_id.'();" class="button">Submit</a>';
+						echo '<a href="javascript:checkRq'.$pdata->poll_id.'();" class="button uk-button">Submit</a>';
 					} else { 
 						echo $pdata->poll_regreqmsg; 
 					}
 					if ($params->get( 'showresultslink', 0 )) {
-						echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="button">Results</a>';
+						echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="button uk-button">Results</a>';
 					}
 					echo '</p>';
 					
@@ -265,7 +265,7 @@ if ($showtitle) {
 					if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
 					
 					if ($params->get( 'showresultslink', 0 )) {
-						echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll=').'" class="button">Results</a></p>';
+						echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll=').'" class="button uk-button">Results</a></p>';
 					}
 				}
 				

@@ -1,6 +1,6 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access'); 
-echo '<div id="system">';
+echo '<div id="system" class="uk-article">';
 $db =& JFactory::getDBO();
 $user = JFactory::getUser();
 if ($this->showlist != 'never') {
@@ -332,7 +332,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	} else { 
 		if ( in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
 			echo JHtml::_('form.token');
-			echo '<input name="castvote" id="castvote" value="Submit" type="submit" class="button">';
+			echo '<input name="castvote" id="castvote" value="Submit" type="submit" class="button uk-button">';
 		} else {
 			echo $this->pdata->poll_accessreqmsg;
 		}
