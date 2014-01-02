@@ -74,12 +74,15 @@ class MPollViewMPoll extends JViewLegacy
 			$task='results';
 			
 			if ($cmplid) $qdata = $model->applyAnswers($qdata,$cmplid);
+			$this->assignRef('cmplid',$cmplid);
 			$fcast = $model->getFirstCast($pollid);
 			$this->assignRef('fcast',$fcast);
 			$lcast = $model->getLastCast($pollid);
 			$this->assignRef('lcast',$lcast);
 			$ncast = $model->getNumCast($pollid);
 			$this->assignRef('ncast',$ncast);
+			$print = JRequest::getInt( 'print',0 );
+			$this->assignRef('print',$print);
 			parent::display($tpl);
 			
 		} else {

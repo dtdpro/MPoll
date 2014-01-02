@@ -211,6 +211,7 @@ class MPollModelMPoll extends JModelLegacy
 				$confemail = str_replace("{name}",$user->name,$confemail);
 				$confemail = str_replace("{username}",$user->username,$confemail);
 				$confemail = str_replace("{email}",$user->email,$confemail);
+				$confemail = str_replace("{resid}",$subid,$confemail);
 				foreach ($flist as $d) {
 					$fieldname = 'q_'.$d->q_id;
 					if ($d->q_type=="attach") {

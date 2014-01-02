@@ -63,7 +63,7 @@ $params = $this->form->getFieldsets('params');
 			<?php foreach($this->form->getFieldset('confcontent') as $field): ?>
 				<?php echo '<div>'.$field->label.'<div class="clr"></div>'.$field->input.'</div>';?>
 			<?php endforeach; ?>
-			<div style="clear:both">{name} Users full name<br />{email} Users email<br />{username} Users username
+			<div style="clear:both">{name} Users full name<br />{email} Users email<br />{username} Users username<br />{resid} Results id
 			<?php 
 				foreach ($this->questions as $q) {
 					echo '<br />{i'.$q->value.'} '.$q->text;

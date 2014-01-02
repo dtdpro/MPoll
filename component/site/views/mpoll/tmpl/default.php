@@ -349,10 +349,15 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
 	if (($this->showlist == 'both' || $this->showlist == 'after')) echo $jumplist;
 	echo '<h2 class="title">'.$this->pdata->poll_name.'</h2>';
+	if ($this->pdata->poll_printresults) {
+		$url = 'index.php?option=com_mpoll&task=results&tmpl=component&print=1&poll='.$this->pdata->poll_id.'&cmplid='.$this->cmplid;
+		if ($this->print) echo '<p><a href="javascript:print()" class="button uk-button">Print</a></p>';
+		else echo '<p><a href="'.JRoute::_($url).'" class="button uk-button" target="_blank">Print</a></p>';
+	}
 	foreach ($this->qdata as $q) {
 		if ($q->answer) {
 			if ($q->q_type != 'mcbox' && $q->q_type != "mlist") {
-				if ($q->q_type == "multi") {
+				if ($q->q_type == "multi" || $q->q_type == "dropdown") {
 					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id = '.$q->answer;
 					$db->setQuery($qo); $opt = $db->loadObject();
 					$result = $opt->opt_txt;
@@ -373,7 +378,11 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			}
 		}
 	}
-	if ($this->pdata->poll_results_msg_before) echo $this->pdata->poll_results_msg_before;
+	if ($this->pdata->poll_results_msg_before) {
+
+		$this->pdata->poll_results_msg_before = str_replace("{resid}",$this->cmplid,$this->pdata->poll_results_msg_before);
+		echo $this->pdata->poll_results_msg_before;
+	}
 	if ($this->pdata->poll_showresults) {
 		foreach ($this->qdata as $q) {
 			if ($q->q_type == "mcbox" || $q->q_type == "multi" || $q->q_type == "dropdown" || $q->q_type == "mlist") {

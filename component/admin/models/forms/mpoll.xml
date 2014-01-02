@@ -64,6 +64,18 @@
 	</fieldset>
 	<fieldset name="results">
 		<field
+			name="poll_printresults"
+			type="radio"
+			label="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_DESC"
+			size="1"
+			class="inputbox"
+			required="false"
+			default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
 			name="poll_resultsemail"
 			type="radio"
 			label="COM_MPOLL_MPOLL_FIELD_RESEMAIL_LABEL"
