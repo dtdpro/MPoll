@@ -72,7 +72,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		//checkbox
 		if ($f->q_type=="cbox") {
 			echo '<div class="mform-radio">';
-			echo '<div class="mform-radio-option">';
+			echo '<div class="mform-radio-option checkbox">';
 			if (!empty($f->value)) $checked = ($f->value == '1') ? ' checked="checked"' : '';
 			else $checked = '';
 			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_radio"';
@@ -89,7 +89,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			$first = true;
 			foreach ($f->options as $o) {
 				if ($o->opt_selectable) {
-					echo '<div class="mform-radio-option">';
+					echo '<div class="mform-radio-option checkbox">';
 					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 					else $checked = '';
 					echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="mf_radio" id="jform_'.$sname.$o->value.'"';
@@ -122,7 +122,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			$first=true;
 			foreach ($f->options as $o) {
 				if ($o->opt_selectable) {
-					echo '<div class="mform-radio-option">';
+					echo '<div class="mform-radio-option radio">';
 					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 					else $checked = '';
 					echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="mf_radio"';
@@ -150,7 +150,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="dropdown") {
 			echo '<div class="mform-field">';
 			echo '<div class="mform-field-select">';
-			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field mf_select" size="1"';
+			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field mf_select"';
 			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>';
 			foreach ($f->options as $o) {
@@ -238,7 +238,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="yesno") {
 			echo '<div class="mform-field">';
 			echo '<div class="mform-field-yesno">';
-			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field" size="1">';
+			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field">';
 			$selected = ' selected="selected"';
 			echo '<option value="1"';
 			echo ($f->value == "1") ? $selected : '';

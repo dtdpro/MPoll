@@ -28,7 +28,7 @@ if ($showtitle) {
 						echo '<div class="mpollmod-answers">';
 						//output checkbox
 						if ($qdata->q_type == 'cbox') { 
-							echo '<div class="mpollmod-answer"><input type="checkbox" size="40" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"><label for="q'.$qdata->q_id.'"> '.$qdata->q_text.'</label></div>';
+							echo '<div class="mpollmod-answer checkbox"><input type="checkbox" size="40" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"><label for="q'.$qdata->q_id.'"> '.$qdata->q_text.'</label></div>';
 						}
 						
 						//verification msg area
@@ -38,7 +38,7 @@ if ($showtitle) {
 						if ($qdata->q_type == 'multi') {
 							$numopts=0;
 							foreach ($qdata->options as $opts) {
-								echo '<div class="mpollmod-answer"><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts->value.'" id="q'.$qdata->q_id.$opts->value.'"';
+								echo '<div class="mpollmod-answer radio"><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts->value.'" id="q'.$qdata->q_id.$opts->value.'"';
 								if ($opts->opt_disabled) echo " disabled";
 								echo '> <label for="q'.$qdata->q_id.$opts->value.'">'.$opts->text.'</label></div>';
 								$numopts++;
