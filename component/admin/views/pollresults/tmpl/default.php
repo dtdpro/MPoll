@@ -18,6 +18,7 @@ $db =& JFactory::getDBO();
 					echo '<th>#'.$qu->ordering.' '.$qu->q_text.'</th>';
 				}
 			?>
+			<th>User Agent</th>
 		</tr>			
 	</thead>
 	<?php
@@ -65,7 +66,7 @@ $db =& JFactory::getDBO();
 					echo '</td>';
 				}
 			?>
-			
+			<td><?php echo ($i->cm_useragent) ? $i->cm_useragent : "N/A"; ?></td>
 		</tr>
 		<?php
 		$k = 1 - $k;

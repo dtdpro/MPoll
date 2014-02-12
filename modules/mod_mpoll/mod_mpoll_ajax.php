@@ -28,7 +28,7 @@ $pquery = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.' && published
 $db->setQuery( $pquery );
 $pdata = $db->loadAssoc();
 
-$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll) VALUES ('.$userid.','.$pollid.')';
+$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll,cm_useragent) VALUES ('.$userid.','.$pollid.',"'.$_SERVER['HTTP_USER_AGENT'].'")';
 $db->setQuery( $qc );
 $db->query();
 $lastid = $db->insertid();

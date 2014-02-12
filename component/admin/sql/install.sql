@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_completed` (
   `cm_user` int(11) NOT NULL,
   `cm_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `cm_poll` int(11) NOT NULL,
+  `cm_useragent` text NOT NULL,
   PRIMARY KEY (`cm_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 

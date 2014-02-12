@@ -136,7 +136,7 @@ class MPollModelMPoll extends JModelLegacy
 			}
 			
 			//save completed
-			$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll) VALUES ('.$user->id.','.$pollid.')';
+			$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll,cm_useragent) VALUES ('.$user->id.','.$pollid.',"'.$_SERVER['HTTP_USER_AGENT'].'")';
 			$db->setQuery( $qc );
 			$db->query();
 			$subid = $db->insertid();
@@ -197,6 +197,7 @@ class MPollModelMPoll extends JModelLegacy
 						$resultsemail .= $item->$fieldname.'<br />';
 					}
 				}
+				$resultsemail .= "<br /><br /><b>User Agent</b><br />".$_SERVER['HTTP_USER_AGENT'];
 				$emllist = Array();
 				$emllist = explode(",",$pollinfo->poll_emailto);
 				
