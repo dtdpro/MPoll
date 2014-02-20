@@ -1,0 +1,1 @@
+ALTER TABLE  `#__mpoll_completed` ADD  `cm_ipaddr` VARCHAR( 50 ) NOT NULL AFTER `cm_poll`;

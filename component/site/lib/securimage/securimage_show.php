@@ -64,7 +64,7 @@ $session=JFactory::getSession();
 $img = new securimage();
 
 $img->session_name=$session->getName();
-$img->code_length = rand(4, 6);
+$img->code_length = rand(5, 7);
 
 
 // You can customize the image by making changes below, some examples are included - remove the "//" to uncomment
@@ -72,12 +72,12 @@ $img->code_length = rand(4, 6);
 //$img->ttf_file        = './Quiff.ttf';
 //$img->captcha_type    = Securimage::SI_CAPTCHA_MATHEMATIC; // show a simple math problem instead of text
 $img->case_sensitive  = false;                              // true to use case sensitve codes - not recommended
-$img->image_width    = 150;                                // width in pixels of the image
-$img->image_height     = 70;          // a good formula for image size
-//$img->perturbation    = .75;                               // 1.0 = high distortion, higher numbers = more distortion
+$img->image_width    = 180;                                // width in pixels of the image
+$img->image_height     = 60;          // a good formula for image size
+$img->perturbation    = .85;                               // 1.0 = high distortion, higher numbers = more distortion
 $img->image_bg_color  = new Securimage_Color("#FFFFFF");   // image background color
 $img->text_color      = new Securimage_Color("#0000A0");   // captcha text color
-//$img->num_lines       = 8;                                 // how many lines to draw over the image
+$img->num_lines        = rand(3, 10);                      // how many lines to draw over the image
 $img->line_color      = new Securimage_Color("#000040");   // color of lines over the image
 //$img->image_type      = SI_IMAGE_JPEG;                     // render as a jpeg image
 //$img->signature_color = new Securimage_Color(rand(0, 64),
