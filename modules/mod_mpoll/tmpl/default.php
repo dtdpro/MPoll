@@ -205,7 +205,7 @@ if ($showtitle) {
 							else echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + encodeURIComponent(ev.q".$qdata->q_id.".value);\n";
 						} 
 						?> 
-						ajaxRequest.open("GET", "modules/mod_mpoll/mod_mpoll_ajax.php" + queryString, true);
+						ajaxRequest.open("GET", "<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php" + queryString, true);
 						ajaxRequest.send(null); 
 					}
 					</script><?php 
