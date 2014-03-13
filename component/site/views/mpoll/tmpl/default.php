@@ -20,8 +20,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		jQuery("#mpollform").validate({
-			errorClass:"mf_error",
-			validClass:"mf_valid",
+			errorClass:"mf_error uk-form-danger",
+			validClass:"mf_valid uk-form-success",
 			errorPlacement: function(error, element) {
 		    	error.appendTo( element.parent("div").parent("div").parent("div").next("div") );
 		    }
@@ -32,7 +32,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 
 </script>
 	<?php 
-	echo '<h2 class="title">'.$this->pdata->poll_name.'</h2>';
+	echo '<h2 class="title uk-article-title">'.$this->pdata->poll_name.'</h2>';
 	if ($this->pdata->poll_regreq == 1 && $user->id == 0) {
 		echo '<p align="center">'.$this->pdata->poll_regreqmsg.'</p>';
 	} else if ( !in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
