@@ -12,7 +12,7 @@ class MPollViewPollResults extends JViewLegacy
 		$pid = JRequest::getVar('poll');
 		JToolBarHelper::title(   JText::_( 'Poll Results' ), 'mpoll' );
 		$tbar =& JToolBar::getInstance('toolbar');
-		$tbar->appendButton('Link','archive','Export CSV','index.php?option=com_mpoll&view=pollresults&format=csv&poll='.$pid.'" target="_blank');
+		$tbar->appendButton('Link','archive','Export CSV','index.php?option=com_mpoll&view=pollresults&format=csv&poll='.$pid);
 		JToolBarHelper::back('Polls','index.php?option=com_mpoll');
 		// Get data from the model
 		$model = $this->getModel('pollresults');

@@ -5,7 +5,7 @@ defined('_JEXEC') or die();
 jimport( 'joomla.application.component.view' );
 		
 
-class MPollViewPollResults extends JView
+class MPollViewPollResults extends JViewLegacy
 {
 	function display($tpl = 'csv')
 	{
