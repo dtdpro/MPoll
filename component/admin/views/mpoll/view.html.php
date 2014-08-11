@@ -18,7 +18,9 @@ class MPollViewMPoll extends JViewLegacy
 		$this->state = $this->get('State');
 		$this->form = $this->get('Form');
 		$this->item = $this->get('Item');
-		$this->questions = $this->get('Questions');
+		
+		$model = $this->getModel();
+		$this->questions = $model->getQuestions($this->item->poll_id);
 	
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

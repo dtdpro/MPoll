@@ -60,7 +60,17 @@ $params = $this->form->getFieldsets('params');
 						</div>
 					<?php endforeach; ?>
 					<div class="control-group">
-						<?php echo $this->form->getInput('poll_confmsg'); ?>
+						<?php echo $this->form->getLabel('poll_confmsg').$this->form->getInput('poll_confmsg'); ?>
+						<div style="clear:both">{name} Users full name<br />{email} Users email<br />{username} Users username<br />{resid} Results id
+							<?php 
+								if ($this->item->poll_id) {
+									foreach ($this->questions as $q) {
+										echo '<br />{i'.$q->value.'} '.$q->text;
+									}
+								}
+							
+							?>
+						</div>
 					</div>
 				</div>
 				<div class="span2 form-horizontal">
