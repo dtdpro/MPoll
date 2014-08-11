@@ -8,34 +8,32 @@ jimport('joomla.application.component.view');
 
 class MPollViewMPoll extends JViewLegacy
 {
-	/**
-	 * display method of view
-	 * @return void
-	 */
-	public function display($tpl = null) 
+	protected $state;
+	protected $item;
+	protected $form;
+	
+	public function display($tpl = null)
 	{
 		// get the Data
+		$this->state = $this->get('State');
 		$this->form = $this->get('Form');
 		$this->item = $this->get('Item');
-		$this->script = $this->get('Script');
 		$this->questions = $this->get('Questions');
-
+	
 		// Check for errors.
-		if (count($errors = $this->get('Errors'))) 
+		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode('<br />', $errors));
 			return false;
 		}
-
+	
 		// Set the toolbar
 		$this->addToolBar();
-
+	
 		// Display the template
 		parent::display($tpl);
-
-		// Set the document
-		$this->setDocument();
 	}
+	
 
 	/**
 	 * Setting the toolbar
@@ -81,18 +79,5 @@ class MPollViewMPoll extends JViewLegacy
 			JToolBarHelper::cancel('mpoll.cancel', 'JTOOLBAR_CLOSE');
 		}
 	}
-	/**
-	 * Method to set up the document properties
-	 *
-	 * @return void
-	 */
-	protected function setDocument() 
-	{
-		$isNew = $this->item->poll_id == 0;
-		$document = JFactory::getDocument();
-		$document->setTitle($isNew ? JText::_('COM_MPOLL_MPOLL_CREATING') : JText::_('COM_MPOLL_MPOLL_EDITING'));
-		$document->addScript(JURI::root() . $this->script);
-		$document->addScript(JURI::root() . "/administrator/components/com_mpoll/views/mpoll/submitbutton.js");
-		JText::script('COM_MPOLL_MPOLL_ERROR_UNACCEPTABLE');
-	}
+
 }

@@ -8,36 +8,30 @@ jimport('joomla.application.component.view');
 
 class MPollViewMPolls extends JViewLegacy
 {
-	function display($tpl = null) 
+	protected $items;
+	protected $pagination;
+	protected $state;
+	
+	function display($tpl = null)
 	{
-		// Get data from the model
-		$items = $this->get('Items');
-		$pagination = $this->get('Pagination');
 		$this->state		= $this->get('State');
-
-		// Check for errors.
-		if (count($errors = $this->get('Errors'))) 
+		$this->items = $this->get('Items');
+		$this->pagination = $this->get('Pagination');
+	
+		// Set the submenu
+		MPollHelper::addSubmenu(JRequest::getVar('view'));
+	
+		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode('<br />', $errors));
 			return false;
 		}
-		// Assign data to the view
-		$this->items = $items;
-		$this->pagination = $pagination;
-
-		// Set the toolbar
+	
 		$this->addToolBar();
-
-		// Display the template
+		$this->sidebar = JHtmlSidebar::render();
 		parent::display($tpl);
-
-		// Set the document
-		$this->setDocument();
 	}
-
-	/**
-	 * Setting the toolbar
-	 */
+	
 	protected function addToolBar() 
 	{
 		$state	= $this->get('State');
@@ -69,15 +63,25 @@ class MPollViewMPolls extends JViewLegacy
 			JToolBarHelper::divider();
 			JToolBarHelper::preferences('com_mpoll');
 		}
+		
+		JHtmlSidebar::setAction('index.php?option=com_mows&view=products');
+		
+		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_state',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.state'), true));
+		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_ACCESS'),'filter_access',JHtml::_('select.options', JHtml::_('access.assetgroups'), 'value', 'text', $this->state->get('filter.access')));
+		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_CATEGORY'),'filter_category_id',JHtml::_('select.options', JHtml::_('category.options', 'com_mpoll'), 'value', 'text', $this->state->get('filter.category_id')));
 	}
-	/**
-	 * Method to set up the document properties
-	 *
-	 * @return void
-	 */
-	protected function setDocument() 
+	
+	protected function getSortFields()
 	{
-		$document = JFactory::getDocument();
-		$document->setTitle(JText::_('COM_MPOLL_ADMINISTRATION'));
+		return array(
+				'p.published' => JText::_('JSTATUS'),
+				'p.poll_created' => JText::_('COM_MPOLL_MPOLL_HEADING_ADDED'),
+				'p.poll_modified' => JText::_('COM_MPOLL_MPOLL_HEADING_MODIFIED'),
+				'p.poll_name' => JText::_('COM_MPOLL_MPOLL_HEADING_TITLE'),
+				'p.access' => JText::_('JGRID_HEADING_ACCESS'),
+				'p.poll_id' => JText::_('JGRID_HEADING_ID')
+		);
 	}
+
+
 }

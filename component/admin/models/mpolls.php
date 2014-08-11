@@ -14,11 +14,14 @@ public function __construct($config = array())
 	{
 		if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
-				'poll_id', 
-				'poll_name', 
+				'p.poll_id', 
+				'p.poll_name', 
 				'category_title', 
 				'published', 
 				'access_level',
+				'p.poll_created',
+				'p.poll_modified',
+				'p.poll_type'
 			);
 		}
 
@@ -48,7 +51,52 @@ public function __construct($config = array())
 		$this->setState('params', $params);
 
 		// List state information.
-		parent::populateState('poll_name', 'asc');
+		parent::populateState('p.poll_name', 'asc');
+	}
+	
+	public function getItems()
+	{
+		// Get a storage key.
+		$store = $this->getStoreId();
+		// Try to load the data from internal storage.
+		if (isset($this->cache[$store]))
+		{
+			return $this->cache[$store];
+		}
+		// Load the list items.
+		$query = $this->_getListQuery();
+		try
+		{
+			$items = $this->_getList($query, $this->getStart(), $this->getState('list.limit'));
+		}
+		catch (RuntimeException $e)
+		{
+			$this->setError($e->getMessage());
+			return false;
+		}
+		
+		$db = JFactory::getDBO();
+		foreach ($items as &$i) {
+			//Questions Count
+			$query = $db->getQuery(true);
+			$query->select('count(*)');
+			$query->from('#__mpoll_questions');
+			$query->where('q_poll='.$i->poll_id);
+			$db->setQuery( $query );
+			$i->questions = $this->_db->loadResult();
+			
+			//Results count
+			$query = $db->getQuery(true);
+			$query->select('count(*)');
+			$query->from('#__mpoll_completed');
+			$query->where('cm_poll='.$i->poll_id);
+			$db->setQuery( $query );
+			$i->results = $this->_db->loadResult();
+		}
+		
+		// Add the items to the internal cache.
+		$this->cache[$store] = $items;
+		return $this->cache[$store];
 	}
 	
 	protected function getListQuery() 
@@ -70,6 +118,14 @@ public function __construct($config = array())
 		// Join over the categories.
 		$query->select('c.title AS category_title');
 		$query->join('LEFT', '#__categories AS c ON c.id = p.poll_cat');
+		
+		// Join over the users for the author who added.
+		$query->select('ua.name AS adder')
+		->join('LEFT', '#__users AS ua ON ua.id = p.poll_created_by');
+		
+		// Join over the users for the author who modified.
+		$query->select('um.name AS modifier')
+		->join('LEFT', '#__users AS um ON um.id = p.poll_modified_by');
 		
 		// Filter by access level.
 		if ($access = $this->getState('filter.access')) {

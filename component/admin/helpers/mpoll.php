@@ -5,18 +5,12 @@ defined('_JEXEC') or die;
 
 abstract class MPollHelper
 {
-	public static function addSubmenu($submenu) 
+	public static function addSubmenu($submenu)
 	{
-		JSubMenuHelper::addEntry(JText::_('COM_MPOLL_SUBMENU_MPOLLS'), 'index.php?option=com_mpoll', $submenu == 'Polls');
-		JSubMenuHelper::addEntry(JText::_('COM_MPOLL_SUBMENU_CATEGORIES'), 'index.php?option=com_categories&view=categories&extension=com_mpoll', $submenu == 'categories');
-		// set some global property
-		$document = JFactory::getDocument();
-		//$document->addStyleDeclaration('.icon-48-helloworld {background-image: url(../media/com_mpoll/images/tux-48x48.png);}');
-		if ($submenu == 'categories') 
-		{
-			$document->setTitle(JText::_('COM_MPOLL_ADMINISTRATION_CATEGORIES'));
-		}
+		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_MPOLLS'), 'index.php?option=com_mpoll', $submenu == 'mpolls');
+		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_CATEGORIES'), 'index.php?option=com_categories&extension=com_mpoll', $submenu == 'categories');
 	}
+	
 	/**
 	 * Get the actions
 	 */

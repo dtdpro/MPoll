@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="1.6.0" method="upgrade">
+<extension type="component" version="3.2.0" method="upgrade">
 	<name>com_mpoll</name>
 	<creationDate>2009.01.09</creationDate>
 	<author>DtD Productions</author>
 	<authorEmail>mike@dtdpro.com</authorEmail>
 	<authorUrl>http://www.ditzthedaisy.com</authorUrl>
-	<copyright>(c)2008-2013</copyright>
+	<copyright>(c)2008-2014</copyright>
 	<license>GPL v2</license>
-	<version>1.20.2</version>
-    <releaseDate>2013.06.06</releaseDate>
+	<version>1.21.0</version>
+    <releaseDate>2013.09.01</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
 	<scriptfile>script.php</scriptfile>
@@ -41,10 +41,10 @@
 	</media>	
 	<administration>
 		<!-- Administration Menu Section -->
-		<menu img="../media/com_mpoll/images/mpoll-16x16.png">COM_MPOLL_MENU</menu>
+		<menu>COM_MPOLL_MENU</menu>
 		<submenu>
-			<menu view="mpolls" img="../media/com_mpoll/images/mpoll-16x16.png">COM_MPOLL_SUBMENU_MPOLLS</menu>
-			<menu link="option=com_categories&amp;extension=com_mpoll" view="categories" img="class:category" alt="MPoll/Categories">COM_MPOLL_SUBMENU_CATEGORIES</menu>
+			<menu view="mpolls">COM_MPOLL_SUBMENU_MPOLLS</menu>
+			<menu link="option=com_categories&amp;extension=com_mpoll" view="categories" alt="MPoll/Categories">COM_MPOLL_SUBMENU_CATEGORIES</menu>
 		</submenu>
 		
 		

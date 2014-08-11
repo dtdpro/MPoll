@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- $Id: mpoll.xml 62 2010-11-28 16:08:16Z chdemko $ -->
 <form>
+	<fieldset name="general">
+	
+		<field
+			name="poll_name"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_NAME_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_NAME_DESC"
+			class="inputbox input-xxlarge input-large-text"
+			required="true"
+			default=""
+		/>
+		<field
+			name="poll_alias"
+			type="text"
+			label="COM_MPOLL_MPOLL_FIELD_ALIAS_LABEL"
+			description="COM_MPOLL_MPOLL_FIELD_ALIAS_DESC"
+			class="inputbox"
+			default=""
+		/>
+	</fieldset>
 	<fieldset name="setup">
 		<field
 			name="poll_id"
@@ -31,16 +51,6 @@
 			default="1"
 			filter="integer"/>
 		<field
-			name="poll_name"
-			type="text"
-			label="COM_MPOLL_MPOLL_FIELD_NAME_LABEL"
-			description="COM_MPOLL_MPOLL_FIELD_NAME_DESC"
-			size="40"
-			class="inputbox"
-			required="true"
-			default=""
-		/>
-		<field
 			name="poll_cat"
 			type="category"
 			extension="com_mpoll"
@@ -51,9 +61,9 @@
 		</field>
 		<field
 			name="poll_pagetype"
-			type="list"
+			type="radio"
 			extension="com_mpoll"
-			class="inputbox"
+			class="btn-group"
 			default="poll"
 			label="COM_MPOLL_MPOLL_FIELD_PAGETYPE_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_PAGETYPE_DESC"
@@ -69,7 +79,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="false"
 			default="0">
 			<option	value="1">Yes</option>
@@ -81,7 +91,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_RESEMAIL_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_RESMAIL_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="false"
 			default="0">
 			<option	value="1">Yes</option>
@@ -115,7 +125,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_CONFEMAIL_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_CONFEMAIL_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="false"
 			default="0">
 			<option	value="1">Yes</option>
@@ -229,7 +239,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_ONLY_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_ONLY_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="true"
 			default="1">
 			<option	value="1">Yes</option>
@@ -241,7 +251,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_REGREQ_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_REGREQ_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="false"
 			default="1">
 			<option	value="1">Yes</option>
@@ -275,7 +285,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="true"
 			default="1">
 			<option	value="1">Yes</option>
