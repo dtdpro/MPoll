@@ -91,7 +91,7 @@ class MPollControllerMPolls extends JControllerAdmin
 		}
 		else
 		{
-			$app->setUserState($context . '.filter.question',$ids[0]);
+			$app->setUserState($context . '.filter.poll',$ids[0]);
 		}
 		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=questions', false));
 	}
