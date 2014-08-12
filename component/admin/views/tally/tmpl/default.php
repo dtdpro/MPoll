@@ -1,7 +1,14 @@
 <?php defined('_JEXEC') or die('Restricted access'); 
 $order = JHTML::_('grid.order', $this->items);
 $db =& JFactory::getDBO();
-		
+if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+	<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;
 /*** DISPLAY POLL RESULTS ***/
 	echo '<div class="componentheading">'.$this->pdata->poll_name.'</div>';
 	foreach ($this->qdata as $q) {
@@ -49,3 +56,4 @@ $db =& JFactory::getDBO();
 	}
 	
 ?>
+</div>

@@ -9,12 +9,10 @@ class MPollViewPollResults extends JViewLegacy
 {
 	function display($tpl = 'csv')
 	{
-		$pid = JRequest::getVar('poll');
-		
 		// Get data from the model
 		$model = $this->getModel('pollresults');
-		$questions = $model->getQuestions($pid);
-		$items = $model->getResponses($pid,$questions);
+		$questions = $model->getQuestions();
+		$items = $model->getResponses($questions);
 		$opts = $model->getOptions($questions);
 		$users = $model->getUsers();
 		

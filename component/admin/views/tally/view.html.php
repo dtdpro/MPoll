@@ -9,16 +9,22 @@ class MPollViewTally extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		JToolBarHelper::title(   JText::_( 'MPoll Polls Manager - Results' ), 'mpoll' );
-		JToolBarHelper::back('Polls','index.php?option=com_mpoll');
-		$model = $this->getModel('tally');
-		// Get data from the model
-		$pollid = JRequest::getVar( 'poll' );
-		$qdata=$model->getQuestions($pollid);
-		$pdata=$model->getPoll($pollid); 
-		$this->qdata = $qdata;
-		$this->pdata = $pdata;
+		
+		$this->qdata = $this->get('Questions');
+		$this->pdata = $this->get('Poll');
+		$this->polltitle = $this->get('PollTitle');
+		
+		MPOLLHelper::addPollSubmenu(JRequest::getVar('view'),$this->polltitle);
+
+		// Set the toolbar
+		$this->addToolBar();
+		$this->sidebar = JHtmlSidebar::render();
 		
 		parent::display($tpl);
+	}
+	
+	protected function addToolBar()
+	{
+		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_TALLY'), 'MPoll');
 	}
 }

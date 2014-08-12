@@ -8,36 +8,36 @@ jimport('joomla.application.component.view');
 
 class MPollViewQuestions extends JViewLegacy
 {
+	protected $items;
+	protected $pagination;
+	protected $state;
+	protected $polltitle;
+	
 	function display($tpl = null) 
 	{
 		// Get data from the model
-		$items = $this->get('Items');
-		$pagination = $this->get('Pagination');
-		$this->state		= $this->get('State');
-		$polllist = $this->get('Polls');
+		$this->items = $this->get('Items');
+		$this->pagination = $this->get('Pagination');
+		$this->state = $this->get('State');
+		$this->polltitle = $this->get('PollTitle');
+		
+		MPOLLHelper::addPollSubmenu(JRequest::getVar('view'),$this->polltitle);
+		
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) 
 		{
 			JError::raiseError(500, implode('<br />', $errors));
 			return false;
 		}
-		// Assign data to the view
-		$this->items = $items;
-		$this->pagination = $pagination;
-		$this->polllist = $polllist;
+		
 		// Set the toolbar
 		$this->addToolBar();
+		$this->sidebar = JHtmlSidebar::render();
 
 		// Display the template
 		parent::display($tpl);
-
-		// Set the document
-		$this->setDocument();
 	}
 
-	/**
-	 * Setting the toolbar
-	 */
 	protected function addToolBar() 
 	{
 		$state	= $this->get('State');
@@ -63,17 +63,8 @@ class MPollViewQuestions extends JViewLegacy
 			JToolBarHelper::trash('questions.trash');
 			JToolBarHelper::divider();
 		}
-		JToolBarHelper::back('COM_MPOLL_TOOLBAR_POLLS','index.php?option=com_mpoll&view=mpolls');
 		
-	}
-	/**
-	 * Method to set up the document properties
-	 *
-	 * @return void
-	 */
-	protected function setDocument() 
-	{
-		$document = JFactory::getDocument();
-		$document->setTitle(JText::_('COM_MPOLL_ADMINISTRATION'));
+		JHtmlSidebar::setAction('index.php?option=com_mpoll&view=questions');
+		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_state',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.state'), true));
 	}
 }

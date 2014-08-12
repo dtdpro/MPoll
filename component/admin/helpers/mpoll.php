@@ -11,9 +11,15 @@ abstract class MPollHelper
 		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_CATEGORIES'), 'index.php?option=com_categories&extension=com_mpoll', $submenu == 'categories');
 	}
 	
-	/**
-	 * Get the actions
-	 */
+	public static function addPollSubmenu($submenu,$polltitle)
+	{
+		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_MPOLLSRETURN'),'index.php?option=com_mpoll&view=mpolls',$submenu == 'mpolls');
+		JHtmlSidebar::addEntry('<span class="nav-header">'.$polltitle.'</span>');
+		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_QUESTIONS'),'index.php?option=com_mpoll&view=questions',$submenu == 'questions');
+		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_RESULTS'),'index.php?option=com_mpoll&view=pollresults',$submenu == 'pollresults');
+		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_TALLY'),'index.php?option=com_mpoll&view=tally',$submenu == 'tally');
+	}
+
 	public static function getActions($vidId = 0)
 	{
 		$user	= JFactory::getUser();

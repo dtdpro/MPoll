@@ -5,10 +5,28 @@ defined('_JEXEC') or die();
 
 jimport( 'joomla.application.component.model' );
 
-class MPollModelPollResults extends JModelLegacy
+class MPollModelPollResults extends JModelList
 {
-	function getResponses($pollid,$questions)
+	protected function populateState($ordering = null, $direction = null)
 	{
+		// Initialise variables.
+		$app = JFactory::getApplication('administrator');
+
+		// Load the filter state.
+		$pollId = $this->getUserStateFromRequest('com_mpoll.questions.filter.poll', 'filter_poll','');
+		$this->setState('filter.poll', $pollId);
+		
+		// Load the parameters.
+		$params = JComponentHelper::getParams('com_mpoll');
+		$this->setState('params', $params);
+
+		// List state information.
+		parent::populateState();
+	}
+	
+	function getResponses($questions)
+	{
+		$pollid = $this->getState('filter.poll');
 		$db =& JFactory::getDBO();
 		
 		//Get Completions
@@ -55,8 +73,9 @@ class MPollModelPollResults extends JModelLegacy
 		return $odata;
 	}
 	
-	function getQuestions($pollid)
+	function getQuestions()
 	{
+		$pollid = $this->getState('filter.poll');
 		$query  = ' SELECT * FROM #__mpoll_questions ';
 		$query .= 'WHERE q_type NOT IN ("captcha","message","header") && q_poll ='.$pollid.' ';
 		$query .= 'ORDER BY ordering ASC';
@@ -78,5 +97,21 @@ class MPollModelPollResults extends JModelLegacy
 		}
 		
 		return $udata;
+	}
+	
+	public function getPollTitle() {
+		$db = JFactory::getDBO();
+		$query = $db->getQuery(true);
+		$pollId = $this->getState('filter.poll');
+		
+		if (is_numeric($pollId)) {
+			$query->select('poll_name');
+			$query->from('#__mpoll_polls');
+			$query->where('poll_id = '.(int) $pollId);
+			$db->setQuery($query);
+			return $db->loadResult();
+		} else {
+			return "NO POLL";
+		}
 	}
 }
