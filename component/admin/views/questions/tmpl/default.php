@@ -129,7 +129,7 @@ if ($saveOrder) {
 					</td>
 					<td>
 							<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=question.edit&q_id='.(int) $item->q_id); ?>">
-							<?php echo $this->escape($item->q_text); ?></a>
+							<?php echo $this->escape($item->q_name); ?></a>
 							<div class="small">
 								<strong>Type:</strong> 
 								<?php switch ($item->q_type) {

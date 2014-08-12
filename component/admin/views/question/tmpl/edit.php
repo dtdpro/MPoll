@@ -18,6 +18,12 @@ $params = $this->form->getFieldsets('params');
 
 <form action="<?php echo JRoute::_('index.php?option=com_mpoll&layout=edit&q_id='.(int) $this->item->q_id); ?>" method="post" name="adminForm" id="mpoll-form" class="form-validate">
 
+	<div class="form-inline form-inline-header">
+		<div class="control-group ">
+			<div class="control-label"><?php echo $this->form->getLabel('q_name'); ?></div>
+			<div class="controls"><?php echo $this->form->getInput('q_name'); ?></div>
+		</div>
+	</div>
 	<div class="row-fluid">
 		<div class="span8">
 			<?php foreach($this->form->getFieldset('content') as $field): ?>
