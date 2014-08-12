@@ -8,36 +8,36 @@ jimport('joomla.application.component.view');
 
 class MPollViewOptions extends JViewLegacy
 {
-	function display($tpl = null) 
+	protected $items;
+	protected $pagination;
+	protected $state;
+	protected $polltitle;
+	
+	function display($tpl = null)
 	{
 		// Get data from the model
-		$items = $this->get('Items');
-		$pagination = $this->get('Pagination');
-		$this->state		= $this->get('State');
-		$qlist = $this->get('Questions');
+		$this->items = $this->get('Items');
+		$this->pagination = $this->get('Pagination');
+		$this->state = $this->get('State');
+		$this->questiontitle = $this->get('QuestionTitle');
+	
+		MPOLLHelper::addQuestionSubmenu(JRequest::getVar('view'),$this->questiontitle);
+	
 		// Check for errors.
-		if (count($errors = $this->get('Errors'))) 
+		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode('<br />', $errors));
 			return false;
 		}
-		// Assign data to the view
-		$this->items = $items;
-		$this->pagination = $pagination;
-		$this->qlist = $qlist;
+	
 		// Set the toolbar
 		$this->addToolBar();
-
+		$this->sidebar = JHtmlSidebar::render();
+	
 		// Display the template
 		parent::display($tpl);
-
-		// Set the document
-		$this->setDocument();
 	}
 
-	/**
-	 * Setting the toolbar
-	 */
 	protected function addToolBar() 
 	{
 		$state	= $this->get('State');
@@ -63,17 +63,7 @@ class MPollViewOptions extends JViewLegacy
 			JToolBarHelper::trash('options.trash');
 			JToolBarHelper::divider();
 		}
-		JToolBarHelper::back('COM_MPOLL_TOOLBAR_QUESTIONS','index.php?option=com_mpoll&view=questions');
-		
-	}
-	/**
-	 * Method to set up the document properties
-	 *
-	 * @return void
-	 */
-	protected function setDocument() 
-	{
-		$document = JFactory::getDocument();
-		$document->setTitle(JText::_('COM_MPOLL_ADMINISTRATION'));
+		JHtmlSidebar::setAction('index.php?option=com_mpoll&view=options');
+		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_state',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.state'), true));
 	}
 }

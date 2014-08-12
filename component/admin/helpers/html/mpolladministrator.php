@@ -25,11 +25,11 @@ abstract class JHtmlMPollAdministrator
 	
 		if ($canEdit && ($type=='mlist' || $type=='multi' || $type=='mcbox' || $type=='dropdown'))
 		{
-			$html	= '<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'questions.options\')" class="btn btn-micro hasTooltip' . '" title="Options"><i class="icon-list"></i></a>';
+			$html	= '<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'questions.options\')" class="btn btn-micro hasTooltip' . '" title="Options"><i class="icon-list-2"></i></a>';
 		}
 		else
 		{
-			$html = '<span class="btn btn-micro hasTooltip disabled"><i class="icon-list"></i></span>';
+			$html = '<span class="btn btn-micro hasTooltip disabled"><i class="icon-list-2"></i></span>';
 		}
 	
 		return $html;

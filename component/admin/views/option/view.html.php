@@ -8,41 +8,32 @@ jimport('joomla.application.component.view');
 
 class MPollViewOption extends JViewLegacy
 {
-	/**
-	 * display method of view
-	 * @return void
-	 */
-	public function display($tpl = null) 
+	protected $state;
+	protected $item;
+	protected $form;
+	
+	public function display($tpl = null)
 	{
 		// get the Data
-		$form = $this->get('Form');
-		$item = $this->get('Item');
-		$script = $this->get('Script');
-
+		$this->state = $this->get('State');
+		$this->form = $this->get('Form');
+		$this->item = $this->get('Item');
+	
 		// Check for errors.
-		if (count($errors = $this->get('Errors'))) 
+		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode('<br />', $errors));
 			return false;
 		}
-		// Assign the Data
-		$this->form = $form;
-		$this->item = $item;
-		$this->script = $script;
-
+	
+	
 		// Set the toolbar
 		$this->addToolBar();
-
+	
 		// Display the template
 		parent::display($tpl);
-
-		// Set the document
-		$this->setDocument();
 	}
-
-	/**
-	 * Setting the toolbar
-	 */
+	
 	protected function addToolBar() 
 	{
 		JRequest::setVar('hidemainmenu', true);
@@ -83,19 +74,5 @@ class MPollViewOption extends JViewLegacy
 			}
 			JToolBarHelper::cancel('option.cancel', 'JTOOLBAR_CLOSE');
 		}
-	}
-	/**
-	 * Method to set up the document properties
-	 *
-	 * @return void
-	 */
-	protected function setDocument() 
-	{
-		$isNew = $this->item->opt_id == 0;
-		$document = JFactory::getDocument();
-		$document->setTitle($isNew ? JText::_('COM_MPOLL_OPTION_CREATING') : JText::_('COM_MPOLL_OPTION_EDITING'));
-		$document->addScript(JURI::root() . $this->script);
-		$document->addScript(JURI::root() . "/administrator/components/com_mpoll/views/mpoll/submitbutton.js");
-		JText::script('COM_MPOLL_OPTION_ERROR_UNACCEPTABLE');
 	}
 }

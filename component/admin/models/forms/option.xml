@@ -48,7 +48,7 @@
 			label="COM_MPOLL_OPTION_FIELD_OTHER_LABEL"
 			description="COM_MPOLL_OPTION_FIELD_OTHER_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="true"
 			default="0">
 			<option	value="1">Yes</option>
@@ -60,7 +60,7 @@
 			label="COM_MPOLL_OPTION_FIELD_CORRECT_LABEL"
 			description="COM_MPOLL_OPTION_FIELD_CORRECT_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="true"
 			default="0">
 			<option	value="1">Yes</option>
@@ -72,7 +72,7 @@
 			label="COM_MPOLL_OPTION_FIELD_SELECTABLE_LABEL"
 			description="COM_MPOLL_OPTION_FIELD_SELECTABLE_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="true"
 			default="1">
 			<option	value="1">Yes</option>
@@ -84,7 +84,7 @@
 			label="COM_MPOLL_OPTION_FIELD_DISABLED_LABEL"
 			description="COM_MPOLL_OPTION_FIELD_DISABLED_DESC"
 			size="1"
-			class="inputbox"
+			class="btn-group"
 			required="true"
 			default="0">
 			<option	value="1">Yes</option>

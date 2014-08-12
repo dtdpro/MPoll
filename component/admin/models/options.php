@@ -13,6 +13,11 @@ class MPollModelOptions extends JModelList
 	public function __construct($config = array())
 	{
 		
+		if (empty($config['filter_fields'])) {
+			$config['filter_fields'] = array(
+				'ordering', 'q.ordering',
+			);
+		}
 		parent::__construct($config);
 	}
 	
@@ -71,15 +76,20 @@ class MPollModelOptions extends JModelList
 				
 		return $query;
 	}
+
+	public function getQuestionTitle() {
+		$db = JFactory::getDBO();
+		$query = $db->getQuery(true);
+		$qId = $this->getState('filter.question');
 	
-	public function getQuestions() {
-		$app = JFactory::getApplication('administrator');
-		$pollId = $app->getUserState('com_mpoll.questions.filter.poll');
-		$query = 'SELECT q_id AS value, q_text AS text' .
-				' FROM #__mpoll_questions' .
-				' WHERE q_type IN ("mcbox","multi") && q_poll = '.$pollId .
-				' ORDER BY ordering';
-		$this->_db->setQuery($query);
-		return $this->_db->loadObjectList();
+		if (is_numeric($qId)) {
+			$query->select('q_name');
+			$query->from('#__mpoll_questions');
+			$query->where('q_id = '.(int) $qId);
+			$db->setQuery($query);
+			return $db->loadResult();
+		} else {
+			return "NO POLL";
+		}
 	}
 }

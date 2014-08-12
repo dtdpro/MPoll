@@ -57,7 +57,6 @@
 		<field
 			name="q_min"
 			type="text"
-			extension="com_continued"
 			class="inputbox"
 			size="6"
 			label="COM_MPOLL_QUESTION_FIELD_MIN_LABEL"
@@ -67,7 +66,6 @@
 		<field
 			name="q_max"
 			type="text"
-			extension="com_continued"
 			class="inputbox"
 			size="6"
 			label="COM_MPOLL_QUESTION_FIELD_MAX_LABEL"
@@ -101,8 +99,8 @@
 		<field
 			name="q_text"
 			type="editor"
-			label="COM_MPOLL_QUESTION_FIELD_NAME_LABEL"
-			description="COM_MPOLL_QUESTION_FIELD_NAME_DESC"
+			label="COM_MPOLL_QUESTION_FIELD_TEXT_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_TEXT_DESC"
 			height="200"
 			class="inputbox"
 			required="true"
@@ -130,6 +128,16 @@
 			default=""
 		/>
 	
+	</fieldset>
+	<fieldset name="other">
+		<field
+			name="q_name"
+			type="text"
+			class="inputbox input-xxlarge input-large-text"
+			label="COM_MPOLL_QUESTION_FIELD_NAME_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_NAME_DESC"
+			required="true"
+			default="" />
 	</fieldset>
 
 </form>
