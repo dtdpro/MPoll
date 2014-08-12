@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_questions` (
   `q_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `q_poll` int(11) NOT NULL,
   `ordering` smallint(6) NOT NULL,
+  `q_name` VARCHAR(255) NOT NULL,
   `q_text` text NOT NULL,
   `q_pretext` TEXT NOT NULL,
   `q_hint` text NOT NULL,
