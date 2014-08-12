@@ -128,7 +128,7 @@ $sortFields = $this->getSortFields();
 						<?php
 							// Create dropdown items
 							
-							if ($item->state) :
+							if ($item->published) :
 								JHtml::_('actionsdropdown.unpublish', 'cb' . $i, 'mpolls');
 							else :
 								JHtml::_('actionsdropdown.publish', 'cb' . $i, 'mpolls');
