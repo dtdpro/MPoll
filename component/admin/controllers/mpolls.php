@@ -96,4 +96,46 @@ class MPollControllerMPolls extends JControllerAdmin
 		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=questions', false));
 	}
 	
+	function pollresults()
+	{
+		// Check for request forgeries
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		$app = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$context = "com_mpoll.questions";
+		// Get items to remove from the request.
+		$ids = JFactory::getApplication()->input->get('cid', array(), 'array');
+		if (!is_array($ids) || count($ids) < 1)
+		{
+			JError::raiseWarning(500, JText::_('COM_MPOLL_POLL_NO_ITEM_SELECTED'));
+			$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=mpolls', false));
+		}
+		else
+		{
+			$app->setUserState($context . '.filter.poll',$ids[0]);
+		}
+		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=pollresults', false));
+	}
+	
+	function tally()
+	{
+		// Check for request forgeries
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		$app = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$context = "com_mpoll.questions";
+		// Get items to remove from the request.
+		$ids = JFactory::getApplication()->input->get('cid', array(), 'array');
+		if (!is_array($ids) || count($ids) < 1)
+		{
+			JError::raiseWarning(500, JText::_('COM_MPOLL_POLL_NO_ITEM_SELECTED'));
+			$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=mpolls', false));
+		}
+		else
+		{
+			$app->setUserState($context . '.filter.poll',$ids[0]);
+		}
+		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=tally', false));
+	}
+	
 }

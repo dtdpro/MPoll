@@ -129,17 +129,17 @@ $sortFields = $this->getSortFields();
 							// Create dropdown items
 							
 							if ($item->state) :
-								JHtml::_('actionsdropdown.unpublish', 'cb' . $i, 'articles');
+								JHtml::_('actionsdropdown.unpublish', 'cb' . $i, 'mpolls');
 							else :
-								JHtml::_('actionsdropdown.publish', 'cb' . $i, 'articles');
+								JHtml::_('actionsdropdown.publish', 'cb' . $i, 'mpolls');
 							endif;
 							
 							JHtml::_('actionsdropdown.divider');
 							
 							if ($trashed) :
-								JHtml::_('actionsdropdown.untrash', 'cb' . $i, 'articles');
+								JHtml::_('actionsdropdown.untrash', 'cb' . $i, 'mpolls');
 							else :
-								JHtml::_('actionsdropdown.trash', 'cb' . $i, 'articles');
+								JHtml::_('actionsdropdown.trash', 'cb' . $i, 'mpolls');
 							endif;
 							
 							// Render dropdown list
@@ -161,9 +161,9 @@ $sortFields = $this->getSortFields();
 						 	| <strong>Submissions:</strong> 
 						 	<?php 
 						 		echo $item->results; 
-						 		if ($item->results) {
-							 		echo ' | <a href="'.JRoute::_('index.php?option=com_mpoll&view=pollresults&poll='.$item->poll_id).'">Results</a>';
-									echo ' | <a href="'.JRoute::_('index.php?option=com_mpoll&view=tally&poll='.$item->poll_id).'">Tally</a>';
+						 		if ($item->results) {//<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.questions\')" class="btn btn-micro hasTooltip' . '" title="Questions"><i class="icon-question"></i></a>
+							 		echo ' | <a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.pollresults\')">Results</a>';
+									echo ' | <a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.tally\')">Tally</a>';
 								}
 							?>
 						</div>
