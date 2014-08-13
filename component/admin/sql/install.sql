@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_questions` (
   `q_min` INT NOT NULL,
   `q_max` INT NOT NULL,
   `q_match` INT NOT NULL,
+  `params` TEXT NOT NULL,
   `published` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`q_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

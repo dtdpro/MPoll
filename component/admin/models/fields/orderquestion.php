@@ -54,7 +54,7 @@ class JFormFieldOrderQuestion extends JFormField
 		$pollId	= (int) $this->form->getValue('q_poll');
 
 		// Build the query for the ordering list.
-		$query = 'SELECT ordering AS value, q_text AS text' .
+		$query = 'SELECT ordering AS value, q_name AS text' .
 				' FROM #__mpoll_questions' .
 				' WHERE q_poll = ' . (int) $pollId .
 				' ORDER BY ordering';

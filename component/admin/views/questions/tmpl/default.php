@@ -145,6 +145,7 @@ if ($saveOrder) {
 									case "header": echo 'Header'; break;
 									case "captcha": echo 'Captcha'; break;
 									case "mlist": echo 'Multi Select'; break;
+									case "mailchimp": echo 'Mailchimp List'; break;
 								} ?>
 								<?php 
 									if ($item->q_type=='mlist' ||$item->q_type=='multi' || $item->q_type=='mcbox' || $item->q_type=='dropdown') {

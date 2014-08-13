@@ -27,6 +27,12 @@ abstract class MPollHelper
 		JHtmlSidebar::addEntry(JText::_('COM_MPOLL_SUBMENU_OPTIONS'),'index.php?option=com_mpoll&view=options',$submenu == 'options');
 	}
 
+	function getConfig() {
+		$menuConfig = JComponentHelper::getParams('com_mpoll');
+		$mamscfg = $menuConfig->toObject();
+		return $mamscfg;
+	}
+
 	public static function getActions($vidId = 0)
 	{
 		$user	= JFactory::getUser();

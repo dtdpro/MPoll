@@ -76,6 +76,54 @@ class MPollModelQuestion extends JModelAdmin
 		return $condition;
 	}
 	
+	public function getItem($pk = null)
+	{
+		$pk = (!empty($pk)) ? $pk : (int) $this->getState($this->getName() . '.id');
+		$table = $this->getTable();
+	
+		if ($pk > 0)
+		{
+			// Attempt to load the row.
+			$return = $table->load($pk);
+	
+			// Check for a table object error.
+			if ($return === false && $table->getError())
+			{
+				$this->setError($table->getError());
+				return false;
+			}
+		}
+	
+		// Convert to the JObject before adding other data.
+		$properties = $table->getProperties(1);
+		$item = JArrayHelper::toObject($properties, 'JObject');
+	
+		if (property_exists($item, 'params'))
+		{
+			$registry = new JRegistry;
+			$registry->loadString($item->params);
+			$item->params = $registry->toArray();
+		}
+		
+		if ($item->q_type == "mailchimp" && $item->q_default) {
+			require_once(JPATH_ROOT.'/components/com_mpoll/lib/mailchimp.php');
+			$cfg=MPollHelper::getConfig();
+			if (!$cfg->mckey) return false;
+			if (strstr($item->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$item->q_default,2);	}
+			else { $mc_key = $cfg->mckey; $mc_list = $item->q_defaultt; }
+			$mc = new MailChimpHelper($mc_key);
+			$mclist=$mc->getLists($mc_list);
+			if ($mclist[0]) {
+				$item->list_mvars = $mc->getListMergeVars($mc_list);
+				$item->questions = $this->getQuestions($item->q_poll);
+			}
+		}
+	
+		return $item;
+	}
+	
+	
+	
 	public function copy(&$pks)
 	{
 		// Initialise variables.
@@ -140,5 +188,17 @@ class MPollModelQuestion extends JModelAdmin
 		$this->cleanCache();
 	
 		return true;
+	}
+	
+	protected function getQuestions($pollId) {
+		$db=$this->_db;
+		$query=$db->getQuery(true);
+		$query->select('q_id AS value');
+		$query->select('q_name AS text');
+		$query->from('#__mpoll_questions');
+		$query->where('q_poll = ' . (int) $pollId);
+		$query->order('ordering');
+		$db->setQuery($query);
+		return $db->loadObjectList();
 	}
 }

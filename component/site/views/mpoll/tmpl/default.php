@@ -43,6 +43,10 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data"><input type="hidden" name="stepnext" value="">';
 	
 	foreach($this->qdata as $f) {
+		
+		//Debug
+		//echo '<pre>'; print_r($f); echo '</pre>';
+		
 		$sname = 'q_'.$f->q_id;
 		if ($ri==1) $ri=0;
 		else $ri=1;
@@ -70,10 +74,11 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_pretext) echo '<span class="mf_pretext">'.$f->q_pretext.'</span>';
 	
 		//checkbox
-		if ($f->q_type=="cbox") {
+		if ($f->q_type=="cbox" || $f->q_type=="mailchimp") {
 			echo '<div class="mform-radio">';
 			echo '<div class="mform-radio-option checkbox">';
-			if (!empty($f->value)) $checked = ($f->value == '1') ? ' checked="checked"' : '';
+			if (!empty($f->value) && $f->q_type=="cbox") $checked = ($f->value == '1') ? ' checked="checked"' : '';
+			else if ($f->params->mc_checked == "1") $checked = ' checked="checked"';
 			else $checked = '';
 			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_radio"';
 			if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
@@ -369,9 +374,11 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 				if ($q->answer) {
 					$qo = 'SELECT opt_txt FROM #__mpoll_questions_opts WHERE published > 0 && opt_id IN ('.str_replace(' ',',',$q->answer).')';
 					$db->setQuery($qo); $opts = $db->loadResultArray();
-					foreach ($opts as $o) {
-						$result = $o->opt_txt;
-						$cfans .= $result.', ';
+					if ($opts) {
+						foreach ($opts as $o) {
+							$result = $o->opt_txt;
+							$cfans .= $result.', ';
+						}
 					}
 				}
 				$this->pdata->poll_results_msg_before = str_replace("{i".$q->q_id."}",$cfans,$this->pdata->poll_results_msg_before);

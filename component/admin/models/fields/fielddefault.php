@@ -27,6 +27,9 @@ class JFormFieldFieldDefault extends JFormField
 			case "yesno":
 				$html = $this->getChecked();
 				break;
+			case "mailchimp":
+				$html = $this->getMailChimp();
+				break;
 			case "textbox":
 			case "textar":
 			default:
@@ -112,4 +115,46 @@ class JFormFieldFieldDefault extends JFormField
 	
 		return implode($html);
 	}
+	
+	protected function getMailchimp()
+	{
+		require_once(JPATH_ROOT.'/administrator/components/com_mpoll/helpers/mpoll.php');
+		require_once(JPATH_ROOT.'/components/com_mpoll/lib/mailchimp.php');
+	
+		$app =& JFactory::getApplication('site');
+		$db  =& JFactory::getDBO();
+		$cfg=MPollHelper::getConfig();
+		if (!$cfg->mckey) return $this->getTextField();
+		$keys = explode(",",$cfg->mckey);
+	
+	
+		// Initialize variables.
+		$html = array();
+		$attr = '';
+		$db = JFactory::getDBO();
+		// Initialize some field attributes.
+		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
+		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
+	
+	
+		// Initialize JavaScript field attributes.
+		$attr .= " onchange=\"Joomla.submitbutton('question.apply')\"";
+	
+	
+		$lists = array();
+		foreach ($keys as $k) {
+			$mc = new MailChimpHelper($k);
+			$keyinfo = $mc->getAccountInfo();
+			$keylists = $mc->getLists();
+			$lists[] = JHtml::_('select.option', "",$keyinfo['username'],"value","text",true);
+			foreach ($keylists as $l) {
+				$lists[] = JHtml::_('select.option', $k."_".$l['id'],$l['name']);
+			}
+		}
+		$html[] = JHtml::_('select.genericlist',$lists,$this->name,$attr, "value","text",$this->value);
+	
+		return implode($html);
+	}
+	
+	
 }

@@ -30,7 +30,7 @@ foreach ($this->items as $i)
     		$contents .= $this->options[$i->$fn];
 			if ($i->$fno) { $contents .= ': '.$i->$fno; }
     	}
-    	if ($qu->q_type == 'textbox') { $contents .= $i->$fn; }
+    	if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp') { $contents .= $i->$fn; }
     	if ($qu->q_type == 'textar') { $contents .= $i->$fn; }
     	if ($qu->q_type == 'attach') {
     		if (strpos($i->$fn,"ERROR:") === FALSE && $i->$fn != "") {

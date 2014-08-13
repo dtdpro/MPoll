@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <config>
-        <fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
+    <fieldset name="integrations" label="COM_MPOLL_CONFIG_INTEGRATIONS_LABEL" description="COM_MPOLL_CONFIG_INTEGRATIONS_DESC">
+		<field name="spacer_apis0" type="spacer" label="COM_MPOLL_CONFIG_MAILCHIMP_LABEL" />
+		<field name="mckey" type="text" label="COM_MPOLL_CONFIG_FIELD_MCKEY_LABEL" description="COM_MPOLL_CONFIG_FIELD_MCKEY_DESC" size="70" class="inputbox" required="false" default="" />		
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
         	<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" validate="rules" filter="rules" component="com_mpoll" section="component" />
         </fieldset>
 </config>

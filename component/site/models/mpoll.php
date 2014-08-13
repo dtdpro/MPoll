@@ -36,6 +36,9 @@ class MPollModelMPoll extends JModelLegacy
 			}
 		}
 		foreach ($qdata as &$u) {
+			$registry = new JRegistry();
+			$registry->loadString($u->params);
+			$u->params = $registry->toObject();
 			$fn='q_'.$u->q_id;
 			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,'');
 			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other','');
@@ -44,7 +47,7 @@ class MPollModelMPoll extends JModelLegacy
 			if ($u->q_type == 'mlimit' || $u->q_type == 'multi' || $u->q_type == 'dropdown' || $u->q_type == 'mcbox' || $u->q_type == 'mlist') {
 				$u->value=explode(" ",$value); 
 				$u->other = $other;
-			} else if ($u->q_type == 'cbox' || $u->q_type == 'yesno') {
+			} else if ($u->q_type == 'mailchimp' || $u->q_type == 'cbox' || $u->q_type == 'yesno') {
 				$u->value=$value;
 			} else if ($u->q_type == 'birthday') {
 				$u->value=$value;
@@ -88,12 +91,16 @@ class MPollModelMPoll extends JModelLegacy
 			//setup item and bind data
 			$fids = array();
 			$optfs = array();
+			$moptfs = array();
 			$upfile=array();
+			$mclists = array();
 			$flist = $this->getQuestions($pollid,false);
 			foreach ($flist as $d) {
 				$fieldname = 'q_'.$d->q_id;
 				if ($d->q_type == 'attach') {
 					$upfile[]=$fieldname;
+				} else if ($d->q_type == 'mailchimp') {
+					$mclists[]=$d;
 				} else if ($d->q_type == 'captcha') {
 					$capfield=$fieldname;
 				} else if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
@@ -109,8 +116,12 @@ class MPollModelMPoll extends JModelLegacy
 				} else {
 					$item->$fieldname = $data[$fieldname];
 				}
-				if ($d->q_type=="mcbox" || $d->q_type=="mlist" || $d->q_type=="multi" || $d->q_type=="dropdown") { 
+				if ($d->q_type=="multi" || $d->q_type=="dropdown") { 
 					$optfs[]=$fieldname;
+					$other->$fieldname=$data[$fieldname."_other"];
+				}
+				if ($d->q_type=="mcbox" || $d->q_type=="mlist") { 
+					$moptfs[]=$fieldname;
 					$other->$fieldname=$data[$fieldname."_other"];
 				}
 				if ($d->q_type != 'captcha') $fids[]=$d->uf_id;
@@ -141,6 +152,7 @@ class MPollModelMPoll extends JModelLegacy
 			$db->query();
 			$subid = $db->insertid();
 			
+			
 			//Upload
 			foreach ($upfile as $u) {
 				$userfile = JRequest::getVar($u, null, 'files', 'array');
@@ -169,6 +181,47 @@ class MPollModelMPoll extends JModelLegacy
 			foreach ($optres as $o) {
 				$optionsdata[$o->opt_id]=$o->opt_txt;
 			}
+
+			//MailChimp List
+			foreach ($mclists as $mclist) {
+				if ($data['q_'.$mclist->q_id])  {
+					if (strstr($mclist->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$mclist->q_default,2);	}
+					else { $mc_key = $cfg->mckey; $mc_list = $mclist->q_default; }
+					$mcf='q_'.$mclist->q_id;
+					include_once 'components/com_mpoll/lib/mailchimp.php';
+					$mc = new MailChimpHelper($mc_key,$mc_list);
+					$mcdata = array('OPTIN_IP'=>$_SERVER['REMOTE_ADDR'], 'OPTIN_TIME'=>$date->toSql(true));
+					$email = $data['q_'.$mclist->params->mc_emailfield];
+					if ($mclist->params->mcvars) {
+						$othervars=$mclist->params->mcvars;
+						foreach ($othervars as $mcv=>$qfid) {
+							$qf='q_'.$qfid;
+							if ($qfid) {
+								if (in_array($qf,$optfs)) {
+									$mcdata[$mcv] = $optionsdata[$item->$qf];
+								} else if (in_array($qf,$moptfs)) {
+									$mcdata[$mcv] = "";
+									foreach (explode(" ",$item->$qf) as $mfo) {
+										$mcdata[$mcv] .= $optionsdata[$mfo]." ";
+									}
+								} else {
+									$mcdata[$mcv] = $item->$qf;
+								}
+							}
+						}
+					}
+					if (!$mc->subStatus($email)) {
+						$mcresult = $mc->subscribeUser(array("email"=>$email),$mcdata,(bool)$mclist->params->mc_doubleoptin,"html");
+						if ($mcresult) { $item->$mcf=$mclist->params->mc_doubleoptin ? "Op-In Sent" : "Subscribed"; }
+						else { $item->$mcf=$mc->error; }
+					} else {
+						$item->$mcf="Already Subscribed";
+					}
+				} else {
+					$mcf='q_'.$mclist->q_id;
+					$item->$mcf="Not Subscribed";
+				}
+			}
 			
 			// Results email
 			if ($pollinfo->poll_resultsemail) {
@@ -182,15 +235,14 @@ class MPollModelMPoll extends JModelLegacy
 					if ($d->q_type=="attach") {
 						if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
 					} else if (in_array($fieldname,$optfs)) {
-						if ($d->q_type == "mcbox" || $d->q_type=="mlist") { 
-							$ans = explode(" ",$item->$fieldname);
-							foreach ($ans as $i) {
-								$resultsemail .= $optionsdata[$i].'<br />';
-							}
-						} else {
-							$resultsemail .= $optionsdata[$item->$fieldname];
-							if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
-							$resultsemail .= '<br />';
+						$resultsemail .= $optionsdata[$item->$fieldname];
+						if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
+						$resultsemail .= '<br />';
+						$resultsemail .= '<br />';
+					}  else if (in_array($fieldname,$moptfs)) {
+						$ans = explode(" ",$item->$fieldname);
+						foreach ($ans as $i) {
+							$resultsemail .= $optionsdata[$i].'<br />';
 						}
 						$resultsemail .= '<br />';
 					} else if ($d->q_type != "captcha") {
@@ -220,14 +272,14 @@ class MPollModelMPoll extends JModelLegacy
 						
 					} else if (in_array($fieldname,$optfs)) {
 						$youropts="";
-						if ($d->q_type == "mcbox" || $d->q_type=="mlist") {
-							$ans = explode(" ",$item->$fieldname);
-							foreach ($ans as $i) {
-								$youropts .= $optionsdata[$i].' ';
-							}
-						} else {
-							$youropts = $optionsdata[$item->$fieldname];
-							if ($other->$fieldname) $youropts .= ': '.$other->$fieldname;
+						$youropts = $optionsdata[$item->$fieldname];
+						if ($other->$fieldname) $youropts .= ': '.$other->$fieldname;
+						$confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
+					} else if (in_array($fieldname,$moptfs)) {
+						$youropts="";
+						$ans = explode(" ",$item->$fieldname);
+						foreach ($ans as $i) {
+							$youropts .= $optionsdata[$i].' ';
 						}
 						$confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
 					} else if ($d->q_type != "captcha") {

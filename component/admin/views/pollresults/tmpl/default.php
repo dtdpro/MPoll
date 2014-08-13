@@ -55,7 +55,7 @@ if (!empty( $this->sidebar)) : ?>
 						echo $this->options[$i->$fn];
 						if ($i->$fno) { echo ': '.$i->$fno; }
 					}
-					if ($qu->q_type == 'textbox') { echo $i->$fn; }
+					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp') { echo $i->$fn; }
 					if ($qu->q_type == 'textar') { echo nl2br($i->$fn);; }
 					if ($qu->q_type == 'attach') { 
 						if (strpos($i->$fn,"ERROR:") === FALSE && $i->$fn != "") {

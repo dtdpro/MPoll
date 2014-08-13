@@ -75,28 +75,6 @@
 	</fieldset>
 	<fieldset name="content">
 		<field
-			name="q_type"
-			type="radio"
-			extension="com_mpoll"
-			class="btn-group"
-			default="multi"
-			label="COM_MPOLL_QUESTION_FIELD_TYPE_LABEL"
-			description="COM_MPOLL_QUESTION_FIELD_TYPE_DESC"
-			required="true">
-			<option value="textbox">Text Field</option>
-			<option value="textar">Text Box</option>
-			<option value="email">EMail</option>
-			<option value="multi">Radio</option>
-			<option value="dropdown">Dropdown</option>
-			<option value="mlist">Multi Select</option>
-			<option value="cbox">Check Box</option>
-			<option value="mcbox">Multi Checkbox</option>
-			<option value="attach">Attachment</option>
-			<option value="message">Message</option>
-			<option value="header">Header</option>
-			<option value="captcha">Captcha</option>
-		</field>
-		<field
 			name="q_text"
 			type="editor"
 			label="COM_MPOLL_QUESTION_FIELD_TEXT_LABEL"
@@ -138,7 +116,48 @@
 			description="COM_MPOLL_QUESTION_FIELD_NAME_DESC"
 			required="true"
 			default="" />
+			
+		<field
+			name="q_type"
+			type="list"
+			extension="com_mpoll"
+			class="inputbox"
+			default="multi"
+			label="COM_MPOLL_QUESTION_FIELD_TYPE_LABEL"
+			description="COM_MPOLL_QUESTION_FIELD_TYPE_DESC"
+			required="true">
+			<option value="textbox">Text Field</option>
+			<option value="textar">Text Box</option>
+			<option value="email">EMail</option>
+			<option value="multi">Radio</option>
+			<option value="dropdown">Dropdown</option>
+			<option value="mlist">Multi Select</option>
+			<option value="cbox">Check Box</option>
+			<option value="mcbox">Multi Checkbox</option>
+			<option value="attach">Attachment</option>
+			<option value="message">Message</option>
+			<option value="header">Header</option>
+			<option value="captcha">Captcha</option>
+			<option value="mailchimp">MailChimp List</option>
+		</field>
 	</fieldset>
+	<fields name="params">
+		<fieldset name="mailchimp" label="COM_MPOLL_QUESTION_FIELDSET_MAILCHIMP_OPTIONS_LABEL">
+			<field name="mc_emailfield" type="question" label="COM_MPOLL_QUESTION_FIELD_MC_EMAILFIELD_LABEL" description="COM_MPOLL_QUESTION_FIELD_MC_EMAILFIELD_DESC" class="inputbox" required="false" qtype="email" />
+			<field name="mc_checked" type="radio" label="COM_MPOLL_QUESTION_FIELD_MC_CHECKED_LABEL" description="COM_MPOLL_QUESTION_FIELD_MC_CHECKED_DESC" class="btn-group" default="1">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="mc_doubleoptin" type="radio" label="COM_MPOLL_QUESTION_FIELD_MC_DOUBLEOPTIN_LABEL" description="COM_MPOLL_QUESTION_FIELD_MC_DOUBLEOPTIN_DESC" class="btn-group" default="0">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+		</fieldset>
+		<field
+			name="mcvars"
+			type="hidden"
+		/>
+	</fields>
 
 </form>
 
