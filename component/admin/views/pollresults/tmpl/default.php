@@ -1,7 +1,10 @@
-<?php defined('_JEXEC') or die('Restricted access'); 
-$db =& JFactory::getDBO();
-
-if (!empty( $this->sidebar)) : ?>
+<?php 
+defined('_JEXEC') or die('Restricted access'); 
+JHtml::_('behavior.multiselect');
+JHtml::_('formbehavior.chosen', 'select');
+?>
+<form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=mpolls'); ?>" method="post" name="adminForm" id="adminForm">
+<?php if (!empty( $this->sidebar)) : ?>
 	<div id="j-sidebar-container" class="span2">
 	<?php echo $this->sidebar; ?>
 	</div>
@@ -16,6 +19,12 @@ if (!empty( $this->sidebar)) : ?>
 	<table class="adminlist table table-striped">
 	<thead>
 		<tr>
+			<th width="1%">
+					<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+			</th>	
+			<th>
+				<?php echo JText::_( 'ID#' ); ?>
+			</th>
 			<th>
 				<?php echo JText::_( 'Users Name' ); ?>
 			</th>
@@ -28,22 +37,26 @@ if (!empty( $this->sidebar)) : ?>
 				}
 			?>
 			<th>User Agent</th>
+			<th>IP Address</th>
 		</tr>			
 	</thead>
 	<?php
-	$k = 0;
 	$cq = 1;
-	foreach ($this->items as $i)
+	foreach ($this->items as $i => $item)
 	{
 		?>
-		<tr class="<?php echo "row$k"; ?>">
+		<tr class="row<?php echo $i % 2; ?>">
+			<td><?php echo JHtml::_('grid.id', $i, $item->cm_id); ?></td>
 			<td>
-				<?php 
-				if ($i->cm_user == 0) echo 'Guest';
-				else echo $this->users[$i->cm_user]->name; ?>
+				<?php echo $item->cm_id; ?>
 			</td>
 			<td>
-				<?php echo $i->cm_time; ?>
+				<?php 
+				if ($item->cm_user == 0) echo 'Guest';
+				else echo $this->users[$item->cm_user]->name; ?>
+			</td>
+			<td>
+				<?php echo $item->cm_time; ?>
 			</td>
 			<?php
             	foreach ($this->questions as $qu) {
@@ -52,35 +65,39 @@ if (!empty( $this->sidebar)) : ?>
 					echo '<td>';
 					$qnum = 'q'.$qu->q_id.'ans';
 					if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') { 
-						echo $this->options[$i->$fn];
-						if ($i->$fno) { echo ': '.$i->$fno; }
+						echo $this->options[$item->$fn];
+						if ($item->$fno) { echo ': '.$item->$fno; }
 					}
-					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp') { echo $i->$fn; }
-					if ($qu->q_type == 'textar') { echo nl2br($i->$fn);; }
+					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp') { echo $item->$fn; }
+					if ($qu->q_type == 'textar') { echo nl2br($item->$fn);; }
 					if ($qu->q_type == 'attach') { 
-						if (strpos($i->$fn,"ERROR:") === FALSE && $i->$fn != "") {
+						if (strpos($item->$fn,"ERROR:") === FALSE && $item->$fn != "") {
 							echo '<a href="'.$i->$fn.'">Right Click Download</a>';
 						} else {
-							echo $i->$fn;
+							echo $item->$fn;
 						}
 					}
-					if ($qu->q_type == 'email') { echo $i->$fn; }
-					if ($qu->q_type == 'cbox') { if ($i->$fn) echo 'Yes'; else echo 'No'; }
+					if ($qu->q_type == 'email') { echo $item->$fn; }
+					if ($qu->q_type == 'cbox') { if ($item->$fn) echo 'Yes'; else echo 'No'; }
 					if ($qu->q_type == 'mcbox' || $qu->q_type=="mlist") {
-						$i->$fn = explode(" ",$i->$fn);
-						foreach ($i->$fn as $o) {
+						$item->$fn = explode(" ",$item->$fn);
+						foreach ($item->$fn as $o) {
 							echo $this->options[$o].'<br />';  
 						}
 					}
 					echo '</td>';
 				}
 			?>
-			<td><?php echo ($i->cm_useragent) ? $i->cm_useragent : "N/A"; ?></td>
+			<td><?php echo ($item->cm_useragent) ? $item->cm_useragent : "N/A"; ?></td>
+			<td><?php echo ($item->cm_useragent) ? $item->cm_ipaddr : "N/A"; ?></td>
 		</tr>
 		<?php
-		$k = 1 - $k;
 	}
 	?>
 	</table>
+	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="boxchecked" value="0" />
+	<?php echo JHtml::_('form.token'); ?>
 </div>
 </div>
+</form>

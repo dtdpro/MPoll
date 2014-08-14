@@ -3,65 +3,48 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
 
-class MPollControllerPollResults extends MPollController
+class MPollControllerPollResults extends JControllerAdmin
 {
 	function __construct()
 	{
 		parent::__construct();
 	}
 
-	function csvme() {
-		$filename       = 'Poll_Results_Detailed' . '-' . date("Y-m-d");
-		$pid = JRequest::getVar('poll');
-		$model = $this->getModel('pollresults');
-		$questions = $model->getQuestions($pid);
-		$items = $model->getResponses($pid,$questions);
-		$db =& JFactory::getDBO();
+	public function delete()
+	{
+		// Check for request forgeries
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
-		JResponse::setHeader('Content-Type', 'application/octet-stream');
-		JResponse::setHeader('Content-Disposition', 'attachment; filename="'. $filename . '.csv"');
-		//echo 'Course: '.$data->qtext."\n";
-		echo "Name,email,Timestamp";
-		foreach ($questions as $qu) {
-			echo ',#'.$qu->q_text;
-		}
-		echo "\n";
-		for ($i=0, $n=count( $items ); $i < $n; $i++)
+		// Get items to remove from the request.
+		$cid = JFactory::getApplication()->input->get('cid', array(), 'array');
+		
+		if (!is_array($cid) || count($cid) < 1)
 		{
-			$row = &$items[$i];
-			if ($row['cm_user'] == 0) { echo 'Guest,NoEmail'; }
-			else echo $row['name'].','.$row['email']; 
-			echo ',';
-			echo $row['cm_time'].',';
-			foreach ($questions as $qu) {
-				
-				$qnum = 'q'.$qu->q_id.'ans';
-				if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') { 
-					if ($row[$qnum.'o']) echo 'Other: '.str_replace(',','',$row[$qnum.'o']);
-					else echo str_replace(',','',$row[$qnum]);
-				}
-				if ($qu->q_type == 'textbox') { echo str_replace(',','',$row[$qnum]); }
-				if ($qu->q_type == 'textar') { echo str_replace(',','',$row[$qnum]); }
-				if ($qu->q_type == 'cbox') { if ($row[$qnum] == 'on') echo 'Checked'; else echo 'Unchecked'; }
-				if ($qu->q_type == 'mcbox') {
-					$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qu->q_id.' ORDER BY ordering ASC';
-					$db->setQuery( $query );
-					$qopts = $db->loadAssocList();
-					$answers = explode(' ',$row[$qnum]);
-					foreach ($qopts as $opts) {
-						if (in_array($opts['opt_id'],$answers)) { 
-							if ($opts['opt_other']) echo 'Other: '.str_replace(',','',$row[$qnum.'o']).' ';
-							else echo str_replace(',','',$opts['opt_txt']).' '; 
-						} 
-					}
-				}
-				echo ',';
-			}
-
-			echo "\n";
+			JLog::add(JText::_('No Records Selected'), JLog::WARNING, 'jerror');
 		}
+		else
+		{
+			// Get the model.
+			$model = $this->getModel('pollresults');
 
+			// Make sure the item ids are integers
+			jimport('joomla.utilities.arrayhelper');
+			JArrayHelper::toInteger($cid);
 
+			// Remove the items.
+			if ($model->delete($cid))
+			{
+				$this->setMessage(count($cid).' Record(s) Deleted');
+			}
+			else
+			{
+				$this->setMessage($model->getError(), 'error');
+			}
+		}
+		// Invoke the postDelete method to allow for the child class to access the model.
+		$this->postDeleteHook($model, $cid);
+
+		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->view_list, false));
 	}
 }
 ?>

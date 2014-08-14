@@ -46,7 +46,7 @@ abstract class MPollHelper
 		}
 
 		$actions = array(
-			'core.admin', 'core.manage', 'core.create', 'core.edit', 'core.delete', 'core.edit.state'
+			'core.admin', 'core.manage', 'core.create', 'core.edit', 'core.delete', 'core.edit.state', 'core.deleterecords'
 		);
 
 		foreach ($actions as $action) {

@@ -114,4 +114,46 @@ class MPollModelPollResults extends JModelList
 			return "NO POLL";
 		}
 	}
+	
+	public function delete(&$pks)
+	{
+		$pks = (array) $pks;
+		$db = JFactory::getDBO();
+		$user = JFactory::getUser();
+		
+		//Check permission
+		if (!$user->authorise('core.deleterecords', $this->option)) {
+			JLog::add(JText::_('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED'), JLog::WARNING, 'jerror');
+			return false;
+		}
+		
+		// Iterate the items to delete each one.
+		foreach ($pks as $i => $pk)
+		{
+			$query = $db->getQuery(true);
+			$query->delete();
+			$query->from("#__mpoll_completed");
+			$query->where('cm_id='.(int)$pk);
+			$db->setQuery($query);
+			if (!$db->query()) {
+				$this->setError($db->getErrorMsg());
+				return false;
+			}
+			
+			$query2 = $db->getQuery(true);
+			$query2->delete();
+			$query2->from("#__mpoll_results");
+			$query2->where('res_cm='.(int)$pk);
+			$db->setQuery($query2);
+			if (!$db->query()) {
+				$this->setError($db->getErrorMsg());
+				return false;
+			}
+		}
+	
+		// Clear the component's cache
+		$this->cleanCache();
+	
+		return true;
+	}
 }
