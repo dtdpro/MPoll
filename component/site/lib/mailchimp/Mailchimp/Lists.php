@@ -14,10 +14,10 @@ class Mailchimp_Lists {
      * @return associative_array the total of all reports and the specific reports reports this page
      *     - total int the total number of matching abuse reports
      *     - data array structs for the actual data for each reports, including:
-     *         - date string date/time the abuse report was received and processed
+     *         - date string date+time the abuse report was received and processed
      *         - email string the email address that reported abuse
      *         - campaign_id string the unique id for the campaign that report was made against
-     *         - type string an internal type generally specifying the orginating mail provider - may not be useful outside of filling report views
+     *         - type string an internal type generally specifying the originating mail provider - may not be useful outside of filling report views
      */
     public function abuseReports($id, $start=0, $limit=500, $since=null) {
         $_params = array("id" => $id, "start" => $start, "limit" => $limit, "since" => $since);
@@ -88,7 +88,6 @@ though you should cap them at 5k - 10k records, depending on your experience. Th
      * @return array Array of structs containing results and any errors that occurred
      *     - success_count int Number of email addresses that were successfully removed
      *     - error_count int Number of email addresses that failed during addition/updating
-     *     - of array structs contain error details including:
      *     - errors array array of error structs including:
      *         - email string whatever was passed in the batch record's email parameter
      *             - email string the email address added
@@ -277,7 +276,7 @@ grouping will automatically turn them on.
      *             - leid string the list member's truly unique id
      *         - activity array an array of structs containing the activity, including:
      *             - action string The action name, one of: open, click, bounce, unsub, abuse, sent, queued, ecomm, mandrill_send, mandrill_hard_bounce, mandrill_soft_bounce, mandrill_open, mandrill_click, mandrill_spam, mandrill_unsub, mandrill_reject
-     *             - timestamp string The date/time of the action (GMT)
+     *             - timestamp string The date+time of the action (GMT)
      *             - url string For click actions, the url clicked, otherwise this is empty
      *             - type string If there's extra bounce, unsub, etc data it will show up here.
      *             - campaign_id string The campaign id the action was related to, if it exists - otherwise empty (ie, direct unsub from list)
@@ -317,15 +316,15 @@ grouping will automatically turn them on.
      *                     - interested bool whether the member has this group selected
      *         - status string The subscription status for this email address, either pending, subscribed, unsubscribed, or cleaned
      *         - ip_signup string IP Address this address signed up from. This may be blank if single optin is used.
-     *         - timestamp_signup string The date/time the double optin was initiated. This may be blank if single optin is used.
+     *         - timestamp_signup string The date+time the double optin was initiated. This may be blank if single optin is used.
      *         - ip_opt string IP Address this address opted in from.
-     *         - timestamp_opt string The date/time the optin completed
+     *         - timestamp_opt string The date+time the optin completed
      *         - member_rating int the rating of the subscriber. This will be 1 - 5 as described <a href="http://eepurl.com/f-2P" target="_blank">here</a>
      *         - campaign_id string If the user is unsubscribed and they unsubscribed from a specific campaign, that campaign_id will be listed, otherwise this is not returned.
      *         - lists array An array of structs for the other lists this member belongs to
      *             - id string the list id
      *             - status string the members status on that list
-     *         - timestamp string The date/time this email address entered it's current status
+     *         - timestamp string The date+time this email address entered it's current status
      *         - info_changed string The last time this record was changed. If the record is old enough, this may be blank.
      *         - web_id int The Member id used in our web app, allows you to create a link directly to it
      *         - leid int The Member id used in our web app, allows you to create a link directly to it
@@ -362,7 +361,7 @@ grouping will automatically turn them on.
 
     /**
      * Get all of the list members for a list that are of a particular status and potentially matching a segment. This will cause locking, so don't run multiples at once. Are you trying to get a dump including lots of merge
-data or specific members of a list? If so, checkout the <a href="export/1.0/list.func.php">List Export API</a>
+data or specific members of a list? If so, checkout the <a href="/export/1.0/list.func.php">List Export API</a>
      * @param string $id
      * @param string $status
      * @param associative_array $opts
@@ -385,13 +384,13 @@ data or specific members of a list? If so, checkout the <a href="export/1.0/list
      * @param string $id
      * @param string $tag
      * @param string $name
-     * @param array $options
+     * @param associative_array $options
      *     - field_type string optional one of: text, number, radio, dropdown, date, address, phone, url, imageurl, zip, birthday - defaults to text
      *     - req boolean optional indicates whether the field is required - defaults to false
      *     - public boolean optional indicates whether the field is displayed in public - defaults to true
      *     - show boolean optional indicates whether the field is displayed in the app's list member view - defaults to true
      *     - order int The order this merge tag should be displayed in - this will cause existing values to be reset so this fits
-     *     - default_value string optional the default value for the field. See subscribe() for formatting info. Defaults to blank - max 255 bytes
+     *     - default_value string optional the default value for the field. See lists/subscribe() for formatting info. Defaults to blank - max 255 bytes
      *     - helptext string optional the help text to be used with some newer forms. Defaults to blank - max 255 bytes
      *     - choices array optional kind of - an array of strings to use as the choices for radio and dropdown type fields
      *     - dateformat string optional only valid for birthday and date fields. For birthday type, must be "MM/DD" (default) or "DD/MM". For date type, must be "MM/DD/YYYY" (default) or "DD/MM/YYYY". Any other values will be converted to the default.
@@ -407,7 +406,7 @@ data or specific members of a list? If so, checkout the <a href="export/1.0/list
      *     - default string The default value for this field
      *     - helptext string The helptext for this field
      *     - size string The width of the field to be used
-     *     - tag string The merge tag that's used for forms and subscribe() and updateMember()
+     *     - tag string The merge tag that's used for forms and lists/subscribe() and lists/update-member()
      *     - choices array the options available for radio and dropdown field types
      *     - id int an unchanging id for the merge var
      */
@@ -470,7 +469,7 @@ unless you're fixing data since you should probably be using default_values and/
      *     - default string The default value for this field
      *     - helptext string The helptext for this field
      *     - size string The width of the field to be used
-     *     - tag string The merge tag that's used for forms and subscribe() and updateMember()
+     *     - tag string The merge tag that's used for forms and lists/subscribe() and lists/update-member()
      *     - choices array the options available for radio and dropdown field types
      *     - id int an unchanging id for the merge var
      */
@@ -498,7 +497,7 @@ unless you're fixing data since you should probably be using default_values and/
      *             - default string The default value the list owner has set for this field
      *             - helptext string The helptext for this field
      *             - size string The width of the field to be used
-     *             - tag string The merge tag that's used for forms and listSubscribe() and listUpdateMember()
+     *             - tag string The merge tag that's used for forms and lists/subscribe() and listUpdateMember()
      *             - choices array For radio and dropdown field types, an array of the options available
      *             - id int an unchanging id for the merge var
      *     - errors array of error structs
@@ -509,6 +508,93 @@ unless you're fixing data since you should probably be using default_values and/
     public function mergeVars($id) {
         $_params = array("id" => $id);
         return $this->master->call('lists/merge-vars', $_params);
+    }
+
+    /**
+     * Retrieve all of Segments for a list.
+     * @param string $id
+     * @param string $type
+     * @return associative_array with 2 keys:
+     *     - static array of structs with data for each segment
+     *         - id int the id of the segment
+     *         - name string the name for the segment
+     *         - created_date string the date+time the segment was created
+     *         - last_update string the date+time the segment was last updated (add or del)
+     *         - last_reset string the date+time the segment was last reset (ie had all members cleared from it)
+     *     - saved array of structs with data for each segment
+     *         - id int the id of the segment
+     *         - name string the name for the segment
+     *         - segment_opts string same match+conditions struct typically used
+     *         - segment_text string a textual description of the segment match/conditions
+     *     - created_date string the date+time the segment was created
+     *     - last_update string the date+time the segment was last updated (add or del)
+     */
+    public function segments($id, $type=null) {
+        $_params = array("id" => $id, "type" => $type);
+        return $this->master->call('lists/segments', $_params);
+    }
+
+    /**
+     * Save a segment against a list for later use. There is no limit to the number of segments which can be saved. Static Segments <strong>are not</strong> tied
+to any merge data, interest groups, etc. They essentially allow you to configure an unlimited number of custom segments which will have standard performance.
+When using proper segments, Static Segments are one of the available options for segmentation just as if you used a merge var (and they can be used with other segmentation
+options), though performance may degrade at that point. Saved Segments (called "auto-updating" in the app) are essentially just the match+conditions typically
+used.
+     * @param string $id
+     * @param associative_array $opts
+     *     - type string either "static" or "saved"
+     *     - name string a unique name per list for the segment - 100 byte maximum length, anything longer will throw an error
+     *     - segment_opts associative_array for "saved" only, the standard segment match+conditions, just like campaigns/segment-test
+     *         - match string "any" or "all"
+     *         - conditions array structs for each condition, just like campaigns/segment-test
+     * @return associative_array with a single entry:
+     *     - id int the id of the new segment, otherwise an error will be thrown.
+     */
+    public function segmentAdd($id, $opts) {
+        $_params = array("id" => $id, "opts" => $opts);
+        return $this->master->call('lists/segment-add', $_params);
+    }
+
+    /**
+     * Delete a segment. Note that this will, of course, remove any member affiliations with any static segments deleted
+     * @param string $id
+     * @param int $seg_id
+     * @return associative_array with a single entry:
+     *     - complete bool whether the call worked. reallistically this will always be true as errors will be thrown otherwise.
+     */
+    public function segmentDel($id, $seg_id) {
+        $_params = array("id" => $id, "seg_id" => $seg_id);
+        return $this->master->call('lists/segment-del', $_params);
+    }
+
+    /**
+     * Allows one to test their segmentation rules before creating a campaign using them - this is no different from campaigns/segment-test() and will eventually replace it.
+For the time being, the crazy segmenting condition documentation will continue to live over there.
+     * @param string $list_id
+     * @param associative_array $options
+     * @return associative_array with a single entry:
+     *     - total int The total number of subscribers matching your segmentation options
+     */
+    public function segmentTest($list_id, $options) {
+        $_params = array("list_id" => $list_id, "options" => $options);
+        return $this->master->call('lists/segment-test', $_params);
+    }
+
+    /**
+     * Update an existing segment. The list and type can not be changed.
+     * @param string $id
+     * @param int $seg_id
+     * @param associative_array $opts
+     *     - name string a unique name per list for the segment - 100 byte maximum length, anything longer will throw an error
+     *     - segment_opts associative_array for "saved" only, the standard segment match+conditions, just like campaigns/segment-test
+     *         - match string "any" or "all"
+     *         - conditions array structs for each condition, just like campaigns/segment-test
+     * @return associative_array with a single entry:
+     *     - complete bool whether the call worked. reallistically this will always be true as errors will be thrown otherwise.
+     */
+    public function segmentUpdate($id, $seg_id, $opts) {
+        $_params = array("id" => $id, "seg_id" => $seg_id, "opts" => $opts);
+        return $this->master->call('lists/segment-update', $_params);
     }
 
     /**
@@ -544,10 +630,9 @@ in order to be included - this <strong>will not</strong> subscribe them to the l
      * @param string $id
      * @param int $seg_id
      * @param array $batch
-     *     - email associative_array a struct with one of the following keys - failing to provide anything will produce an error relating to the email address. Provide multiples and we'll use the first we see in this same order.
-     *         - email string an email address
-     *         - euid string the unique id for an email address (not list related) - the email "id" returned from listMemberInfo, Webhooks, Campaigns, etc.
-     *         - leid string the list email id (previously called web_id) for a list-member-info type call. this doesn't change when the email address changes
+     *     - email string an email address
+     *     - euid string the unique id for an email address (not list related) - the email "id" returned from listMemberInfo, Webhooks, Campaigns, etc.
+     *     - leid string the list email id (previously called web_id) for a list-member-info type call. this doesn't change when the email address changes
      * @return associative_array an array with the results of the operation
      *     - success_count int the total number of successful updates (will include members already in the segment)
      *     - errors array structs for each error including:
@@ -569,10 +654,9 @@ in order to be removed - this <strong>will not</strong> unsubscribe them from th
      * @param string $id
      * @param int $seg_id
      * @param array $batch
-     *     - email associative_array a struct with one of the following keys - failing to provide anything will produce an error relating to the email address. Provide multiples and we'll use the first we see in this same order.
-     *         - email string an email address
-     *         - euid string the unique id for an email address (not list related) - the email "id" returned from listMemberInfo, Webhooks, Campaigns, etc.
-     *         - leid string the list email id (previously called web_id) for a list-member-info type call. this doesn't change when the email address changes
+     *     - email string an email address
+     *     - euid string the unique id for an email address (not list related) - the email "id" returned from listMemberInfo, Webhooks, Campaigns, etc.
+     *     - leid string the list email id (previously called web_id) for a list-member-info type call. this doesn't change when the email address changes
      * @return associative_array an array with the results of the operation
      *     - success_count int the total number of successful removals
      *     - error_count int the total number of unsuccessful removals
@@ -604,16 +688,19 @@ in order to be removed - this <strong>will not</strong> unsubscribe them from th
     /**
      * Retrieve all of the Static Segments for a list.
      * @param string $id
+     * @param boolean $get_counts
+     * @param int $start
+     * @param int $limit
      * @return array an of structs with data for each static segment
      *     - id int the id of the segment
      *     - name string the name for the segment
      *     - member_count int the total number of subscribed members currently in a segment
-     *     - created_date string the date/time the segment was created
-     *     - last_update string the date/time the segment was last updated (add or del)
-     *     - last_reset string the date/time the segment was last reset (ie had all members cleared from it)
+     *     - created_date string the date+time the segment was created
+     *     - last_update string the date+time the segment was last updated (add or del)
+     *     - last_reset string the date+time the segment was last reset (ie had all members cleared from it)
      */
-    public function staticSegments($id) {
-        $_params = array("id" => $id);
+    public function staticSegments($id, $get_counts=true, $start=0, $limit=null) {
+        $_params = array("id" => $id, "get_counts" => $get_counts, "start" => $start, "limit" => $limit);
         return $this->master->call('lists/static-segments', $_params);
     }
 
@@ -625,7 +712,7 @@ in order to be removed - this <strong>will not</strong> unsubscribe them from th
      *     - euid string the unique id for an email address (not list related) - the email "id" returned from listMemberInfo, Webhooks, Campaigns, etc.
      *     - leid string the list email id (previously called web_id) for a list-member-info type call. this doesn't change when the email address changes
      * @param associative_array $merge_vars
-     *     - new-email string set this to change the email address. This is only respected on calls using update_existing or when passed to listUpdateMember().
+     *     - new-email string set this to change the email address. This is only respected on calls using update_existing or when passed to lists/update.
      *     - groupings array of Interest Grouping structs. Each should contain:
      *         - id int Grouping "id" from lists/interest-groupings (either this or name must be present) - this id takes precedence and can't change (unlike the name)
      *         - name string Grouping "name" from lists/interest-groupings (either this or id must be present)
@@ -676,7 +763,7 @@ in order to be removed - this <strong>will not</strong> unsubscribe them from th
 
     /**
      * Edit the email address, merge fields, and interest groups for a list member. If you are doing a batch update on lots of users,
-consider using listBatchSubscribe() with the update_existing and possible replace_interests parameter.
+consider using lists/batch-subscribe() with the update_existing and possible replace_interests parameter.
      * @param string $id
      * @param associative_array $email
      *     - email string an email address
@@ -760,8 +847,8 @@ consider using listBatchSubscribe() with the update_existing and possible replac
      *     - from_name string optional - only lists that have a default from name matching this
      *     - from_email string optional - only lists that have a default from email matching this
      *     - from_subject string optional - only lists that have a default from email matching this
-     *     - created_before string optional - only show lists that were created before this date/time  - 24 hour format in <strong>GMT</strong>, eg "2013-12-30 20:30:00"
-     *     - created_after string optional - only show lists that were created since this date/time  - 24 hour format in <strong>GMT</strong>, eg "2013-12-30 20:30:00"
+     *     - created_before string optional - only show lists that were created before this date+time  - 24 hour format in <strong>GMT</strong>, eg "2013-12-30 20:30:00"
+     *     - created_after string optional - only show lists that were created since this date+time  - 24 hour format in <strong>GMT</strong>, eg "2013-12-30 20:30:00"
      *     - exact boolean optional - flag for whether to filter on exact values when filtering, or search within content for filter values - defaults to true
      * @param int $start
      * @param int $limit
@@ -805,7 +892,7 @@ consider using listBatchSubscribe() with the update_existing and possible replac
      *     - errors array structs of any errors found while loading lists - usually just from providing invalid list ids
      *         - param string the data that caused the failure
      *         - code int the error code
-     *         - error int the error message
+     *         - error string the error message
      */
     public function getList($filters=array(), $start=0, $limit=25, $sort_field='created', $sort_dir='DESC') {
         $_params = array("filters" => $filters, "start" => $start, "limit" => $limit, "sort_field" => $sort_field, "sort_dir" => $sort_dir);

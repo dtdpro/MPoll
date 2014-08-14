@@ -33,7 +33,7 @@ class Mailchimp_Folders {
      * List all the folders of a certain type
      * @param string $type
      * @return array structs for each folder, including:
-     *     - folder_id int Folder Id for the given folder, this can be used in the campaigns() function to filter on.
+     *     - folder_id int Folder Id for the given folder, this can be used in the campaigns/list() function to filter on.
      *     - name string Name of the given folder
      *     - date_created string The date/time the folder was created
      *     - type string The type of the folders being returned, just to make sure you know.

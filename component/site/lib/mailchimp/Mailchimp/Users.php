@@ -74,10 +74,30 @@ class Mailchimp_Users {
      *     - email string the email tied to the account used for passwords resets and the ilk
      *     - role string the role assigned to the account
      *     - avatar string if available, the url for the login's avatar
+     *     - global_user_id int the globally unique user id for the user account connected to
+     *     - dc_unique_id string the datacenter unique id for the user account connected to, like helper/account-details
      */
     public function logins() {
         $_params = array();
         return $this->master->call('users/logins', $_params);
+    }
+
+    /**
+     * Retrieve the profile for the login owning the provided API Key
+     * @return associative_array the current user's details, including:
+     *     - id int the login id for this login
+     *     - username string the username used to log in
+     *     - name string a display name for the account - empty first/last names will return the username
+     *     - email string the email tied to the account used for passwords resets and the ilk
+     *     - role string the role assigned to the account
+     *     - avatar string if available, the url for the login's avatar
+     *     - global_user_id int the globally unique user id for the user account connected to
+     *     - dc_unique_id string the datacenter unique id for the user account connected to, like helper/account-details
+     *     - account_name string The name of the account to which the API key belongs
+     */
+    public function profile() {
+        $_params = array();
+        return $this->master->call('users/profile', $_params);
     }
 
 }

@@ -5,6 +5,7 @@ require_once 'Mailchimp/Templates.php';
 require_once 'Mailchimp/Users.php';
 require_once 'Mailchimp/Helper.php';
 require_once 'Mailchimp/Mobile.php';
+require_once 'Mailchimp/Conversations.php';
 require_once 'Mailchimp/Ecomm.php';
 require_once 'Mailchimp/Neapolitan.php';
 require_once 'Mailchimp/Lists.php';
@@ -12,13 +13,14 @@ require_once 'Mailchimp/Campaigns.php';
 require_once 'Mailchimp/Vip.php';
 require_once 'Mailchimp/Reports.php';
 require_once 'Mailchimp/Gallery.php';
+require_once 'Mailchimp/Goal.php';
 require_once 'Mailchimp/Exceptions.php';
 
 class Mailchimp {
     
     public $apikey;
     public $ch;
-    public $root = 'https://api.mailchimp.com/2.0';
+    public $root  = 'https://api.mailchimp.com/2.0';
     public $debug = false;
 
     public static $error_map = array(
@@ -108,24 +110,43 @@ class Mailchimp {
         "Invalid_PagingLimit" => "Mailchimp_Invalid_PagingLimit",
         "Invalid_PagingStart" => "Mailchimp_Invalid_PagingStart",
         "Max_Size_Reached" => "Mailchimp_Max_Size_Reached",
-        "MC_SearchException" => "Mailchimp_MC_SearchException"
+        "MC_SearchException" => "Mailchimp_MC_SearchException",
+        "Goal_SaveFailed" => "Mailchimp_Goal_SaveFailed",
+        "Conversation_DoesNotExist" => "Mailchimp_Conversation_DoesNotExist",
+        "Conversation_ReplySaveFailed" => "Mailchimp_Conversation_ReplySaveFailed",
+        "File_Not_Found_Exception" => "Mailchimp_File_Not_Found_Exception",
+        "Folder_Not_Found_Exception" => "Mailchimp_Folder_Not_Found_Exception",
+        "Folder_Exists_Exception" => "Mailchimp_Folder_Exists_Exception"
     );
 
     public function __construct($apikey=null, $opts=array()) {
-        if(!$apikey) $apikey = getenv('MAILCHIMP_APIKEY');
-        if(!$apikey) $apikey = $this->readConfigs();
-        if(!$apikey) throw new Mailchimp_Error('You must provide a MailChimp API key');
-        $this->apikey = $apikey;
-        $dc = "us1";
-        if (strstr($this->apikey,"-")){
-            list($key, $dc) = explode("-",$this->apikey,2);
-            if (!$dc) $dc = "us1";
+        if (!$apikey) {
+            $apikey = getenv('MAILCHIMP_APIKEY');
         }
-        $this->root = str_replace('https://api', 'https://'.$dc.'.api', $this->root);
+
+        if (!$apikey) {
+            $apikey = $this->readConfigs();
+        }
+
+        if (!$apikey) {
+            throw new Mailchimp_Error('You must provide a MailChimp API key');
+        }
+
+        $this->apikey = $apikey;
+        $dc           = "us1";
+
+        if (strstr($this->apikey, "-")){
+            list($key, $dc) = explode("-", $this->apikey, 2);
+            if (!$dc) {
+                $dc = "us1";
+            }
+        }
+
+        $this->root = str_replace('https://api', 'https://' . $dc . '.api', $this->root);
         $this->root = rtrim($this->root, '/') . '/';
 
         if (!isset($opts['timeout']) || !is_int($opts['timeout'])){
-            $opts['timeout']=600;
+            $opts['timeout'] = 600;
         }
         if (isset($opts['debug'])){
             $this->debug = true;
@@ -133,9 +154,13 @@ class Mailchimp {
 
 
         $this->ch = curl_init();
-        curl_setopt($this->ch, CURLOPT_USERAGENT, 'MailChimp-PHP/2.0.3');
+
+        if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
+            curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);    
+        }
+
+        curl_setopt($this->ch, CURLOPT_USERAGENT, 'MailChimp-PHP/2.0.5');
         curl_setopt($this->ch, CURLOPT_POST, true);
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($this->ch, CURLOPT_HEADER, false);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 30);
@@ -147,6 +172,7 @@ class Mailchimp {
         $this->users = new Mailchimp_Users($this);
         $this->helper = new Mailchimp_Helper($this);
         $this->mobile = new Mailchimp_Mobile($this);
+        $this->conversations = new Mailchimp_Conversations($this);
         $this->ecomm = new Mailchimp_Ecomm($this);
         $this->neapolitan = new Mailchimp_Neapolitan($this);
         $this->lists = new Mailchimp_Lists($this);
@@ -154,6 +180,7 @@ class Mailchimp {
         $this->vip = new Mailchimp_Vip($this);
         $this->reports = new Mailchimp_Reports($this);
         $this->gallery = new Mailchimp_Gallery($this);
+        $this->goal = new Mailchimp_Goal($this);
     }
 
     public function __destruct() {
@@ -162,8 +189,9 @@ class Mailchimp {
 
     public function call($url, $params) {
         $params['apikey'] = $this->apikey;
+        
         $params = json_encode($params);
-        $ch = $this->ch;
+        $ch     = $this->ch;
 
         curl_setopt($ch, CURLOPT_URL, $this->root . $url . '.json');
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
@@ -178,6 +206,7 @@ class Mailchimp {
         }
 
         $response_body = curl_exec($ch);
+
         $info = curl_getinfo($ch);
         $time = microtime(true) - $start;
         if($this->debug) {
@@ -205,21 +234,27 @@ class Mailchimp {
         foreach($paths as $path) {
             if(file_exists($path)) {
                 $apikey = trim(file_get_contents($path));
-                if($apikey) return $apikey;
+                if ($apikey) {
+                    return $apikey;
+                }
             }
         }
         return false;
     }
 
     public function castError($result) {
-        if($result['status'] !== 'error' || !$result['name']) throw new Mailchimp_Error('We received an unexpected error: ' . json_encode($result));
+        if ($result['status'] !== 'error' || !$result['name']) {
+            throw new Mailchimp_Error('We received an unexpected error: ' . json_encode($result));
+        }
 
         $class = (isset(self::$error_map[$result['name']])) ? self::$error_map[$result['name']] : 'Mailchimp_Error';
         return new $class($result['error'], $result['code']);
     }
 
     public function log($msg) {
-        if($this->debug) error_log($msg);
+        if ($this->debug) {
+            error_log($msg);
+        }
     }
 }
 
