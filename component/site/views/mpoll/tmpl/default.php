@@ -197,7 +197,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	
 	
 		//text field, phone #, email, username
-		if ($f->q_type=="textbox" || $f->q_type=="email" || $f->q_type=="username" || $f->q_type=="phone") {
+		if ($f->q_type=="textbox" || $f->q_type=="email") {
 			echo '<div class="mform-field">';
 			echo '<div class="mform-field-text">';
 			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field" type="text"';
@@ -217,18 +217,6 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '</div></div>';
 		}
 	
-		//password
-		if ($f->q_type=="password") {
-			echo '<div class="mform-field">';
-			echo '<div class="mform-field-password">';
-			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_field" size="20" type="password" ';
-			echo 'data-rule-required="true" data-rule-minlength="8"';
-			if ($f->q_match) echo ' data-rule-equalTo="#jform_'.$f->q_match.'"';
-			echo ' data-msg-required="This Field is required" data-msg-minlength="Minimum length 8 characters"';
-			if ($f->q_match) echo ' data-msg-equalTo="Fields must match"';
-			echo '</div></div>';
-		}
-	
 		//text area
 		if ($f->q_type=="textar") {
 			echo '<div class="mform-field">';
@@ -238,57 +226,6 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 			echo '>'.$f->value.'</textarea>';
 			echo '</div></div>';
 		}
-	
-		//Yes no
-		if ($f->q_type=="yesno") {
-			echo '<div class="mform-field">';
-			echo '<div class="mform-field-yesno">';
-			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field">';
-			$selected = ' selected="selected"';
-			echo '<option value="1"';
-			echo ($f->value == "1") ? $selected : '';
-			echo '>Yes</option>';
-			echo '<option value="0"';
-			echo ($f->value == "0") ? $selected : '';
-			echo '>No</option>';
-	
-			echo '</select>';
-			echo '</div></div>';
-	
-		}
-	
-	
-		//Birthday
-		if ($f->q_type=="birthday") {
-			echo '<div class="mform-field">';
-			echo '<div class="mform-field-birthday">';
-			$selected = ' selected="selected"';
-			echo '<select id="jform_'.$sname.'_month" name="jform['.$sname.'_month]" class="mf_bday_month">';
-			echo '<option value="01"'; echo (substr($f->value,0,2) == "01") ? $selected : ''; echo '>01 - January</option>';
-			echo '<option value="02"'; echo (substr($f->value,0,2) == "02") ? $selected : ''; echo '>02 - February</option>';
-			echo '<option value="03"'; echo (substr($f->value,0,2) == "03") ? $selected : ''; echo '>03 - March</option>';
-			echo '<option value="04"'; echo (substr($f->value,0,2) == "04") ? $selected : ''; echo '>04 - April</option>';
-			echo '<option value="05"'; echo (substr($f->value,0,2) == "05") ? $selected : ''; echo '>05 - May</option>';
-			echo '<option value="06"'; echo (substr($f->value,0,2) == "06") ? $selected : ''; echo '>06 - June</option>';
-			echo '<option value="07"'; echo (substr($f->value,0,2) == "07") ? $selected : ''; echo '>07 - July</option>';
-			echo '<option value="08"'; echo (substr($f->value,0,2) == "08") ? $selected : ''; echo '>08 - August</option>';
-			echo '<option value="09"'; echo (substr($f->value,0,2) == "09") ? $selected : ''; echo '>09 - September</option>';
-			echo '<option value="10"'; echo (substr($f->value,0,2) == "10") ? $selected : ''; echo '>10 - October</option>';
-			echo '<option value="11"'; echo (substr($f->value,0,2) == "11") ? $selected : ''; echo '>11 - November</option>';
-			echo '<option value="12"'; echo (substr($f->value,0,2) == "12") ? $selected : ''; echo '>12 - December</option>';
-			echo '</select>';
-			echo '<select id="jform_'.$sname.'_day" name="jform['.$sname.'_day]" class="mf_bday_day">';
-			for ($i=1;$i<=31;$i++) {
-				if ($i<10) $val = "0".$i;
-				else $val=$i;
-				echo '<option value="'.$val.'"';
-				echo (substr($f->value,2,2) == $val) ? $selected : '';
-				echo '>'.$val.'</option>';
-			}
-			echo '</select>';
-			echo '</div></div>';
-		}
-	
 	
 		//captcha
 		if ($f->q_type=="captcha") {
@@ -345,7 +282,6 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	echo '</div></div>';
 	echo '<input type="hidden" name="option" value="com_mpoll">';
 	echo '<input type="hidden" name="casting" value="true">';
-	echo '<input type="hidden" name="jform[CTypeID]" value="'.$this->typeinfo[0]->ct_id.'">';
 	echo '<input type="hidden" name="return" value="'.base64_encode($this->return).'">';
 	echo '</form>';
 	echo '<div style="clear:both;"></div>';

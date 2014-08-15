@@ -42,8 +42,7 @@ class MPollModelMPoll extends JModelLegacy
 			$fn='q_'.$u->q_id;
 			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,'');
 			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other','');
-			if(!$value && $udata->$fn) $value = $udata->$fn;
-			else if (!$value) $value=$u->q_default;
+			$value=$u->q_default;
 			if ($u->q_type == 'mlimit' || $u->q_type == 'multi' || $u->q_type == 'dropdown' || $u->q_type == 'mcbox' || $u->q_type == 'mlist') {
 				$u->value=explode(" ",$value); 
 				$u->other = $other;
@@ -107,12 +106,6 @@ class MPollModelMPoll extends JModelLegacy
 					$item->$fieldname = implode(" ",$data[$fieldname]);
 				} else if ($d->q_type=='cbox') {
 					$item->$fieldname = ($data[$fieldname]=='on') ? "1" : "0";
-				} else if ($d->q_type=='birthday') {
-					$fmonth = (int)$data[$fieldname.'_month'];
-					$fday = (int)$data[$fieldname.'_day'];
-					if ($fmonth < 10) $fmonth = "0".$fmonth;
-					if ($fday < 10) $fday = "0".$fday;
-					$item->$fieldname = $fmonth.$fday;
 				} else {
 					$item->$fieldname = $data[$fieldname];
 				}
@@ -132,7 +125,6 @@ class MPollModelMPoll extends JModelLegacy
 					}
 				}
 			}
-			$item->site_url = JURI::base();
 			
 			//Check CAPTCHA
 			if ($capfield) {
@@ -186,7 +178,6 @@ class MPollModelMPoll extends JModelLegacy
 			foreach ($mclists as $mclist) {
 				if ($data['q_'.$mclist->q_id])  {
 					if (strstr($mclist->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$mclist->q_default,2);	}
-					else { $mc_key = $cfg->mckey; $mc_list = $mclist->q_default; }
 					$mcf='q_'.$mclist->q_id;
 					include_once 'components/com_mpoll/lib/mailchimp.php';
 					$mc = new MailChimpHelper($mc_key,$mc_list);
