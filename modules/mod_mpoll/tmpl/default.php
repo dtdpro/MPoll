@@ -2,7 +2,32 @@
 defined('_JEXEC') or die('Restricted access'); 
 $db =& JFactory::getDBO();
 ?>
-<form name="mpollf<?php echo $pdata->poll_id; ?>">
+<script type="text/javascript">
+	function MPollAJAX<?php echo $pdata->poll_id; ?>() {
+		var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
+	    /* Send the data using post and put the results in a div */
+	    jQuery.post( url, jQuery("#mpollf<?php echo $pdata->poll_id; ?>").serialize(),
+	      function( data ) {
+	          jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
+	      }
+	    );
+	}
+
+	jQuery(document).ready(function() {
+		jQuery("#mpollf<?php echo $pdata->poll_id; ?>").validate({
+			errorClass:"mf_error uk-form-danger",
+			validClass:"mf_valid uk-form-success",
+			errorPlacement: function(error, element) {
+		    	error.appendTo( element.parent("div").parent("div").parent("div").next("div") );
+		    },
+		    submitHandler: function(form) { 
+		    	MPollAJAX<?php echo $pdata->poll_id; ?>();
+		    }
+	    });
+
+	});
+</script>
+<form name="mpollf<?php echo $pdata->poll_id; ?>" id="mpollf<?php echo $pdata->poll_id; ?>" action="">
 
 <?php 
 if ($showtitle) {
@@ -10,65 +35,194 @@ if ($showtitle) {
 }
 ?>
 	<div id="mpollmod<?php echo $pdata->poll_id; ?>" class="mpollmod-pollbody">
+
+					
+
 			<?php
 				if ($status != 'closed' && $status != 'done') {
-					foreach ($qdatap as $qdata) {
-						if ($qdata->q_req && $qdata->q_type != 'mcbox') { 
-							$req_q[] = 'q'.$qdata->q_id;
-							$req_t[] = $qdata->q_type;
-						}
-						//Question #
-						echo '<div class="mpollmod-question">';
 					
-						//Question text if not a single checkbox
-						if ($qdata->q_type != 'cbox') {
-							echo '<div class="mpollmod-question-text">'.$qdata->q_text.'</div>';
-							
+					foreach($qdatap as $f) {
+				
+						$sname = 'q_'.$f->q_id;
+						if ($ri==1) $ri=0;
+						else $ri=1;
+						echo '<div class="mpoll-form-poll-row row-'.$sname.' mpoll-form-poll-row'.($ri % 2).'">';
+						echo '<div class="mpoll-form-poll-label">';
+						if ($f->q_req) echo "*";
+						//field title
+						if ($f->q_type != "cbox" && $f->q_type != "mailchimp") echo $f->q_text;
+						echo '</div>';
+						echo '<div class="mpoll-form-poll-value">';
+						if ($f->q_type == "mcbox" || $f->q_type == "mlist") {
+							if (!$f->q_min && !$f->q_max) echo '<em>(Select all that apply)</em><br />';
+							if ($f->q_min && !$f->q_max) echo '<em>(Select at least '.$f->q_min.')</em><br />';
+							if (!$f->q_min && $f->q_max) echo '<em>(Select at most '.$f->q_max.')</em><br />';
+							if ($f->q_min && $f->q_max) echo '<em>(Select at least '.$f->q_min.' and at most '.$f->q_max.')</em><br />';
 						}
-						echo '<div class="mpollmod-answers">';
-						//output checkbox
-						if ($qdata->q_type == 'cbox') { 
-							echo '<div class="mpollmod-answer checkbox"><input type="checkbox" size="40" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"><label for="q'.$qdata->q_id.'"> '.$qdata->q_text.'</label></div>';
+					
+						//checkbox
+						if ($f->q_type=="cbox" || $f->q_type=="mailchimp") {
+							echo '<div class="mform-radio">';
+							echo '<div class="mform-radio-option checkbox">';
+							if (!empty($f->value) && $f->q_type=="cbox") $checked = ($f->value == '1') ? ' checked="checked"' : '';
+							else if ($f->params->mc_checked == "1") $checked = ' checked="checked"';
+							else $checked = '';
+							echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="mf_radio"';
+							if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
+							echo $checked.'/>'."\n";
+							echo '<label for="jform_'.$sname.'">';
+							echo ' '.$f->q_text.'</label><br />'."\n";
+							echo '</div></div>';
 						}
-						
-						//verification msg area
-						echo '<div id="'.'q'.$qdata->q_id.'_msg" class="mpollmod-error_msg"></div>';
-						
-						//output radio select
-						if ($qdata->q_type == 'multi') {
-							$numopts=0;
-							foreach ($qdata->options as $opts) {
-								echo '<div class="mpollmod-answer radio"><input type="radio" name="q'.$qdata->q_id.'" value="'.$opts->value.'" id="q'.$qdata->q_id.$opts->value.'"';
-								if ($opts->opt_disabled) echo " disabled";
-								echo '> <label for="q'.$qdata->q_id.$opts->value.'">'.$opts->text.'</label></div>';
-								$numopts++;
+					
+						//multi checkbox
+						if ($f->q_type=="mcbox") {
+							echo '<div class="mform-radio">';
+							$first = true;
+							foreach ($f->options as $o) {
+								if ($o->opt_selectable) {
+									echo '<div class="mform-radio-option checkbox">';
+									if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
+									else $checked = '';
+									echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="mf_radio" id="jform_'.$sname.$o->value.'"';
+									if ($f->q_req && $first) {
+										echo ' data-rule-required="true"';
+										if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+										if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+										echo ' data-msg-required="This Field is required"';
+										if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
+										if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
+										$first=false;
+									}
+									if ($o->opt_disabled) $checked .= ' disabled';
+									echo $checked.'/>'."\n";
+									echo '<label for="jform_'.$sname.$o->value.'">';
+									echo ' '.$o->text.'</label></div>'."\n";
+								} else {
+									echo '<div class="mform-radio-noselect';
+									echo ($first) ? ' mform-radio-noselecttop':'';
+									echo '">'.$o->text.'</div>';
+								}
+									
 							}
-						} 
+							echo '</div>';
+						}
 					
-						/* disabled for module
-						//output multi checkbox
-						if ($qdata->q_type == 'mcbox') {
-							//echo '<em>(check all that apply)</em><br />';
-							$query = 'SELECT * FROM #__mpoll_questions_opts WHERE opt_qid = '.$qdata->q_id.' ORDER BY opt_order ASC';
-							$db->setQuery( $query );
-							$qopts = $db->loadAssocList();
-							foreach ($qopts as $opts) {
-								echo '<label><input type="checkbox" name="q'.$qdata->q_id.'[]" value="'.$opts['opt_id'].'" id="q'.$qdata->q_id.'">'.$opts['opt_txt'].'</label><br>';
+						//radio
+						if ($f->q_type=="multi") {
+							echo '<div class="mform-radio">';
+							$first=true;
+							foreach ($f->options as $o) {
+								if ($o->opt_selectable) {
+									echo '<div class="mform-radio-option radio">';
+									if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
+									else $checked = '';
+									echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="mf_radio"';
+									if ($f->q_req && $first) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; $first=false;}
+									if ($o->opt_disabled) $checked .= ' disabled';
+									echo $checked.'/>'."\n";
+									echo '<label for="jform_'.$sname.$o->value.'">';
+									echo ' '.$o->text;
+									if ($o->opt_other) {
+										echo ' <input type="text" value="'.$f->other.'" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="mf_other">';
+									}
+									echo '</label>';
+									echo '</div>'."\n";
+								} else {
+									echo '<div class="mform-radio-noselect';
+									echo ($first) ? ' mform-radio-noselecttop':'';
+									echo '">'.$o->text.'</div>';
+								}
+									
 							}
-						} */
-						
-						//output text field
-						if ($qdata->q_type == 'textbox' || $qdata->q_type == 'email') { echo '<input type="text" size="20" style="width:100%" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"><br>'; }
-						if ($qdata->q_type == 'textar') { echo '<textarea cols="20" rows="2" style="width:100%" name="q'.$qdata->q_id.'" id="q'.$qdata->q_id.'"></textarea><br>'; }
+							echo '</div>';
+						}
 					
-						
-						//add in verification if nedded
-						if ($qdata->q_req && $qdata->q_type != 'mcbox') { $req_o[] = $numopts;}
-						echo '</div></div>';
+						//dropdown
+						if ($f->q_type=="dropdown") {
+							echo '<div class="mform-field">';
+							echo '<div class="mform-field-select">';
+							echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="mf_field mf_select"';
+							if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
+							echo '>';
+							foreach ($f->options as $o) {
+								if (!empty($f->value)) $selected = in_array($o->value,$f->value) ? ' selected="selected"' : '';
+								else $selected = '';
+								if ($o->opt_disabled) $selected .= ' disabled';
+								echo '<option value="'.$o->value.'"'.$selected.'>';
+								echo ' '.$o->text.'</option>';
+							}
+							echo '</select>';
+							echo '</div></div>';
+						}
+					
+						//multilist
+						if ($f->q_type=="mlist") {
+							echo '<div class="mform-field">';
+							echo '<div class="mform-field-select">';
+							echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="mf_field mf_mselect" size="4" multiple="multiple"';
+							if ($f->q_req) {
+								echo ' data-rule-required="true"';
+								if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+								if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+								echo ' data-msg-required="This Field is required"';
+								if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
+								if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
+								$first=false;
+							}
+							echo '>';
+							foreach ($f->options as $o) {
+								if (!empty($f->value)) $selected = in_array($o->value,$f->value) ? ' selected="selected"' : '';
+								else $selected = '';
+								if ($o->opt_disabled) $selected .= ' disabled';
+								echo '<option value="'.$o->value.'"'.$selected.'>';
+								echo ' '.$o->text.'</option>';
+							}
+							echo '</select>';
+							echo '</div></div>';
+						}
+		
+		
+						//text field, phone #, email, username
+						if ($f->q_type=="textbox" || $f->q_type=="email") {
+							echo '<div class="mform-field">';
+							echo '<div class="mform-field-text">';
+							echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field" type="text"';
+							if ($f->q_req) {
+								echo ' data-rule-required="true"';
+								if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+								if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+								if ($f->q_type=="email") echo ' data-rule-email="true"';
+								if ($f->q_match) echo ' data-rule-equalTo="#jform_'.$f->q_match.'"';
+								echo ' data-msg-required="This Field is required"';
+								if ($f->q_min) echo ' data-msg-minlength="Min length '.$f->q_min.' characters"';
+								if ($f->q_max) echo ' data-msg-maxlength="Max length '.$f->q_max.' characters"';
+								if ($f->q_type=="email") echo ' data-msg-email="Email address must be valid"';
+								if ($f->q_match) echo ' data-msg-equalTo="Fields must match"';
+							}
+							echo '>';
+							echo '</div></div>';
+						}
+					
+						//text area
+						if ($f->q_type=="textar") {
+							echo '<div class="mform-field">';
+							echo '<div class="mform-field-textarea">';
+							echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field"';
+							if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
+							echo '>'.$f->value.'</textarea>';
+							echo '</div></div>';
+						}
+		
+						echo '</div>';
+						echo '<div class="mpoll-form-poll-error">';
+						echo '</div>';
+						echo '</div>';
 					}
+					
 					echo '<p align="center">';
 					if ($status == 'open') {
-						echo '<a href="javascript:checkRq'.$pdata->poll_id.'();" class="button uk-button">Submit</a>';
+						echo '<a href="javascript:submitMPoll'.$pdata->poll_id.'();" onclick="jQuery(\'#mpollf'.$pdata->poll_id.'\').submit()" class="button uk-button">Submit</a>';
 					} else { 
 						echo $pdata->poll_regreqmsg; 
 					}
@@ -77,138 +231,12 @@ if ($showtitle) {
 					}
 					echo '</p>';
 					
-					$cnt = count($req_q);
-					?>
-					<script type='text/javascript'>
-					function checkRq<?php echo $pdata->poll_id; ?>() {
-						ev = document.mpollf<?php echo $pdata->poll_id; ?>;
-						erMsg = '<span style="color:#800000"><b>Answer is Required</b></span>';
-						erMsgEml = '<span style="color:#800000"><b>A valid email address is required</b></span>';
-						cks = false; errs = false;
-					<?
-					for ($i=0; $i<$cnt; $i++) {
-						if ($req_t[$i] == 'textbox') { echo "	if(isEmpty".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
-						if ($req_t[$i] == 'email') { echo "	if(isEmpty".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg') || isNotEmail".$pdata->poll_id."(ev.".$req_q[$i].", erMsgEml,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
-						if ($req_t[$i] == 'multi') { echo "	if(isNCheckedR".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,".$req_o[$i].",'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
-						if ($req_t[$i] == 'cbox') { echo "	if(isChecked".$pdata->poll_id."(ev.".$req_q[$i].", erMsg,'".$req_q[$i]."'+'_msg')) { errs=true; }\n"; }
-						
-					} 
-				
-				?>
-					if (!errs) MPollAJAX<?php echo $pdata->poll_id; ?>();
-					}
+					echo '<input type="hidden" name="poll" value="'.$pdata->poll_id.'">';
+					echo '<input type="hidden" name="showresults" value="'.$params->get( 'showresults', 1 ).'">';
+					echo '<input type="hidden" name="showresultslink" value="'.$params->get( 'showresultslink', 0 ).'">';
+					echo '<input type="hidden" name="resultsas" value="'.$params->get( 'resultsas', "count" ).'">';
+					echo JHtml::_('form.token');
 					
-					function isNotEmail<?php echo $pdata->poll_id; ?>(elem, helperMsg,msgl){
-
-						var emailExp=/^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-Z0-9]{2,4}$/;
-						if (!elem.value.match(emailExp)) { 
-							elem.focus();
-							document.getElementById(msgl).innerHTML = helperMsg; 
-							return true;
-						} 
-						
-						document.getElementById(msgl).innerHTML ='';
-							return false;
-					}
-
-					function isEmpty<?php echo $pdata->poll_id; ?>(elem, helperMsg,msgl){
-						if(elem.value.length == 0){
-							document.getElementById(msgl).innerHTML = helperMsg;
-							document.getElementById(msgl).style.display='block';
-							elem.focus(); // set the focus to this input
-							return true;
-						}
-						document.getElementById(msgl).innerHTML ='';
-						document.getElementById(msgl).style.display='none';
-							return false;
-					}
-					
-					function isNCheckedR<?php echo $pdata->poll_id; ?>(elem, helperMsg,cnt,msgl){
-						var isit = false;
-						for (var i=0; i<cnt; i++) {
-							if(elem[i].checked){ isit = true; }
-						}
-						if (isit == false) {
-							document.getElementById(msgl).innerHTML = helperMsg;
-							document.getElementById(msgl).style.display='block';
-							elem[0].focus(); // set the focus to this input
-							return true;
-						}
-						document.getElementById(msgl).innerHTML = '';
-						document.getElementById(msgl).style.display='none';
-							return false;
-					}
-					function isChecked<?php echo $pdata->poll_id; ?>(elem, helperMsg,msgl) {
-						if (elem.checked) {
-							document.getElementById(msgl).innerHTML = '';
-							document.getElementById(msgl).style.display='none';
-							return false;
-						} else { 
-							document.getElementById(msgl).innerHTML = helperMsg;
-							document.getElementById(msgl).style.display='block';
-							elem.focus(); // set the focus to this input
-							return true; 
-						}
-					}
-					function getCheckedValue<?php echo $pdata->poll_id; ?>(radioObj) {
-						if(!radioObj)
-							return "";
-						var radioLength = radioObj.length;
-						if(radioLength == undefined)
-							if(radioObj.checked)
-								return radioObj.value;
-							else
-								return "";
-						for(var i = 0; i < radioLength; i++) {
-							if(radioObj[i].checked) {
-								return radioObj[i].value;
-							}
-						}
-						return "";
-					}
-	
-					function MPollAJAX<?php echo $pdata->poll_id; ?>(){
-						var ajaxRequest;  // The variable that makes Ajax possible!
-						
-						try{
-							// Opera 8.0+, Firefox, Safari
-							ajaxRequest = new XMLHttpRequest();
-						} catch (e){
-							// Internet Explorer Browsers
-							try{
-								ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
-							} catch (e) {
-								try{
-									ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
-								} catch (e){
-									// Something went wrong
-									alert("Your browser broke!");
-									return false;
-								}
-							}
-						}
-						// Create a function that will receive data sent from the server
-						ajaxRequest.onreadystatechange = function(){
-							if(ajaxRequest.readyState == 4){
-								var ajaxDisplay = document.getElementById('mpollmod<?php echo $pdata->poll_id; ?>');
-								ajaxDisplay.innerHTML = ajaxRequest.responseText;
-							}
-						}
-						var queryString = "?";
-						<?php
-						echo "queryString += 'poll=".$pdata->poll_id."&showresults=".$params->get( 'showresults', 1 )."&showresultslink=".$params->get( 'showresultslink', 0 )."&resultsas=".$params->get( 'resultsas', "count" )."';\n";
-						if ($params->get( 'showresultslink', 0 )) echo "queryString += '&resultslink=".urlencode(JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id))."';\n";
-						foreach ($qdatap as $qdata) {
-							if ($qdata->q_type == 'multi') {
-								echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + getCheckedValue".$pdata->poll_id."(ev.q".$qdata->q_id.");\n";
-							}
-							else echo "\t\t\t\t\tqueryString += '&q".$qdata->q_id."=' + encodeURIComponent(ev.q".$qdata->q_id.".value);\n";
-						} 
-						?> 
-						ajaxRequest.open("GET", "<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php" + queryString, true);
-						ajaxRequest.send(null); 
-					}
-					</script><?php 
 				} else if ($status == 'done') {
 					if ($pdata->poll_results_msg_before) echo $pdata->poll_results_msg_before;
 					if ($pdata->poll_showresults && $params->get( 'showresults', 1 )) {

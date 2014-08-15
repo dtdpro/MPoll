@@ -17,14 +17,32 @@ class modMPollHelper
 	{
 		$db =& JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_questions ';
-		$query .= 'WHERE published = 1 && q_poll = '.$pollid.' && q_type IN ("multi","cbox","textbox","textar") ORDER BY ordering ASC';
+		$query .= 'WHERE published = 1 && q_poll = '.$pollid.' && q_type IN ("mcbox","mlist","mailchimp","email","dropdown","multi","cbox","textbox","textar") ORDER BY ordering ASC';
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
 		foreach ($qdata as &$q) {
-			if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown") {
-				$qo="SELECT opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
+			//Get options
+			if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
+				$qo="SELECT opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
 				$db->setQuery($qo);
 				$q->options = $db->loadObjectList();
+			}
+			
+			//Set value
+			$registry = new JRegistry();
+			$registry->loadString($q->params);
+			$q->params = $registry->toObject();
+			$fn='q_'.$q->q_id;
+			$value = $q->q_default;
+			if ($q->q_type == 'mlimit' || $q->q_type == 'multi' || $q->q_type == 'dropdown' || $q->q_type == 'mcbox' || $q->q_type == 'mlist') {
+				$q->value=explode(" ",$value);
+				$q->other = $other;
+			} else if ($q->q_type == 'mailchimp' || $q->q_type == 'cbox' || $q->q_type == 'yesno') {
+				$q->value=$value;
+			} else if ($q->q_type == 'birthday') {
+				$q->value=$value;
+			} else if ($q->q_type != 'captcha') {
+				$q->value=$value;
 			}
 		}
 		return $qdata;
