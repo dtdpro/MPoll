@@ -240,54 +240,46 @@ if ($showtitle) {
 				} else if ($status == 'done') {
 					if ($pdata->poll_results_msg_before) echo $pdata->poll_results_msg_before;
 					if ($pdata->poll_showresults && $params->get( 'showresults', 1 )) {
-						foreach ($qdatap as $q) {
-							if ($q->q_type == "multi") {
+						foreach ($qdatap as $qr) {
+							if ($qr->q_type == "mcbox" || $qr->q_type == "multi" || $qr->q_type == "dropdown" || $qr->q_type == "mlist") {
 								echo '<div class="mpollmod-question">';
 								$anscor=false;
-								echo '<div class="mpollmod-question-text">'.$q->q_text.'</div>';
-								echo '<div class="mpollmod-options">';
-								switch ($q->q_type) {
+								echo '<div class="mpollmod-question-text">'.$qr->q_text.'</div>';
+								switch ($qr->q_type) {
 									case 'multi':
-										$qnum = 'SELECT count(res_qid) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' GROUP BY res_qid';
-										$db->setQuery( $qnum );
-										$qnums = $db->loadAssoc();
-										$numr=$qnums['count(res_qid)'];
-										$tph=0;
-										foreach ($q->options as &$o) {
-											$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$q->q_id.' && res_ans = '.$o->value.' GROUP BY res_ans';
+									case 'mcbox':
+									case 'mlist':
+									case 'dropdown':
+										$numr=0;
+										foreach ($qr->options as &$o) {
+											$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$qr->q_id.' && res_ans LIKE "%'.$o->value.'%" GROUP BY res_qid';
 											$db->setQuery($qa);
 											$o->anscount = $db->loadResult();
 											if ($o->anscount == "") $o->anscount = 0;
+											$numr = $numr + (int)$o->anscount;
 										}
-										$gper=0; $ansper=0; $gperid = 0;
-										foreach ($q->options as $opts) {
-											if ($numr != 0) $per = ($opts->anscount+$opts->prehits)/($numr+$tph); else $per=1;
-											echo '<div class="mpollmod-opt">';
-								
-											echo '<div class="mpollmod-opt-text">';
-											if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->text.'</div>';
-											else echo $opts->text;
-											echo '</div>';
-											echo '<div class="mpollmod-opt-count">';
-											if ($params->get( 'resultsas', "count" ) == "count") {
-												echo ($opts->anscount);
-											} else {
-												echo (int)($per*100)."%";
+										foreach ($qr->options as $opts) {
+											if ($opts->opt_selectable) {
+												if ($numr != 0) $per = ($opts->anscount)/($numr); else $per=1;
+												echo '<div class="mpollmod-opt">';
+						
+												echo '<div class="mpollmod-opt-text">';
+												if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->text.'</div>';
+												else echo $opts->text;
+												echo '</div>';
+												echo '<div class="mpollmod-opt-count">';
+												if ($resultsas == "percent") echo (int)($per*100)."%";
+												else echo ($opts->anscount);
+												echo '</div>';
+												echo '<div class="mpollmod-opt-bar-box"><div class="mpollmod-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
+												echo '</div>';
 											}
-											echo '</div>';
-											echo '<div class="mpollmod-opt-bar-box"><div class="mpollmod-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
-											echo '</div>';
-											if ($gper < $per) {
-												$gper = $per; $gperid = $opts->value;
-											}
-											}
-											break;
-												
-											}
-												
-											echo '</div></div>';
+										}
+										break;
+									default: break;
+								}
+								echo '</div>';
 							}
-							
 						}
 					}
 					if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
