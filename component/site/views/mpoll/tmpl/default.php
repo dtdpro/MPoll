@@ -20,11 +20,14 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		jQuery("#mpollform").validate({
-			errorClass:"mf_error uk-form-danger",
-			validClass:"mf_valid uk-form-success",
+			errorClass:"uk-form-danger",
+			validClass:"uk-form-success",
+			errorElement: "div",
 			errorPlacement: function(error, element) {
-		    	error.appendTo( element.parent("div").parent("div").parent("div").next("div") );
+		    	error.appendTo( element.parent("div"));
+		    	error.addClass("uk-alert uk-alert-danger uk-form-controls-text")
 		    }
+
 	    });
 
 	});
@@ -34,15 +37,239 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 	<?php 
 	echo '<h2 class="title uk-article-title">'.$this->pdata->poll_name.'</h2>';
 	if ($this->pdata->poll_regreq == 1 && $user->id == 0) {
-		echo '<p align="center">'.$this->pdata->poll_regreqmsg.'</p>';
+		echo '<div class="uk-alert uk-alert-warning">'.$this->pdata->poll_regreqmsg.'</div>';
 	} else if ( !in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
-		echo $this->pdata->poll_accessreqmsg;
+		echo '<div class="uk-alert uk-alert-danger">'.$this->pdata->poll_accessreqmsg.'</div>';
 	}
 	echo $this->pdata->poll_desc;
-	echo '<div id="mpoll-form-'.$this->pdata->poll_pagetype.'">';
-	echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data"><input type="hidden" name="stepnext" value="">';
+	
+	echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data" class="uk-form';
+	if ($this->pdata->poll_pagetype == "form") echo ' uk-form-horizontal';
+	echo '"><input type="hidden" name="stepnext" value="">';
 	
 	foreach($this->qdata as $f) {
+		
+		//Debug
+		//echo '<pre>'; print_r($f); echo '</pre>';
+		
+		$sname = 'q_'.$f->q_id;
+		if ($ri==1) $ri=0;
+		else $ri=1;
+		echo '<div class="row-'.$sname.' mpoll-form-'.$this->pdata->poll_pagetype.'-row'.($ri % 2);
+		if ($f->q_type != "message" && $f->q_type != "header") echo ' uk-form-row';
+		echo '">';
+		
+		//field title/label
+		if ($f->q_type != "message" && $f->q_type != "header") {
+			echo '<div class="uk-form-label uk-text-bold">';
+			if ($f->q_req) echo "*";
+					if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
+			echo '</div>';
+		}
+		
+		//Field
+		if ($f->q_type == "message") echo '<div class="uk-alert">';
+		else if ($f->q_type == "header") echo '<div class="uk-margin-top uk-text-bold uk-text-large">';
+		else {
+			echo '<div class="uk-form-controls';
+			if ($f->q_type != "cbox" || $f->q_type != "mailchimp" || $f->q_pretext || $f->q_hint) echo ' uk-form-controls-text';
+			echo '">';
+		}
+		
+		//Pretext
+		if ($f->q_pretext) echo '<div class="">'.$f->q_pretext.'</div>';
+		
+		//Limit warnings
+		if ($f->q_type == "mcbox" || $f->q_type == "mlist") {
+			if (!$f->q_min && !$f->q_max) echo '<em>(Select all that apply)</em><br />';
+			if ($f->q_min && !$f->q_max) echo '<em>(Select at least '.$f->q_min.')</em><br />';
+			if (!$f->q_min && $f->q_max) echo '<em>(Select at most '.$f->q_max.')</em><br />';
+			if ($f->q_min && $f->q_max) echo '<em>(Select at least '.$f->q_min.' and at most '.$f->q_max.')</em><br />';
+		}
+	
+		//Message
+		if ($f->q_type == "message") echo $f->q_text;
+		if ($f->q_type == "header") echo $f->q_text;
+	
+	
+		//checkbox & mailchimp list
+		if ($f->q_type=="cbox" || $f->q_type=="mailchimp") {
+			if (!empty($f->value) && $f->q_type=="cbox") $checked = ($f->value == '1') ? ' checked="checked"' : '';
+			else if ($f->params->mc_checked == "1") $checked = ' checked="checked"';
+			else $checked = '';
+			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class=""';
+			if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
+			echo $checked.'/>'."\n";
+			echo '<label for="jform_'.$sname.'">';
+			echo ' '.$f->q_text.'</label><br />'."\n";
+		}
+	
+		//multi checkbox
+		if ($f->q_type=="mcbox") {
+			$first = true;
+			foreach ($f->options as $o) {
+				if ($o->opt_selectable) {
+					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
+					else $checked = '';
+					echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="" id="jform_'.$sname.$o->value.'"';
+					if ($f->q_req && $first) {
+						echo ' data-rule-required="true"';
+						if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+						if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+						echo ' data-msg-required="This Field is required"';
+						if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
+						if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
+						$first=false;
+					}
+					if ($o->opt_disabled) $checked .= ' disabled';
+					echo $checked.'/>'."\n";
+					echo '<label for="jform_'.$sname.$o->value.'">';
+					echo ' '.$o->text.'</label><br />'."\n";
+				} else {
+					echo '<span class="uk-text-bold">'.$o->text.'</span><br />';
+				}
+					
+			}
+		}
+	
+		//radio
+		if ($f->q_type=="multi") {
+			
+			$first=true;
+			foreach ($f->options as $o) {
+				if ($o->opt_selectable) {
+					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
+					else $checked = '';
+					echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class=""';
+					if ($f->q_req && $first) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; $first=false;}
+					if ($o->opt_disabled) $checked .= ' disabled';
+					echo $checked.'/>'."\n";
+					echo '<label for="jform_'.$sname.$o->value.'">';
+					echo ' '.$o->text;
+					if ($o->opt_other) {
+						echo ' <input type="text" value="'.$f->other.'" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="">';
+					}
+					echo '</label>';
+					echo '<br />'."\n";
+				} else {
+					echo '<span class="uk-text-bold">'.$o->text.'</span><br />';
+				}
+					
+			}
+		}
+	
+		//dropdown
+		if ($f->q_type=="dropdown") {
+			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="uk-width-1-1"';
+			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
+			echo '>';
+			foreach ($f->options as $o) {
+				if (!empty($f->value)) $selected = in_array($o->value,$f->value) ? ' selected="selected"' : '';
+				else $selected = '';
+				if ($o->opt_disabled) $selected .= ' disabled';
+				echo '<option value="'.$o->value.'"'.$selected.'>';
+				echo ' '.$o->text.'</option>';
+			}
+			echo '</select>';
+		}
+	
+		//multilist
+		if ($f->q_type=="mlist") {
+			echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="uk-width-1-1" size="4" multiple="multiple"';
+			if ($f->q_req) {
+				echo ' data-rule-required="true"';
+				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+				if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+				echo ' data-msg-required="This Field is required"';
+				if ($f->q_min) echo ' data-msg-minlength="Select at least '.$f->q_min.'"';
+				if ($f->q_max) echo ' data-msg-maxlength="Select at most '.$f->q_max.'"';
+				$first=false;
+			}
+			echo '>';
+			foreach ($f->options as $o) {
+				if (!empty($f->value)) $selected = in_array($o->value,$f->value) ? ' selected="selected"' : '';
+				else $selected = '';
+				if ($o->opt_disabled) $selected .= ' disabled';
+				echo '<option value="'.$o->value.'"'.$selected.'>';
+				echo ' '.$o->text.'</option>';
+			}
+			echo '</select>';
+		}
+	
+	
+		//text field, phone #, email, username
+		if ($f->q_type=="textbox" || $f->q_type=="email") {
+			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field uk-width-1-1" type="text"';
+			if ($f->q_req) {
+				echo ' data-rule-required="true"';
+				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
+				if ($f->q_max) echo ' data-rule-maxlength="'.$f->q_max.'"';
+				if ($f->q_type=="email") echo ' data-rule-email="true"';
+				if ($f->q_match) echo ' data-rule-equalTo="#jform_'.$f->q_match.'"';
+				echo ' data-msg-required="This Field is required"';
+				if ($f->q_min) echo ' data-msg-minlength="Min length '.$f->q_min.' characters"';
+				if ($f->q_max) echo ' data-msg-maxlength="Max length '.$f->q_max.' characters"';
+				if ($f->q_type=="email") echo ' data-msg-email="Email address must be valid"';
+				if ($f->q_match) echo ' data-msg-equalTo="Fields must match"';
+			}
+			echo '>';
+		}
+	
+		//text area
+		if ($f->q_type=="textar") {
+			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field uk-width-1-1"';
+			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
+			echo '>'.$f->value.'</textarea>';
+		}
+	
+		//captcha
+		if ($f->q_type=="captcha") {
+			echo '<img id="captcha_img" src="'.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
+			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field" type="text"';
+			if ($f->q_req) {
+				echo ' data-rule-required="true"';
+				echo ' data-msg-required="This Field is required"';
+			}
+			echo '>';
+			echo '<div class="uk-text-small">';
+			echo '<a href="#" onclick="document.getElementById(\'captcha_img\').src = \''.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php?\' + Math.random(); return false">Reload Image</a>';
+			echo '</div>';
+		}
+		
+		//File Attachment
+		if ($f->q_type == 'attach') {
+			echo '<input name="q_'.$f->q_id.'" id="jform_'.$sname.'" type="file" size="40" class="mf_file"';
+			if ($f->q_req) {
+				echo ' data-rule-required="true"';
+				echo ' data-msg-required="This Field is required"';
+			}
+			echo ' />';
+		}
+	
+		if ($f->q_hint && $f->q_type!="captcha") echo '<div class="uk-text-small">'.$f->q_hint.'</div>';
+	
+		echo '</div>';
+		
+		echo '</div>';
+	}
+
+	//Submit
+	echo '<div class="uk-form-row">';
+	echo '<div class="uk-form-controls">';
+	if ($this->pdata->poll_regreq == 1 && $user->id == 0) {
+		echo '<div class="uk-alert uk-alert-warning">'.$this->pdata->poll_regreqmsg.'</div>';
+	} else {
+		if ( in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
+			echo JHtml::_('form.token');
+			echo '<input name="castvote" id="castvote" value="Submit" type="submit" class="button uk-button">';
+		} else {
+			echo '<div class="uk-alert uk-alert-danger">'.$this->pdata->poll_accessreqmsg.'</div>';
+		}
+	}
+	echo '</div></div>';
+	
+	/*
+	 * foreach($this->qdata as $f) {
 		
 		//Debug
 		//echo '<pre>'; print_r($f); echo '</pre>';
@@ -53,7 +280,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-row row-'.$sname.' mpoll-form-'.$this->pdata->poll_pagetype.'-row'.($ri % 2).'">';
 		echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-label">';
 		if ($f->q_req) echo "*";
-		//field title
+		
+		//field title/label
 		if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
 		echo '</div>';
 		if ($f->q_type == "message") echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-msg">';
@@ -200,7 +428,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="textbox" || $f->q_type=="email") {
 			echo '<div class="mform-field">';
 			echo '<div class="mform-field-text">';
-			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field" type="text"';
+			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field uk-width-1-1" type="text"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
 				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -221,7 +449,7 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		if ($f->q_type=="textar") {
 			echo '<div class="mform-field">';
 			echo '<div class="mform-field-textarea">';
-			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field"';
+			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field uk-width-1-1"';
 			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>'.$f->value.'</textarea>';
 			echo '</div></div>';
@@ -265,6 +493,8 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		echo '</div>';
 	}
 	
+	
+	//Submit
 	echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-row">';
 	echo '<div class="mpoll-form-'.$this->pdata->poll_pagetype.'-label">';
 	echo '</div>';
@@ -280,12 +510,12 @@ if ($this->task=='ballot') {  /*** DISPLAY POLL ***/
 		}
 	}
 	echo '</div></div>';
+	 */
+		
 	echo '<input type="hidden" name="option" value="com_mpoll">';
 	echo '<input type="hidden" name="casting" value="true">';
 	echo '<input type="hidden" name="return" value="'.base64_encode($this->return).'">';
 	echo '</form>';
-	echo '<div style="clear:both;"></div>';
-	echo '</div>';
 	
 } else if ($this->task=='results') { /*** DISPLAY POLL RESULTS ***/
 	if (($this->showlist == 'both' || $this->showlist == 'after')) echo $jumplist;
