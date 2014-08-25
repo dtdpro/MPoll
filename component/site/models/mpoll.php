@@ -47,20 +47,20 @@ class MPollModelMPoll extends JModelLegacy
 					$qo->order('ordering ASC');
 					$db->setQuery($qo);
 					$q->options = $db->loadObjectList();
-				}
-				
-				//Load counts
-				if ($count) {
-					foreach ($q->options as &$o) {
-						$qa = $db->getQuery(true);
-						$qa->select('count(*)');
-						$qa->from('#__mpoll_results');
-						$qa->where('res_qid = '.$q->q_id);
-						$qa->where('res_ans LIKE "%'.$o->value.'%"');
-						$qa->group('res_qid');
-						$db->setQuery($qa);
-						$o->anscount = (int)$db->loadResult();
-						$q->anscount = $q->anscount + (int)$db->loadResult();
+					
+					//Load counts
+					if ($count) {
+						foreach ($q->options as &$o) {
+							$qa = $db->getQuery(true);
+							$qa->select('count(*)');
+							$qa->from('#__mpoll_results');
+							$qa->where('res_qid = '.$q->q_id);
+							$qa->where('res_ans LIKE "%'.$o->value.'%"');
+							$qa->group('res_qid');
+							$db->setQuery($qa);
+							$o->anscount = (int)$db->loadResult();
+							$q->anscount = $q->anscount + (int)$db->loadResult();
+						}
 					}
 				}
 			}
@@ -171,9 +171,15 @@ class MPollModelMPoll extends JModelLegacy
 			}
 			
 			//save completed
-			$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll,cm_useragent,cm_ipaddr) VALUES ('.$user->id.','.$pollid.',"'.$_SERVER['HTTP_USER_AGENT'].'","'.$_SERVER['REMOTE_ADDR'].'")';
-			$db->setQuery( $qc );
-			$db->query();
+			$cmrec=new stdClass();
+			$cmrec->cm_user=$user->id;
+			$cmrec->cm_poll=$pollid;
+			$cmrec->cm_useragent=$_SERVER['HTTP_USER_AGENT'];
+			$cmrec->cm_ipaddr=$_SERVER['REMOTE_ADDR'];
+			if (!$db->insertObject('#__mpoll_completed',$cmrec)) {
+				$this->setError("Error saving compleition record");
+				return false;
+			}	
 			$subid = $db->insertid();
 			
 			
@@ -198,7 +204,9 @@ class MPollModelMPoll extends JModelLegacy
 				} else { $item->$u = ""; }
 			}
 	
-			$odsql = "SELECT * FROM #__mpoll_questions_opts";
+			$odsql=$db->getQuery(true);
+			$odsql->select('*');
+			$odsql->from('#__mpoll_questions_opts');
 			$db->setQuery($odsql);
 			$optionsdata = array();
 			$optres = $db->loadObjectList();
@@ -318,9 +326,14 @@ class MPollModelMPoll extends JModelLegacy
 			foreach ($flist as $fl) {
 				$fieldname = 'q_'.$fl->q_id;
 				if ($fl->q_type != "captcha") {
-					$q = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_cm,res_ans_other) VALUES ("'.$user->id.'","'.$pollid.'","'.$fl->q_id.'","'.$db->escape($item->$fieldname).'","'.$subid.'","'.$db->escape($other->$fieldname).'")';
-					$db->setQuery( $q );
-					if (!$db->query()) {
+					$cmres=new stdClass();
+					$cmres->res_user=$user->id;
+					$cmres->res_poll=$pollid;
+					$cmres->res_qid=$fl->q_id;
+					$cmres->res_ans=$db->escape($item->$fieldname);
+					$cmres->res_cm=$subid;
+					$cmres->res_ans_other=$db->escape($other->$fieldname);
+					if (!$db->insertObject('#__mpoll_results',$cmres)) {
 						$this->setError("Error saving additional information");
 						return false;
 					}
