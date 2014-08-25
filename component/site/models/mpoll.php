@@ -12,46 +12,78 @@ class MPollModelMPoll extends JModelLegacy
 	function getPoll($pollid)
 	{
 		$db =& JFactory::getDBO();
-		$user =& JFactory::getUser();
-		$query = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.' && published > 0';
+		$query = $db->getQuery(true);
+		$query->select('*');
+		$query->from('#__mpoll_polls');
+		$query->where('poll_id = '.$pollid);
+		$query->where('published > 0');
 		$db->setQuery( $query );
 		$pdata = $db->loadObject();
 		return $pdata;
 	}
-	function getQuestions($pollid,$options=false)
+	function getQuestions($pollid,$options=false,$count=false)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$app=Jfactory::getApplication();
-		$query = 'SELECT * FROM #__mpoll_questions ';
-		$query .= 'WHERE published > 0 && q_poll = '.$pollid.' ORDER BY ordering ASC';
+		$query=$db->getQuery(true);
+		$query->select('*');
+		$query->from('#__mpoll_questions');
+		$query->where('published > 0');
+		$query->where('q_poll = '.$pollid);
+		$query->order('ordering ASC');
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
-		if ($options) {
-			foreach ($qdata as &$q) {
+		foreach ($qdata as &$q) {
+			
+			//Load option and count if needed 
+			if ($options) {
+				//Load options
 				if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
-					$qo="SELECT opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
+					$qo=$db->getQuery(true);
+					$qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable');
+					$qo->from('#__mpoll_questions_opts');
+					$qo->where('opt_qid = '.$q->q_id);
+					$qo->where('published > 0');
+					$qo->order('ordering ASC');
 					$db->setQuery($qo);
 					$q->options = $db->loadObjectList();
 				}
+				
+				//Load counts
+				if ($count) {
+					foreach ($q->options as &$o) {
+						$qa = $db->getQuery(true);
+						$qa->select('count(*)');
+						$qa->from('#__mpoll_results');
+						$qa->where('res_qid = '.$q->q_id);
+						$qa->where('res_ans LIKE "%'.$o->value.'%"');
+						$qa->group('res_qid');
+						$db->setQuery($qa);
+						$o->anscount = (int)$db->loadResult();
+						$q->anscount = $q->anscount + (int)$db->loadResult();
+					}
+				}
 			}
-		}
-		foreach ($qdata as &$u) {
+			
+			//Load Question Params
 			$registry = new JRegistry();
-			$registry->loadString($u->params);
-			$u->params = $registry->toObject();
-			$fn='q_'.$u->q_id;
+			$registry->loadString($q->params);
+			$q->params = $registry->toObject();
+			
+			//Set default/saved values
+			$fn='q_'.$q->q_id;
 			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,'');
 			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other','');
-			$value=$u->q_default;
-			if ($u->q_type == 'mlimit' || $u->q_type == 'multi' || $u->q_type == 'dropdown' || $u->q_type == 'mcbox' || $u->q_type == 'mlist') {
-				$u->value=explode(" ",$value); 
-				$u->other = $other;
-			} else if ($u->q_type == 'mailchimp' || $u->q_type == 'cbox' || $u->q_type == 'yesno') {
-				$u->value=$value;
-			} else if ($u->q_type == 'birthday') {
-				$u->value=$value;
-			} else if ($u->q_type != 'captcha') {
-				$u->value=$value;
+			$value=$q->q_default;
+			if ($q->q_type == 'mlimit' || $q->q_type == 'multi' || $q->q_type == 'dropdown' || $q->q_type == 'mcbox' || $q->q_type == 'mlist') {
+				$q->value=explode(" ",$value); 
+				$q->other = $other;
+			} else if ($q->q_type == 'mailchimp' || $q->q_type == 'cbox' || $q->q_type == 'yesno') {
+				$q->value=$value;
+			} else if ($q->q_type == 'birthday') {
+				$q->value=$value;
+			} else if ($q->q_type != 'captcha') {
+				$q->value=$value;
 			}
 		}
 		return $qdata;
@@ -307,57 +339,68 @@ class MPollModelMPoll extends JModelLegacy
 	}
 	
 	function getCasted($pollid) {
-		$db =& JFactory::getDBO();
-		//$sewn = JFactory::getSession();
-		//$sessionid = $sewn->getId();
-		$user =& JFactory::getUser();
-		$userid = $user->id;
-		$query = 'SELECT * FROM #__mpoll_completed WHERE cm_user="'.$userid.'" && cm_poll="'.$pollid.'"';
+		$db = JFactory::getDBO();
+		$user = JFactory::getUser();
+		if (!$user->id) return false;
+		
+		$query=$db->getQuery(true);
+		$query->select('cm_id');
+		$query->from('#__mpoll_completed');
+		$query->where('cm_user='.$user->id);
+		$query->where('cm_poll='.$pollid);
 		$db->setQuery($query);
-		$data = $db->loadAssoc();
-		if (count($data) > 0) return true;
+		$data = $db->loadColumn();
+
+		if (count($data)) return true;
 		else return false;
 	}
 	
-	function getPolls($catid) {
-		$query  = ' SELECT * ';
-		$query .= ' FROM #__mpoll_polls';
-		$query .= ' WHERE published = 1 && poll_cat = '.$catid;
-		$query .= ' ORDER BY poll_name ASC';
-		$db =& JFactory::getDBO();
-		$db->setQuery($query);
-		$data = $db->loadObjectList();
-		return $data;
-	}
-	
 	function getFirstCast($pollid) {
-		$q = 'SELECT cm_time FROM #__mpoll_completed WHERE cm_poll = '.$pollid.' ORDER BY cm_time ASC LIMIT 1';
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
+		$q = $db->getQuery(true);
+		$q->select('cm_time');
+		$q->from('#__mpoll_completed');
+		$q->where('cm_poll = '.$pollid);
+		$q->order('cm_time ASC');
+		$q->limit('1');
 		$db->setQuery($q); 
 		$data = $db->loadAssoc(); 
 		return $data['cm_time'];
 	}
 	function getLastCast($pollid) {
-		$q = 'SELECT cm_time FROM #__mpoll_completed WHERE cm_poll = '.$pollid.' ORDER BY cm_time DESC LIMIT 1';
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
+		$q = $db->getQuery(true);
+		$q->select('cm_time');
+		$q->from('#__mpoll_completed');
+		$q->where('cm_poll = '.$pollid);
+		$q->order('cm_time DESC');
+		$q->limit('1');
 		$db->setQuery($q); 
 		$data = $db->loadAssoc(); 
 		return $data['cm_time'];
 	}
 	function getNumCast($pollid) {
-		$q = 'SELECT count(*),cm_poll FROM #__mpoll_completed WHERE cm_poll = '.$pollid.' GROUP BY cm_poll';
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
+		$q = $db->getQuery(true);
+		$q->select('count(*)');
+		$q->from('#__mpoll_completed');
+		$q->where('cm_poll = '.$pollid);
+		$q->group('cm_poll');
 		$db->setQuery($q); 
-		$data = $db->loadAssoc();
-		if ($data) return $data['count(*)'];
-		else return 0;
+		$count = $db->loadResult();
+		return (int)$count;
 	}
 	
 	function applyAnswers($qdata,$cmplid) {
-		$db =& JFactory::getDBO();
-		$user =& JFactory::getUser();
+		$db = JFactory::getDBO();
+		$user = JFactory::getUser();
 		foreach ($qdata as &$q) {
-			$qa = 'SELECT res_ans FROM #__mpoll_results WHERE res_user = '.$user->id.' && res_qid = '.$q->q_id.' && res_cm='.$cmplid;
+			$qa = $db->getQuery(true);
+			$qa->select('res_ans');
+			$qa->from('#__mpoll_results');
+			$qa->where('res_user='.$user->id);
+			$qa->where('res_qid='.$q->q_id);
+			$qa->where('res_cm='.$cmplid);
 			$db->setQuery($qa);
 			$q->answer=$db->loadResult();
 		}
@@ -401,7 +444,7 @@ class MPollModelMPoll extends JModelLegacy
 		}
 	
 		
-		//othe checks
+		//other checks
 		$xss_check =  JFile::read($file['tmp_name'], false, 256);
 		$html_tags = array('abbr', 'acronym', 'address', 'applet', 'area', 'audioscope', 'base', 'basefont', 'bdo', 'bgsound', 'big', 'blackface', 'blink', 'blockquote', 'body', 'bq', 'br', 'button', 'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'comment', 'custom', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'fn', 'font', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'html', 'iframe', 'ilayer', 'img', 'input', 'ins', 'isindex', 'keygen', 'kbd', 'label', 'layer', 'legend', 'li', 'limittext', 'link', 'listing', 'map', 'marquee', 'menu', 'meta', 'multicol', 'nobr', 'noembed', 'noframes', 'noscript', 'nosmartquotes', 'object', 'ol', 'optgroup', 'option', 'param', 'plaintext', 'pre', 'rt', 'ruby', 's', 'samp', 'script', 'select', 'server', 'shadow', 'sidebar', 'small', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'tt', 'ul', 'var', 'wbr', 'xml', 'xmp', '!DOCTYPE', '!--');
 		foreach($html_tags as $tag) {

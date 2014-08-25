@@ -39,6 +39,9 @@
 		<folder>upload</folder>
 		<folder>scripts</folder>
 	</media>	
+	<languages folder="site">
+		<language tag="en-GB">language/en-GB.com_mpoll.ini</language>
+	</languages>
 	<administration>
 		<!-- Administration Menu Section -->
 		<menu>COM_MPOLL_MENU</menu>
