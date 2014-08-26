@@ -21,14 +21,14 @@ $pdata   = modMPollHelper::getPoll($params->get( 'poll', 0 ));
 $showtitle = $params->get( 'showtitle', 1 );
 if ( $pdata && $pdata->poll_id ) {
 	$status='open';
-	//check if poll is still active
+	// Check if poll is still active
 	if ((strtotime($pdata->poll_start) > strtotime(date("Y-m-d H:i:s"))) && $pdata->poll_start != '0000-00-00 00:00:00') { $status='closed'; }
 	if ((strtotime($pdata->poll_end) < strtotime(date("Y-m-d H:i:s"))) && $pdata->poll_start != '0000-00-00 00:00:00') { $status='closed'; }
 	
-	//get questions
-    $qdatap = modMPollHelper::getQuestions($params->get( 'poll', 0 ));
+	// Get questions
+    $qdata = modMPollHelper::getQuestions($params->get( 'poll', 0 ));
 	
-	//check if user has voted or not
+	// Check if user has voted or not
 	if ($pdata->poll_only) {
 			if ($user->id) $casted=modMPollHelper::getCasted($params->get( 'poll', 0 ));
 			else $casted=false;
@@ -37,9 +37,14 @@ if ( $pdata && $pdata->poll_id ) {
 	}
 	if ($casted) $status='done';
 	
-	//Checkif login requird
+	// Check if login requird
 	if (!$user->id && $pdata->poll_regreq) { 
-		$status="show"; 
+		$status="regreq"; 
+	}
+	
+	// Check if ACL Met
+	if ($user->id && !in_array($pdata->access,$user->getAuthorisedViewLevels())) {
+		$status="accessreq";
 	}
 	
 	

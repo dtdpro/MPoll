@@ -24,27 +24,45 @@ $showresultslink  = JRequest::getVar('showresultslink');
 $resultsas  = JRequest::getVar('resultsas');
 $resultslink  = urldecode(JRequest::getVar('resultslink'));
 
-//get poll data
-$pquery = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.' && published=1';
+// Get poll data
+$pquery = $db->getQuery(true);
+$pquery->select('*');
+$pquery->from('#__mpoll_polls');
+$pquery->where('poll_id = '.$pollid);
+$pquery->where('published > 0');
 $db->setQuery( $pquery );
 $pdata = $db->loadObject();
 
-//save completed
-$qc = 'INSERT INTO #__mpoll_completed (cm_user,cm_poll,cm_useragent,cm_ipaddr) VALUES ('.$user->id.','.$pollid.',"'.$_SERVER['HTTP_USER_AGENT'].'","'.$_SERVER['REMOTE_ADDR'].'")';
-$db->setQuery( $qc );
-$db->query();
+// Save completed
+$cmrec=new stdClass();
+$cmrec->cm_user=$user->id;
+$cmrec->cm_poll=$pollid;
+$cmrec->cm_useragent=$_SERVER['HTTP_USER_AGENT'];
+$cmrec->cm_ipaddr=$_SERVER['REMOTE_ADDR'];
+$db->insertObject('#__mpoll_completed',$cmrec);
 $subid = $db->insertid();
 
-//get questions
-$query = 'SELECT * FROM #__mpoll_questions ';
-$query .= 'WHERE published = 1 && q_poll = '.$pollid.' && q_type IN ("mcbox","mlist","mailchimp","email","dropdown","multi","cbox","textbox","textar") ORDER BY ordering ASC';
-$db->setQuery( $query );
-$qdata = $db->loadObjectList(); 
+// Get questions
 
-//add options to questions and format params
+$qquery=$db->getQuery(true);
+$qquery->select('*');
+$qquery->from('#__mpoll_questions');
+$qquery->where('published > 0');
+$qquery->where('q_poll = '.$pollid);
+$qquery->where('q_type IN ("mcbox","mlist","mailchimp","email","dropdown","multi","cbox","textbox","textar")');
+$qquery->order('ordering ASC');
+$db->setQuery( $qquery );
+$qdata = $db->loadObjectList();
+
+// Add options to questions and format params
 foreach ($qdata as &$q) {
 	if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
-		$qo="SELECT opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable FROM #__mpoll_questions_opts WHERE opt_qid = ".$q->q_id." && published > 0 ORDER BY ordering ASC";
+		$qo=$db->getQuery(true);
+		$qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable');
+		$qo->from('#__mpoll_questions_opts');
+		$qo->where('opt_qid = '.$q->q_id);
+		$qo->where('published > 0');
+		$qo->order('ordering ASC');
 		$db->setQuery($qo);
 		$q->options = $db->loadObjectList();
 	}
@@ -55,7 +73,7 @@ foreach ($qdata as &$q) {
 	
 
 try {
-	//Process $data
+	// Process $data
 	$fids = array();
 	$optfs = array();
 	$moptfs = array();
@@ -68,7 +86,8 @@ try {
 		} else if ($d->q_type == 'mailchimp') {
 			$mclists[]=$d;
 		} else if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
-			$item->$fieldname = implode(" ",$data[$fieldname]);
+			if (is_array($data[$fieldname])) $item->$fieldname = implode(" ",$data[$fieldname]);
+			else $item->$fieldname = "";
 		} else if ($d->q_type=='cbox') {
 			$item->$fieldname = ($data[$fieldname]=='on') ? "1" : "0";
 		} else {
@@ -85,8 +104,10 @@ try {
 		$fids[]=$d->uf_id;
 	}
 	
-	//get options
-	$odsql = "SELECT * FROM #__mpoll_questions_opts";
+	// Get Options
+	$odsql=$db->getQuery(true);
+	$odsql->select('*');
+	$odsql->from('#__mpoll_questions_opts');
 	$db->setQuery($odsql);
 	$optionsdata = array();
 	$optres = $db->loadObjectList();
@@ -94,7 +115,7 @@ try {
 		$optionsdata[$o->opt_id]=$o->opt_txt;
 	}
 	
-	//MailChimp List
+	// MailChimp List
 	foreach ($mclists as $mclist) {
 		if ($data['q_'.$mclist->q_id])  {
 			if (strstr($mclist->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$mclist->q_default,2);	}
@@ -138,9 +159,14 @@ try {
 	foreach ($qdata as $fl) {
 		$fieldname = 'q_'.$fl->q_id;
 		if ($fl->q_type != "captcha") {
-			$qur = 'INSERT INTO #__mpoll_results	(res_user,res_poll,res_qid,res_ans,res_cm,res_ans_other) VALUES ("'.$user->id.'","'.$pollid.'","'.$fl->q_id.'","'.$db->escape($item->$fieldname).'","'.$subid.'","'.$db->escape($other->$fieldname).'")';
-			$db->setQuery( $qur );
-			$db->query();
+			$cmres=new stdClass();
+			$cmres->res_user=$user->id;
+			$cmres->res_poll=$pollid;
+			$cmres->res_qid=$fl->q_id;
+			$cmres->res_ans=$db->escape($item->$fieldname);
+			$cmres->res_cm=$subid;
+			$cmres->res_ans_other=$db->escape($other->$fieldname);
+			$db->insertObject('#__mpoll_results',$cmres);
 		}
 	}
 }
@@ -151,10 +177,11 @@ echo $e->getMessage();
 return false;
 }
 
+// Show before results message
 if ($pdata->poll_results_msg_before) echo $pdata->poll_results_msg_before;
 
 
-//show results
+// Show results
 if ($pdata->poll_showresults && $showresults) {
 	foreach ($qdata as $qr) {
 		if ($qr->q_type == "mcbox" || $qr->q_type == "multi" || $qr->q_type == "dropdown" || $qr->q_type == "mlist") {
@@ -168,11 +195,15 @@ if ($pdata->poll_showresults && $showresults) {
 				case 'dropdown':
 					$numr=0; 
 					foreach ($qr->options as &$o) {
-						$qa = 'SELECT count(*) FROM #__mpoll_results WHERE res_qid = '.$qr->q_id.' && res_ans LIKE "%'.$o->value.'%" GROUP BY res_qid';
+						$qa = $db->getQuery(true);
+						$qa->select('count(*)');
+						$qa->from('#__mpoll_results');
+						$qa->where('res_qid = '.$qr->q_id);
+						$qa->where('res_ans LIKE "%'.$o->value.'%"');
+						$qa->group('res_qid');
 						$db->setQuery($qa);
-						$o->anscount = $db->loadResult();
-						if ($o->anscount == "") $o->anscount = 0;
-						$numr = $numr + (int)$o->anscount;
+						$o->anscount = (int)$db->loadResult();
+						$numr = $numr + (int)$db->loadResult();
 					}
 					foreach ($qr->options as $opts) {
 						if ($opts->opt_selectable) {
@@ -199,6 +230,7 @@ if ($pdata->poll_showresults && $showresults) {
 	}
 }
 
+// Show after results module message
 if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
 if ($showresultslink) {
 	echo '<p align="center"><a href="'.$resultslink.'" class="button">Results</a></p>';
