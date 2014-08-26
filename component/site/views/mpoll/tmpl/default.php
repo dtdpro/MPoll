@@ -16,7 +16,8 @@ if ($this->task=='ballot') {   ?>
 				errorElement: "div",
 				errorPlacement: function(error, element) {
 			    	error.appendTo( element.parent("div"));
-			    	error.addClass("uk-alert uk-alert-danger uk-form-controls-text") 	
+			    	error.addClass("uk-alert uk-alert-danger uk-form-controls-text");	
+				}
 		    });
 		});
 	</script>

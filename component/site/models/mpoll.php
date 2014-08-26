@@ -119,7 +119,7 @@ class MPollModelMPoll extends JModelLegacy
 		// Allow an exception to be thrown.
 		try
 		{	
-			//setup item and bind data
+			// Setup item and bind data
 			$fids = array();
 			$optfs = array();
 			$moptfs = array();
@@ -158,7 +158,7 @@ class MPollModelMPoll extends JModelLegacy
 				}
 			}
 			
-			//Check CAPTCHA
+			// Check CAPTCHA
 			if ($capfield) {
 				include_once 'components/com_mpoll/lib/securimage/securimage.php';
 				$securimage = new Securimage();
@@ -170,7 +170,7 @@ class MPollModelMPoll extends JModelLegacy
 				}
 			}
 			
-			//save completed
+			// Save completed
 			$cmrec=new stdClass();
 			$cmrec->cm_user=$user->id;
 			$cmrec->cm_poll=$pollid;
@@ -183,7 +183,7 @@ class MPollModelMPoll extends JModelLegacy
 			$subid = $db->insertid();
 			
 			
-			//Upload
+			// Upload files
 			foreach ($upfile as $u) {
 				$userfile = JRequest::getVar($u, null, 'files', 'array');
 				if (!empty($userfile['name'])) {
@@ -204,6 +204,7 @@ class MPollModelMPoll extends JModelLegacy
 				} else { $item->$u = ""; }
 			}
 	
+			// Get Options
 			$odsql=$db->getQuery(true);
 			$odsql->select('*');
 			$odsql->from('#__mpoll_questions_opts');
@@ -214,7 +215,7 @@ class MPollModelMPoll extends JModelLegacy
 				$optionsdata[$o->opt_id]=$o->opt_txt;
 			}
 
-			//MailChimp List
+			// MailChimp List
 			foreach ($mclists as $mclist) {
 				if ($data['q_'.$mclist->q_id])  {
 					if (strstr($mclist->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$mclist->q_default,2);	}
@@ -289,7 +290,7 @@ class MPollModelMPoll extends JModelLegacy
 				$sent = $mail->sendMail ($jconfig->get( 'config.mailfrom' ), $jconfig->get( 'config.fromname' ), $emllist, $pollinfo->poll_emailsubject, $resultsemail, true);
 			}
 			
-			//confirmation email
+			// Confirmation email
 			if ($pollinfo->poll_confemail && $user->id) {
 				$flist = $this->getQuestions($pollid,false);
 				$confemail = $pollinfo->poll_confmsg;
@@ -321,7 +322,7 @@ class MPollModelMPoll extends JModelLegacy
 				$sent = $mail->sendMail ($pollinfo->poll_conffromemail, $pollinfo->poll_conffromname, $user->email, $pollinfo->poll_confsubject, $confemail, true);
 			}
 			
-			// Save poll info
+			// Save results
 			$flist = $this->getQuestions($pollid,false);
 			foreach ($flist as $fl) {
 				$fieldname = 'q_'.$fl->q_id;
