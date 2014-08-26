@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_polls` (
   `poll_only` tinyint(4) NOT NULL DEFAULT '1',
   `poll_regreq` tinyint(4) NOT NULL DEFAULT '0',
   `poll_regreqmsg` text NOT NULL,
+  `poll_accessreqmsg` text NOT NULL,
   `poll_results_msg_before` text NOT NULL,
   `poll_results_msg_after` text NOT NULL,
   `poll_results_msg_mod` text NOT NULL,
