@@ -19,7 +19,6 @@
 		<filename>controller.php</filename>
 		<folder>views</folder>
 		<folder>models</folder>
-		<folder>images</folder>
 		<folder>lib</folder>
 	</files>
 	<install>
