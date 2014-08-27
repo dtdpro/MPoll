@@ -260,25 +260,25 @@ class MPollModelMPoll extends JModelLegacy
 				$flist = $this->getQuestions($pollid,false);
 				$resultsemail = "";
 				foreach ($flist as $d) {
-					if ($d->q_type != "captcha") {
+					if ($d->q_type != "captcha" && $d->q_type != "message" && $d->q_type != "header") {
 						$fieldname = 'q_'.$d->q_id;
 						$resultsemail .= "<b>".$d->q_text.'</b><br />';
-					}
-					if ($d->q_type=="attach") {
-						if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
-					} else if (in_array($fieldname,$optfs)) {
-						$resultsemail .= $optionsdata[$item->$fieldname];
-						if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
-						$resultsemail .= '<br />';
-						$resultsemail .= '<br />';
-					}  else if (in_array($fieldname,$moptfs)) {
-						$ans = explode(" ",$item->$fieldname);
-						foreach ($ans as $i) {
-							$resultsemail .= $optionsdata[$i].'<br />';
+						if ($d->q_type=="attach") {
+							if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
+						} else if (in_array($fieldname,$optfs)) {
+							$resultsemail .= $optionsdata[$item->$fieldname];
+							if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
+							$resultsemail .= '<br />';
+							$resultsemail .= '<br />';
+						}  else if (in_array($fieldname,$moptfs)) {
+							$ans = explode(" ",$item->$fieldname);
+							foreach ($ans as $i) {
+								$resultsemail .= $optionsdata[$i].'<br />';
+							}
+							$resultsemail .= '<br />';
+						} else if ($d->q_type != "captcha") {
+							$resultsemail .= $item->$fieldname.'<br />';
 						}
-						$resultsemail .= '<br />';
-					} else if ($d->q_type != "captcha") {
-						$resultsemail .= $item->$fieldname.'<br />';
 					}
 				}
 				$resultsemail .= "<br /><br /><b>User Agent:</b> ".$_SERVER['HTTP_USER_AGENT'];
