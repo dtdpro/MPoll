@@ -1,6 +1,8 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access'); 
-echo '<div id="system" class="uk-article">';
+if ($this->params->get('divwrapper',1)) {
+	echo '<div id="system" class="'.$this->params->get('wrapperclass','uk-article').'">';
+}
 echo '<h2 class="title uk-article-title">'.$this->pdata->poll_name.'</h2>';
 
 $user = JFactory::getUser();
@@ -361,8 +363,8 @@ if ($this->task=='results') {
 	}
 	
 }
-
+if ($this->params->get('divwrapper',1)) { echo '</div>'; }
 ?>
 
-</div>
+
 
