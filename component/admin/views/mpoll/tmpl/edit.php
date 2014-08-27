@@ -73,7 +73,7 @@ $params = $this->form->getFieldsets('params');
 						</div>
 					</div>
 				</div>
-				<div class="span2 form-horizontal">
+				<div class="span2">
 					<?php foreach($this->form->getFieldset('results') as $field): ?>
 						<div class="control-group">
 							<div class="control-label"><?php echo $field->label;?></div>
