@@ -14,7 +14,7 @@ if($controller = JRequest::getVar('controller')) {
 $doc = &JFactory::getDocument();
 $doc->addStyleSheet('media/com_mpoll/mpoll.css');
 
-//jQuery
+// jQuery
 JHtml::_('jquery.framework');
 $doc->addScript('media/com_mpoll/scripts/jquery.validate.js');
 $doc->addScript('media/com_mpoll/scripts/additional-methods.js');
