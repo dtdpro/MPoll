@@ -219,7 +219,7 @@ if ($this->task=='ballot') {   ?>
 		//captcha
 		if ($f->q_type=="captcha") {
 			echo '<img id="captcha_img" src="'.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
-			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field" type="text"';
+			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field uk-width-1-1" type="text"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
 				echo ' data-msg-required="This Field is required"';
