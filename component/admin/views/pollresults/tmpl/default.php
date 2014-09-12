@@ -72,7 +72,7 @@ JHtml::_('formbehavior.chosen', 'select');
 					if ($qu->q_type == 'textar') { echo nl2br($item->$fn);; }
 					if ($qu->q_type == 'attach') { 
 						if (strpos($item->$fn,"ERROR:") === FALSE && $item->$fn != "") {
-							echo '<a href="'.$i->$fn.'">Right Click Download</a>';
+							echo '<a href="'.$item->$fn.'">Right Click Download</a>';
 						} else {
 							echo $item->$fn;
 						}
