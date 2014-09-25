@@ -66,7 +66,7 @@ class MPollViewMPolls extends JViewLegacy
 		
 		JHtmlSidebar::setAction('index.php?option=com_mpoll&view=mpolls');
 		
-		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_state',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.state'), true));
+		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_published',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.published'), true));
 		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_ACCESS'),'filter_access',JHtml::_('select.options', JHtml::_('access.assetgroups'), 'value', 'text', $this->state->get('filter.access')));
 		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_CATEGORY'),'filter_category_id',JHtml::_('select.options', JHtml::_('category.options', 'com_mpoll'), 'value', 'text', $this->state->get('filter.category_id')));
 	}

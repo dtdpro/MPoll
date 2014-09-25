@@ -64,6 +64,6 @@ class MPollViewOptions extends JViewLegacy
 			JToolBarHelper::divider();
 		}
 		JHtmlSidebar::setAction('index.php?option=com_mpoll&view=options');
-		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_state',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.state'), true));
+		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_published',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.published'), true));
 	}
 }
