@@ -123,7 +123,7 @@ $sortFields = $this->getSortFields();
 				<td><?php echo JHtml::_('grid.id', $i, $item->poll_id); ?></td>
 				<td class="center">
 					<div class="btn-group">
-						<?php echo JHtml::_('jgrid.published', $item->published, $i, 'products.', true); ?>
+						<?php echo JHtml::_('jgrid.published', $item->published, $i, 'mpolls.', true); ?>
 						<?php echo JHtml::_('mpolladministrator.questions',$i, true); ?>
 						<?php
 							// Create dropdown items
