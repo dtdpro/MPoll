@@ -11,11 +11,10 @@ class MPollModelQuestions extends JModelList
 {
 	
 	public function __construct($config = array())
-	{
-		
+	{		
 		if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
-				'ordering', 'q.ordering',
+				'ordering', 'q.ordering','published','q.published'
 			);
 		}
 		parent::__construct($config);
@@ -25,14 +24,9 @@ class MPollModelQuestions extends JModelList
 	{
 		// Initialise variables.
 		$app = JFactory::getApplication('administrator');
-
-		// Load the filter state.
-		$pollId = $this->getUserStateFromRequest($this->context.'.filter.poll', 'filter_poll','');
-		$this->setState('filter.poll', $pollId);
 		
 		$published = $this->getUserStateFromRequest($this->context.'.filter.published', 'filter_published', '', 'string');
 		$this->setState('filter.published', $published);
-		
 		
 		// Load the parameters.
 		$params = JComponentHelper::getParams('com_mpoll');
@@ -40,45 +34,38 @@ class MPollModelQuestions extends JModelList
 
 		// List state information.
 		parent::populateState('q.ordering', 'asc');
+
+		// Load the filter state.
+		$pollId = $this->getUserStateFromRequest($this->context.'.poll', 'poll','');
+		$this->setState('poll', $pollId);
+	}
+	
+	protected function getStoreId($id = '')
+	{
+		// Compile the store id.
+		$id .= ':' . $this->getState('filter.search');
+		$id .= ':' . $this->getState('filter.published');
+	
+		return parent::getStoreId($id);
 	}
 	
 	public function getItems()
 	{
-		// Get a storage key.
-		$store = $this->getStoreId();
-		// Try to load the data from internal storage.
-		if (isset($this->cache[$store]))
-		{
-			return $this->cache[$store];
-		}
-		// Load the list items.
-		$query = $this->_getListQuery();
-		try
-		{
-			$items = $this->_getList($query, $this->getStart(), $this->getState('list.limit'));
-		}
-		catch (RuntimeException $e)
-		{
-			$this->setError($e->getMessage());
-			return false;
-		}
+		$items = parent::getItems();
 	
-		$db = JFactory::getDBO();
 		foreach ($items as &$i) {
 			//Options Count
 			if ($i->q_type=='mlist' ||$i->q_type=='multi' || $i->q_type=='mcbox' || $i->q_type=='dropdown') {
-				$query = $db->getQuery(true);
+				$query = $this->_db->getQuery(true);
 				$query->select('count(*)');
 				$query->from('#__mpoll_questions_opts');
 				$query->where('opt_qid='.$i->q_id);
-				$db->setQuery( $query );
+				$this->_db->setQuery( $query );
 				$i->options = $this->_db->loadResult();
 			}
 		}
-	
-		// Add the items to the internal cache.
-		$this->cache[$store] = $items;
-		return $this->cache[$store];
+
+		return $items;
 	}
 	
 	protected function getListQuery() 
@@ -102,9 +89,20 @@ class MPollModelQuestions extends JModelList
 		}
 
 		// Filter by poll.
-		$pollId = $this->getState('filter.poll');
+		$pollId = $this->getState('poll');
 		if (is_numeric($pollId)) {
 			$query->where('q.q_poll = '.(int) $pollId);
+		}
+
+		// Filter by search in title
+		$search = $this->getState('filter.search');
+		if (!empty($search)) {
+			if (stripos($search, 'id:') === 0) {
+				$query->where('q.q_id = '.(int) substr($search, 3));
+			} else {
+				$search = $db->Quote('%'.$db->escape($search, true).'%');
+				$query->where('(q.q_name LIKE '.$search.' )');
+			}
 		}
 				
 		$orderCol	= $this->state->get('list.ordering');
@@ -120,7 +118,7 @@ class MPollModelQuestions extends JModelList
 	public function getPollTitle() {
 		$db = JFactory::getDBO();
 		$query = $db->getQuery(true);
-		$pollId = $this->getState('filter.poll');
+		$pollId = $this->getState('poll');
 		
 		if (is_numeric($pollId)) {
 			$query->select('poll_name');

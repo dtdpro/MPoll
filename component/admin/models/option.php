@@ -39,7 +39,7 @@ class MPollModelOption extends JModelAdmin
 			$data = $this->getItem();
 			if ($this->getState('option.opt_id') == 0) {
 				$app = JFactory::getApplication();
-				$data->set('opt_qid', JRequest::getInt('opt_qid', $app->getUserState('com_mpoll.options.filter.question')));
+				$data->set('opt_qid', JRequest::getInt('opt_qid', $app->getUserState('com_mpoll.options.question')));
 			}
 		}
 		return $data;		

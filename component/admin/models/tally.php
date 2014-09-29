@@ -14,8 +14,8 @@ class MPollModelTally extends JModelList
 		$app = JFactory::getApplication('administrator');
 
 		// Load the filter state.
-		$pollId = $this->getUserStateFromRequest('com_mpoll.questions.filter.poll', 'filter_poll','');
-		$this->setState('filter.poll', $pollId);
+		$pollId = $this->getUserStateFromRequest('com_mpoll.questions.poll', 'poll','');
+		$this->setState('poll', $pollId);
 		
 		// Load the parameters.
 		$params = JComponentHelper::getParams('com_mpoll');
@@ -27,7 +27,7 @@ class MPollModelTally extends JModelList
 	
 	function getPoll()
 	{
-		$pollid = $this->getState('filter.poll');
+		$pollid = $this->getState('poll');
 		$db =& JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.'';
 		$db->setQuery( $query ); 
@@ -37,7 +37,7 @@ class MPollModelTally extends JModelList
 	
 	function getQuestions()
 	{
-		$pollid = $this->getState('filter.poll');
+		$pollid = $this->getState('poll');
 		$db =& JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_questions ';
 		$query .= 'WHERE Q_type IN ("multi","mcbox","dropdown") && q_poll = '.$pollid.' && published = 1 ORDER BY ordering ASC';
@@ -60,7 +60,7 @@ class MPollModelTally extends JModelList
 	public function getPollTitle() {
 		$db = JFactory::getDBO();
 		$query = $db->getQuery(true);
-		$pollId = $this->getState('filter.poll');
+		$pollId = $this->getState('poll');
 		
 		if (is_numeric($pollId)) {
 			$query->select('poll_name');

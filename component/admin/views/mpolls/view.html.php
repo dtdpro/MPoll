@@ -17,6 +17,8 @@ class MPollViewMPolls extends JViewLegacy
 		$this->state		= $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
+		$this->filterForm    = $this->get('FilterForm');
+		$this->activeFilters = $this->get('ActiveFilters');
 	
 		// Set the submenu
 		MPollHelper::addSubmenu(JRequest::getVar('view'));
@@ -63,12 +65,6 @@ class MPollViewMPolls extends JViewLegacy
 			JToolBarHelper::divider();
 			JToolBarHelper::preferences('com_mpoll');
 		}
-		
-		JHtmlSidebar::setAction('index.php?option=com_mpoll&view=mpolls');
-		
-		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_published',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.published'), true));
-		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_ACCESS'),'filter_access',JHtml::_('select.options', JHtml::_('access.assetgroups'), 'value', 'text', $this->state->get('filter.access')));
-		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_CATEGORY'),'filter_category_id',JHtml::_('select.options', JHtml::_('category.options', 'com_mpoll'), 'value', 'text', $this->state->get('filter.category_id')));
 	}
 	
 	protected function getSortFields()

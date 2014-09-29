@@ -91,7 +91,7 @@ class MPollControllerMPolls extends JControllerAdmin
 		}
 		else
 		{
-			$app->setUserState($context . '.filter.poll',$ids[0]);
+			$app->setUserState($context . '.poll',$ids[0]);
 		}
 		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=questions', false));
 	}
@@ -112,7 +112,7 @@ class MPollControllerMPolls extends JControllerAdmin
 		}
 		else
 		{
-			$app->setUserState($context . '.filter.poll',$ids[0]);
+			$app->setUserState($context . '.poll',$ids[0]);
 		}
 		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=pollresults', false));
 	}
@@ -133,7 +133,7 @@ class MPollControllerMPolls extends JControllerAdmin
 		}
 		else
 		{
-			$app->setUserState($context . '.filter.poll',$ids[0]);
+			$app->setUserState($context . '.poll',$ids[0]);
 		}
 		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=tally', false));
 	}

@@ -40,7 +40,7 @@ class MPollModelQuestion extends JModelAdmin
 			$data = $this->getItem();
 			if ($this->getState('question.q_id') == 0) {
 				$app = JFactory::getApplication();
-				$data->set('q_poll', JRequest::getInt('q_poll', $app->getUserState('com_mpoll.questions.filter.poll')));
+				$data->set('q_poll', JRequest::getInt('q_poll', $app->getUserState('com_mpoll.questions.poll')));
 			}
 		}
 		return $data;

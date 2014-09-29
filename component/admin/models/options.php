@@ -15,7 +15,7 @@ class MPollModelOptions extends JModelList
 		
 		if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
-				'ordering', 'q.ordering',
+				'ordering', 'o.ordering','published','o.published'
 			);
 		}
 		parent::__construct($config);
@@ -26,9 +26,6 @@ class MPollModelOptions extends JModelList
 		// Initialise variables.
 		$app = JFactory::getApplication('administrator');
 
-		// Load the filter state.
-		$qId = $this->getUserStateFromRequest($this->context.'.filter.question', 'filter_question'.'');
-		$this->setState('filter.question', $qId);
 		
 		$published = $this->getUserStateFromRequest($this->context.'.filter.published', 'filter_published', '', 'string');
 		$this->setState('filter.published', $published);
@@ -39,6 +36,10 @@ class MPollModelOptions extends JModelList
 
 		// List state information.
 		parent::populateState('o.ordering', 'asc');
+		
+		// Load the filter state.
+		$qId = $this->getUserStateFromRequest($this->context.'.question', 'filter_question'.'');
+		$this->setState('question', $qId);
 	}
 	
 	protected function getListQuery() 
@@ -62,9 +63,20 @@ class MPollModelOptions extends JModelList
 		}
 
 		// Filter by poll.
-		$qId = $this->getState('filter.question');
+		$qId = $this->getState('question');
 		if (is_numeric($qId)) {
 			$query->where('o.opt_qid = '.(int) $qId);
+		}
+
+		// Filter by search in title
+		$search = $this->getState('filter.search');
+		if (!empty($search)) {
+			if (stripos($search, 'id:') === 0) {
+				$query->where('o.opt_id = '.(int) substr($search, 3));
+			} else {
+				$search = $db->Quote('%'.$db->escape($search, true).'%');
+				$query->where('(o.opt_text LIKE '.$search.' )');
+			}
 		}
 				
 		$orderCol	= $this->state->get('list.ordering');
@@ -80,7 +92,7 @@ class MPollModelOptions extends JModelList
 	public function getQuestionTitle() {
 		$db = JFactory::getDBO();
 		$query = $db->getQuery(true);
-		$qId = $this->getState('filter.question');
+		$qId = $this->getState('question');
 	
 		if (is_numeric($qId)) {
 			$query->select('q_name');

@@ -10,7 +10,7 @@ jimport('joomla.application.component.modellist');
 class MPollModelMPolls extends JModelList
 {
 	
-public function __construct($config = array())
+	public function __construct($config = array())
 	{
 		if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
@@ -21,7 +21,9 @@ public function __construct($config = array())
 				'access_level',
 				'p.poll_created',
 				'p.poll_modified',
-				'p.poll_type'
+				'p.poll_type',
+				'access',
+				'category_id',
 			);
 		}
 

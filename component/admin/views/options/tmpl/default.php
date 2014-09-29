@@ -14,6 +14,7 @@ $archived	= $this->state->get('filter.published') == 2 ? true : false;
 $trashed	= $this->state->get('filter.published') == -2 ? true : false;
 $saveOrder = ($listOrder == 'o.ordering');
 $published = $this->state->get('filter.published');
+$sortFields = $this->getSortFields();
 if ($saveOrder) {
 	$saveOrderingUrl = 'index.php?option=com_mpoll&task=options.saveOrderAjax&tmpl=component';
 	JHtml::_('sortablelist.sortable', 'MPollOptionList', 'adminForm', strtolower($listDirn), $saveOrderingUrl);
@@ -48,8 +49,10 @@ if ($saveOrder) {
 <?php else : ?>
 	<div id="j-main-container">
 <?php endif;?>
-	
-	<div class="clr clearfix"> </div>
+	<?php
+		// Search tools bar
+		echo JLayoutHelper::render('joomla.searchtools.default', array('view' => $this));
+	?>
 	
 	<table class="adminlist table table-striped" id ="MPollOptionList">
 		<thead>
@@ -150,8 +153,6 @@ if ($saveOrder) {
 	<div>
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
-		<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
-		<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
 		<?php echo JHtml::_('form.token'); ?>
 	</div>
 </form>

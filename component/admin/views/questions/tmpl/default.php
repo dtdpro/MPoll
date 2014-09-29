@@ -1,4 +1,4 @@
-<?php 
+<?php
 // No direct access to this file
 defined('_JEXEC') or die('Restricted Access');
 // load tooltip behavior
@@ -6,19 +6,22 @@ JHtml::_('bootstrap.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
 JHtml::_('formbehavior.chosen', 'select');
-
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
+
+$app	= JFactory::getApplication();
+$user	= JFactory::getUser();
+$userId	= $user->get('id');
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 $archived	= $this->state->get('filter.published') == 2 ? true : false;
 $trashed	= $this->state->get('filter.published') == -2 ? true : false;
-$saveOrder = ($listOrder == 'q.ordering');
 $published = $this->state->get('filter.published');
+$saveOrder = ($listOrder == 'q.ordering');
+$sortFields = $this->getSortFields();
 if ($saveOrder) {
 	$saveOrderingUrl = 'index.php?option=com_mpoll&task=questions.saveOrderAjax&tmpl=component';
 	JHtml::_('sortablelist.sortable', 'MPollQuestionList', 'adminForm', strtolower($listDirn), $saveOrderingUrl);
 }
-
 ?>
 <script type="text/javascript">
 	Joomla.orderTable = function()
@@ -47,7 +50,10 @@ if ($saveOrder) {
 <?php else : ?>
 	<div id="j-main-container">
 <?php endif;?>
-
+	<?php
+		// Search tools bar
+		echo JLayoutHelper::render('joomla.searchtools.default', array('view' => $this));
+	?>
 	
 	<table class="adminlist table table-striped" id ="MPollQuestionList">
 		<thead>
@@ -168,8 +174,6 @@ if ($saveOrder) {
 	<div>
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
-		<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
-		<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
 		<?php echo JHtml::_('form.token'); ?>
 	</div>
 </form>

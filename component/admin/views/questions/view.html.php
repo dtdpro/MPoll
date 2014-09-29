@@ -16,10 +16,12 @@ class MPollViewQuestions extends JViewLegacy
 	function display($tpl = null) 
 	{
 		// Get data from the model
+		$this->state = $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
-		$this->state = $this->get('State');
 		$this->polltitle = $this->get('PollTitle');
+		$this->filterForm    = $this->get('FilterForm');
+		$this->activeFilters = $this->get('ActiveFilters');
 		
 		MPOLLHelper::addPollSubmenu(JRequest::getVar('view'),$this->polltitle);
 		
@@ -40,7 +42,7 @@ class MPollViewQuestions extends JViewLegacy
 
 	protected function addToolBar() 
 	{
-		$state	= $this->get('State');
+		$state	= $this->state;
 		$canDo = MPollHelper::getActions();
 		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_QUESTIONS'), 'MPoll');
 		if ($canDo->get('core.create'))
@@ -64,7 +66,13 @@ class MPollViewQuestions extends JViewLegacy
 			JToolBarHelper::divider();
 		}
 		
-		JHtmlSidebar::setAction('index.php?option=com_mpoll&view=questions');
-		JHtmlSidebar::addFilter(JText::_('JOPTION_SELECT_PUBLISHED'),'filter_published',JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.published'), true));
+		
+	}
+	
+	protected function getSortFields()
+	{
+		return array(
+				'q.ordering'     => JText::_('JGRID_HEADING_ORDERING')
+		);
 	}
 }
