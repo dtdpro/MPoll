@@ -21,7 +21,6 @@ class MPollModelMPolls extends JModelList
 				'access_level',
 				'p.poll_created',
 				'p.poll_modified',
-				'p.poll_type',
 				'access',
 				'category_id',
 			);

@@ -66,14 +66,8 @@ $sortFields = $this->getSortFields();
 				</th>		
 				<th width="10%">
 					<?php echo JText::_('JCATEGORY'); ?>
-				</th>		
-				<th width="8%">
-					<?php echo JHtml::_('searchtools.sort','COM_MPOLL_MPOLL_HEADING_PTYPE','p.poll_type', $listDirn, $listOrder); ?>
 				</th>	
-				<th width="5%">
-					<?php echo JText::_('COM_MPOLL_MPOLL_HEADING_REGREQ'); ?>
-				</th>	
-				<th width="8%">
+				<th width="10%">
 					<?php echo JText::_( 'COM_MPOLL_MPOLL_HEADING_AVAILABILITY' ); ?>
 				</th>		
 				<th width="10%" class="hidden-phone">
@@ -131,8 +125,16 @@ $sortFields = $this->getSortFields();
 							<?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($item->poll_alias));?>
 						</span>
 						<div class="small">
-						 	<strong>Questions:</strong> 
-						 	<?php echo $item->questions; ?> 
+						 	<strong>Type:</strong> 
+							<?php 
+								switch ($item->poll_pagetype) {
+									case "poll": echo "Poll"; break;
+									case "form": echo "Form"; break;
+								} 
+							?>
+						 	 | <strong>Questions:</strong>
+						 	<?php echo $item->questions; ?>  
+						 	<?php if ($item->poll_regreq) echo ' | <span style="color:#800000">Reg Required</span>'; ?>
 						 	| <strong>Submissions:</strong> 
 						 	<?php 
 						 		echo $item->results; 
@@ -145,20 +147,6 @@ $sortFields = $this->getSortFields();
 					</div>
 				</td>
 				<td class="small"><?php echo $item->category_title; ?></td>
-				<td class="small">
-					<?php 
-						switch ($item->poll_pagetype) {
-							case "poll": echo "Poll"; break;
-							case "form": echo "Form"; break;
-						} 
-					?>
-				</td>
-				<td class="small">
-					<?php
-						if ($item->poll_regreq) echo '<span style="color:#008000">Yes</span>';
-						else echo '<span style="color:#800000">No</span>';
-					?>
-				</td>
 				<td class="small">
 					<?php 
 						if ($item->poll_start == '0000-00-00 00:00:00') echo 'Always';
