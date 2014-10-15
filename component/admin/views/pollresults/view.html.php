@@ -30,7 +30,7 @@ class MPollViewPollResults extends JViewLegacy
 	{
 		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_POLLRESULTS'), 'MPoll');
 		$tbar =& JToolBar::getInstance('toolbar');
-		$tbar->appendButton('Link','archive','Export CSV','index.php?option=com_mpoll&view=pollresults&format=csv&poll='.$pid);
+		$tbar->appendButton('Link','archive','Export CSV','index.php?option=com_mpoll&view=pollresults&format=csv');
 		$canDo = MPollHelper::getActions();
 		if ($canDo->get('core.deleterecords')) {
 			JToolBarHelper::divider();
