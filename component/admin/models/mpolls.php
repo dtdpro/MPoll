@@ -22,6 +22,7 @@ class MPollModelMPolls extends JModelList
 				'p.poll_created',
 				'p.poll_modified',
 				'access',
+                'p.access',
 				'category_id',
 			);
 		}

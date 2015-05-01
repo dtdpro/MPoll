@@ -48,8 +48,6 @@
 			<option value="">JGLOBAL_SORT_BY</option>
 			<option value="p.poll_name ASC">JGLOBAL_TITLE_ASC</option>
 			<option value="p.poll_name DESC">JGLOBAL_TITLE_DESC</option>
-			<option value="p.ordering ASC">JGRID_HEADING_ORDERING_ASC</option>
-			<option value="p.ordering DESC">JGRID_HEADING_ORDERING_DESC</option>
 			<option value="p.access ASC">JGRID_HEADING_ACCESS_ASC</option>
 			<option value="p.access DESC">JGRID_HEADING_ACCESS_DESC</option>
 			<option value="category_title ASC">JCATEGORY_ASC</option>
