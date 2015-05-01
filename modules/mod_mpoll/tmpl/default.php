@@ -250,7 +250,7 @@ if ($showtitle) {
 			
 			echo '<p align="center">';
 			if ($status == 'open') {
-				echo '<a href="#" onclick="jQuery(\'#mpollf'.$pdata->poll_id.'\').submit()" class="button uk-button">Submit</a>';
+				echo '<a href="#" onclick="jQuery(\'#mpollf'.$pdata->poll_id.'\').submit(); return false;" class="button uk-button">Submit</a>';
 			} 
 			
 			if ($status == 'regreq') { 
