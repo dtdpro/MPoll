@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@dtdpro.com</authorEmail>
 	<authorUrl>www.dtdpro.com</authorUrl>
-	<version>1.9.1</version>
+	<version>1.9.2</version>
 	<description>MOD_MPOLL_DESC</description>
 	<files>
 		<filename module="mod_mpoll">mod_mpoll.php</filename>
@@ -28,6 +28,10 @@
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>
+                <field name="showdesc" type="radio" default="0" label="MOD_MPOLL_FIELD_SHOWDESC_LABEL" description="MOD_MPOLL_FIELD_SHOWDESC_DESC" class="btn-group">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </field>
 				<field name="showresults" type="radio" default="1" label="MOD_MPOLL_FIELD_SHOWRESULTS_LABEL" description="MOD_MPOLL_FIELD_SHOWRESULTS_DESC" class="btn-group">
 					<option value="0">No</option>
 					<option value="1">Yes</option>

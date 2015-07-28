@@ -35,6 +35,11 @@ $db =& JFactory::getDBO();
 if ($showtitle) {
 	echo '<div class="mpollmod-title">'.$pdata->poll_name.'</div>';
 }
+
+if ($showdesc) {
+    //Message before Questions
+    echo $pdata->poll_desc;
+}
 ?>
 	<div id="mpollmod<?php echo $pdata->poll_id; ?>" class="mpollmod-pollbody"> <?php
 		

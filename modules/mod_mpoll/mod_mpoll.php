@@ -19,6 +19,7 @@ $user =& JFactory::getUser();
 		
 $pdata   = modMPollHelper::getPoll($params->get( 'poll', 0 ));
 $showtitle = $params->get( 'showtitle', 1 );
+$showdesc = $params->get( 'showdesc', 0 );
 if ( $pdata && $pdata->poll_id ) {
 	$status='open';
 	// Check if poll is still active
