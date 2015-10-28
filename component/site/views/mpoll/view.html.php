@@ -46,7 +46,7 @@ class MPollViewMPoll extends JViewLegacy
 					$app->redirect(JRoute::_($url,false));
 				} else {
 					$url = 'index.php?option=com_mpoll&task=ballot&poll='.$this->pollid.'&cmplid='.$this->cmplid;
-					$app->redirect(JRoute::_($urle,false),$model->getError(),"error");
+					$app->redirect(JRoute::_($url,false),$model->getError(),"error");
 				}
 				break;
 			case 'results': //Show Results

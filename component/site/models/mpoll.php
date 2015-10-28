@@ -72,9 +72,8 @@ class MPollModelMPoll extends JModelLegacy
 			
 			//Set default/saved values
 			$fn='q_'.$q->q_id;
-			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,'');
-			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other','');
-			$value=$q->q_default;
+			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,$q->q_default);
+			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other',$q->q_default);
 			if ($q->q_type == 'mlimit' || $q->q_type == 'multi' || $q->q_type == 'dropdown' || $q->q_type == 'mcbox' || $q->q_type == 'mlist') {
 				$q->value=explode(" ",$value); 
 				$q->other = $other;
