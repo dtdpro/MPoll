@@ -56,8 +56,8 @@ if ($this->task=='ballot') {   ?>
 		//field title/label
 		if ($f->q_type != "message" && $f->q_type != "header") {
 			echo '<div class="uk-form-label uk-text-bold">';
-			if ($f->q_req) echo "*";
-					if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
+			if ($f->q_req && $this->params->get('showreq',1)) echo "*";
+			if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
 			echo '</div>';
 		}
 		

@@ -14,6 +14,10 @@
 	</fields>
 	<fields name="params">
 		<fieldset name="basic">
+			<field name="showreq" type="radio" default="1" label="Indicate Required" description="Show the * to indicate required questions">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
 			<field name="showstats" type="radio" default="1" label="Show Results Stats" description="# Voters, First and last vote time">
 				<option value="1">Yes</option>
 				<option value="0">No</option>
