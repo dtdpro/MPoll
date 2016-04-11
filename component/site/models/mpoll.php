@@ -11,7 +11,7 @@ class MPollModelMPoll extends JModelLegacy
 	
 	function getPoll($pollid)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = $db->getQuery(true);
 		$query->select('*');
 		$query->from('#__mpoll_polls');
@@ -21,6 +21,7 @@ class MPollModelMPoll extends JModelLegacy
 		$pdata = $db->loadObject();
 		return $pdata;
 	}
+
 	function getQuestions($pollid,$options=false,$count=false)
 	{
 		$db = JFactory::getDBO();

@@ -3,9 +3,9 @@ jimport('joomla.application.component.controller');
 
 class MPollController extends JControllerLegacy
 {
-	function display()
+	function display($cachable = false, $urlparams = false)
 	{
-		parent::display();
+		parent::display($cachable,$urlparams);
 	}
 
 }

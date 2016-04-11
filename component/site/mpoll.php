@@ -11,7 +11,7 @@ if($controller = JRequest::getVar('controller')) {
 }
 
 // Load StyleSheet for template, based on config
-$doc = &JFactory::getDocument();
+$doc = JFactory::getDocument();
 $doc->addStyleSheet('media/com_mpoll/mpoll.css');
 
 // jQuery
