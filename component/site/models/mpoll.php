@@ -8,7 +8,7 @@ jimport( 'joomla.application.component.model' );
 class MPollModelMPoll extends JModelLegacy
 {
 	var $errmsg = "";
-	
+
 	function getPoll($pollid)
 	{
 		$db = JFactory::getDBO();
@@ -35,8 +35,8 @@ class MPollModelMPoll extends JModelLegacy
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
 		foreach ($qdata as &$q) {
-			
-			//Load option and count if needed 
+
+			//Load option and count if needed
 			if ($options) {
 				//Load options
 				if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
@@ -48,7 +48,7 @@ class MPollModelMPoll extends JModelLegacy
 					$qo->order('ordering ASC');
 					$db->setQuery($qo);
 					$q->options = $db->loadObjectList();
-					
+
 					//Load counts
 					if ($count) {
 						foreach ($q->options as &$o) {
@@ -60,23 +60,23 @@ class MPollModelMPoll extends JModelLegacy
 							$qa->group('res_qid');
 							$db->setQuery($qa);
 							$o->anscount = (int)$db->loadResult();
-							$q->anscount = $q->anscount + (int)$db->loadResult();
+							$q->anscount = $q->anscount + $o->anscount;
 						}
 					}
 				}
 			}
-			
+
 			//Load Question Params
 			$registry = new JRegistry();
 			$registry->loadString($q->params);
 			$q->params = $registry->toObject();
-			
+
 			//Set default/saved values
 			$fn='q_'.$q->q_id;
 			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,$q->q_default);
 			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other',$q->q_default);
 			if ($q->q_type == 'mlimit' || $q->q_type == 'multi' || $q->q_type == 'dropdown' || $q->q_type == 'mcbox' || $q->q_type == 'mlist') {
-				$q->value=explode(" ",$value); 
+				$q->value=explode(" ",$value);
 				$q->other = $other;
 			} else if ($q->q_type == 'mailchimp' || $q->q_type == 'cbox' || $q->q_type == 'yesno') {
 				$q->value=$value;
@@ -88,7 +88,7 @@ class MPollModelMPoll extends JModelLegacy
 		}
 		return $qdata;
 	}
-	
+
 	public function save($pollid)
 	{
 		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
@@ -105,20 +105,20 @@ class MPollModelMPoll extends JModelLegacy
 		$jconfig = JFactory::getConfig();
 		// Include the content plugins for the on save events.
 		JPluginHelper::importPlugin('content');
-		
+
 		if ($pollinfo->poll_regreq == 1 && $user->id == 0) {
-				$this->setError('Login required');
-				return false;
+			$this->setError('Login required');
+			return false;
 		} else {
 			if ( !in_array($pollinfo->access,$user->getAuthorisedViewLevels())) {
 				$this->setError('Access denied');
 				return false;
 			}
 		}
-	
+
 		// Allow an exception to be thrown.
 		try
-		{	
+		{
 			// Setup item and bind data
 			$fids = array();
 			$optfs = array();
@@ -141,23 +141,23 @@ class MPollModelMPoll extends JModelLegacy
 				} else {
 					$item->$fieldname = $data[$fieldname];
 				}
-				if ($d->q_type=="multi" || $d->q_type=="dropdown") { 
+				if ($d->q_type=="multi" || $d->q_type=="dropdown") {
 					$optfs[]=$fieldname;
 					$other->$fieldname=$data[$fieldname."_other"];
 				}
-				if ($d->q_type=="mcbox" || $d->q_type=="mlist") { 
+				if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
 					$moptfs[]=$fieldname;
 					$other->$fieldname=$data[$fieldname."_other"];
 				}
 				if ($d->q_type != 'captcha') $fids[]=$d->uf_id;
 				if ($d->cf_type != 'captcha' || $d->cf_type != 'password') {
 					$app->setUserState('mpoll.poll'.$pollid.'.'.$fieldname, $item->$fieldname);
-					if ($other->$fieldname) { 
+					if ($other->$fieldname) {
 						$app->setUserState('mpoll.poll'.$pollid.'.'.$fieldname.'_other', $other->$fieldname);
 					}
 				}
 			}
-			
+
 			// Check CAPTCHA
 			if ($capfield) {
 				include_once 'components/com_mpoll/lib/securimage/securimage.php';
@@ -169,7 +169,7 @@ class MPollModelMPoll extends JModelLegacy
 					return false;
 				}
 			}
-			
+
 			// Save completed
 			$cmrec=new stdClass();
 			$cmrec->cm_user=$user->id;
@@ -179,10 +179,10 @@ class MPollModelMPoll extends JModelLegacy
 			if (!$db->insertObject('#__mpoll_completed',$cmrec)) {
 				$this->setError("Error saving compleition record");
 				return false;
-			}	
+			}
 			$subid = $db->insertid();
-			
-			
+
+
 			// Upload files
 			foreach ($upfile as $u) {
 				$userfile = JRequest::getVar($u, null, 'files', 'array');
@@ -191,7 +191,7 @@ class MPollModelMPoll extends JModelLegacy
 					$config		= JFactory::getConfig();
 					$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$userfile['name'];
 					$tmp_src	= $userfile['tmp_name'];
-				
+
 					// Move uploaded file
 					jimport('joomla.filesystem.file');
 					if ($this->canUpload($userfile,$err)) {
@@ -203,7 +203,7 @@ class MPollModelMPoll extends JModelLegacy
 					}
 				} else { $item->$u = ""; }
 			}
-	
+
 			// Get Options
 			$odsql=$db->getQuery(true);
 			$odsql->select('*');
@@ -254,7 +254,26 @@ class MPollModelMPoll extends JModelLegacy
 					$item->$mcf="Not Subscribed";
 				}
 			}
-			
+
+			// Save results
+			$flist = $this->getQuestions($pollid,false);
+			foreach ($flist as $fl) {
+				$fieldname = 'q_'.$fl->q_id;
+				if ($fl->q_type != "captcha") {
+					$cmres=new stdClass();
+					$cmres->res_user=$user->id;
+					$cmres->res_poll=$pollid;
+					$cmres->res_qid=$fl->q_id;
+					$cmres->res_ans=$db->escape($item->$fieldname);
+					$cmres->res_cm=$subid;
+					$cmres->res_ans_other=$db->escape($other->$fieldname);
+					if (!$db->insertObject('#__mpoll_results',$cmres)) {
+						$this->setError("Error saving additional information");
+						return false;
+					}
+				}
+			}
+
 			// Results email
 			if ($pollinfo->poll_resultsemail) {
 				$flist = $this->getQuestions($pollid,false);
@@ -285,11 +304,11 @@ class MPollModelMPoll extends JModelLegacy
 				$resultsemail .= "<br /><b>IP:</b> ".$_SERVER['REMOTE_ADDR'];
 				$emllist = Array();
 				$emllist = explode(",",$pollinfo->poll_emailto);
-				
+
 				$mail = &JFactory::getMailer();
-				$sent = $mail->sendMail ($jconfig->get( 'config.mailfrom' ), $jconfig->get( 'config.fromname' ), $emllist, $pollinfo->poll_emailsubject, $resultsemail, true);
+				$sent = $mail->sendMail ($jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $pollinfo->poll_emailsubject, $resultsemail, true);
 			}
-			
+
 			// Confirmation email
 			if ($pollinfo->poll_confemail && $user->id) {
 				$flist = $this->getQuestions($pollid,false);
@@ -301,7 +320,7 @@ class MPollModelMPoll extends JModelLegacy
 				foreach ($flist as $d) {
 					$fieldname = 'q_'.$d->q_id;
 					if ($d->q_type=="attach") {
-						
+
 					} else if (in_array($fieldname,$optfs)) {
 						$youropts="";
 						$youropts = $optionsdata[$item->$fieldname];
@@ -321,42 +340,23 @@ class MPollModelMPoll extends JModelLegacy
 				$mail = &JFactory::getMailer();
 				$sent = $mail->sendMail ($pollinfo->poll_conffromemail, $pollinfo->poll_conffromname, $user->email, $pollinfo->poll_confsubject, $confemail, true);
 			}
-			
-			// Save results
-			$flist = $this->getQuestions($pollid,false);
-			foreach ($flist as $fl) {
-				$fieldname = 'q_'.$fl->q_id;
-				if ($fl->q_type != "captcha") {
-					$cmres=new stdClass();
-					$cmres->res_user=$user->id;
-					$cmres->res_poll=$pollid;
-					$cmres->res_qid=$fl->q_id;
-					$cmres->res_ans=$db->escape($item->$fieldname);
-					$cmres->res_cm=$subid;
-					$cmres->res_ans_other=$db->escape($other->$fieldname);
-					if (!$db->insertObject('#__mpoll_results',$cmres)) {
-						$this->setError("Error saving additional information");
-						return false;
-					}
-				}
-			}
-				
+
 		}
 		catch (Exception $e)
 		{
 			$this->setError($e->getMessage());
-				
+
 			return false;
 		}
-	
+
 		return $subid;
 	}
-	
+
 	function getCasted($pollid) {
 		$db = JFactory::getDBO();
 		$user = JFactory::getUser();
 		if (!$user->id) return false;
-		
+
 		$query=$db->getQuery(true);
 		$query->select('cm_id');
 		$query->from('#__mpoll_completed');
@@ -368,7 +368,7 @@ class MPollModelMPoll extends JModelLegacy
 		if (count($data)) return true;
 		else return false;
 	}
-	
+
 	function getFirstCast($pollid) {
 		$db = JFactory::getDBO();
 		$q = $db->getQuery(true);
@@ -377,8 +377,8 @@ class MPollModelMPoll extends JModelLegacy
 		$q->where('cm_poll = '.$pollid);
 		$q->order('cm_time ASC');
 		$q->limit('1');
-		$db->setQuery($q); 
-		$data = $db->loadAssoc(); 
+		$db->setQuery($q);
+		$data = $db->loadAssoc();
 		return $data['cm_time'];
 	}
 	function getLastCast($pollid) {
@@ -389,8 +389,8 @@ class MPollModelMPoll extends JModelLegacy
 		$q->where('cm_poll = '.$pollid);
 		$q->order('cm_time DESC');
 		$q->limit('1');
-		$db->setQuery($q); 
-		$data = $db->loadAssoc(); 
+		$db->setQuery($q);
+		$data = $db->loadAssoc();
 		return $data['cm_time'];
 	}
 	function getNumCast($pollid) {
@@ -400,11 +400,11 @@ class MPollModelMPoll extends JModelLegacy
 		$q->from('#__mpoll_completed');
 		$q->where('cm_poll = '.$pollid);
 		$q->group('cm_poll');
-		$db->setQuery($q); 
+		$db->setQuery($q);
 		$count = $db->loadResult();
 		return (int)$count;
 	}
-	
+
 	function applyAnswers($qdata,$cmplid) {
 		$db = JFactory::getDBO();
 		$user = JFactory::getUser();
@@ -420,26 +420,26 @@ class MPollModelMPoll extends JModelLegacy
 		}
 		return $qdata;
 	}
-	
+
 	public static function canUpload($file,&$err)
 	{
 		$params = JComponentHelper::getParams('com_media');
-		
+
 		//Check for File
 		if (empty($file['name'])) {
 			$err="No File";
 			return false;
 		}
-	
+
 		//Check filename is safe
 		jimport('joomla.filesystem.file');
 		if ($file['name'] !== JFile::makesafe($file['name'])) {
 			$err="Bad file name";
 			return false;
 		}
-	
+
 		$format = strtolower(JFile::getExt($file['name']));
-	
+
 		//Check if type allowed
 		$allowable = explode(',', $params->get('upload_extensions'));
 		$ignored = explode(',', $params->get('ignore_extensions'));
@@ -448,7 +448,7 @@ class MPollModelMPoll extends JModelLegacy
 			$err="Filetype Not Allowed";
 			return false;
 		}
-	
+
 		//Check for size
 		$maxSize = (int) ($params->get('upload_maxsize', 0) * 1024 * 1024);
 		if ($maxSize > 0 && (int) $file['size'] > $maxSize)
@@ -456,8 +456,8 @@ class MPollModelMPoll extends JModelLegacy
 			$err = 'File too Large';
 			return false;
 		}
-	
-		
+
+
 		//other checks
 		$xss_check =  JFile::read($file['tmp_name'], false, 256);
 		$html_tags = array('abbr', 'acronym', 'address', 'applet', 'area', 'audioscope', 'base', 'basefont', 'bdo', 'bgsound', 'big', 'blackface', 'blink', 'blockquote', 'body', 'bq', 'br', 'button', 'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'comment', 'custom', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'fn', 'font', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'html', 'iframe', 'ilayer', 'img', 'input', 'ins', 'isindex', 'keygen', 'kbd', 'label', 'layer', 'legend', 'li', 'limittext', 'link', 'listing', 'map', 'marquee', 'menu', 'meta', 'multicol', 'nobr', 'noembed', 'noframes', 'noscript', 'nosmartquotes', 'object', 'ol', 'optgroup', 'option', 'param', 'plaintext', 'pre', 'rt', 'ruby', 's', 'samp', 'script', 'select', 'server', 'shadow', 'sidebar', 'small', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'tt', 'ul', 'var', 'wbr', 'xml', 'xmp', '!DOCTYPE', '!--');
@@ -470,6 +470,6 @@ class MPollModelMPoll extends JModelLegacy
 		}
 		return true;
 	}
-	
+
 
 }
