@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_polls` (
   `poll_desc` text NOT NULL,
   `poll_start` datetime NOT NULL,
   `poll_end` datetime NOT NULL,
+  `poll_printresults` BOOLEAN NOT NULL DEFAULT FALSE,
   `poll_pagetype` varchar(50) NOT NULL DEFAULT 'poll',
   `published` tinyint(1) NOT NULL,
   `poll_only` tinyint(4) NOT NULL DEFAULT '1',
