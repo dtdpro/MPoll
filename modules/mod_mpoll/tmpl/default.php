@@ -1,16 +1,16 @@
 <?php // no direct access
-defined('_JEXEC') or die('Restricted access'); 
+defined('_JEXEC') or die('Restricted access');
 $db =& JFactory::getDBO();
 ?>
 <script type="text/javascript">
 	function MPollAJAX<?php echo $pdata->poll_id; ?>() {
 		var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
-	    /* Send the data using post and put the results in a div */
-	    jQuery.post( url, jQuery("#mpollf<?php echo $pdata->poll_id; ?>").serialize(),
-	      function( data ) {
-	          jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
-	      }
-	    );
+		/* Send the data using post and put the results in a div */
+		jQuery.post( url, jQuery("#mpollf<?php echo $pdata->poll_id; ?>").serialize(),
+			function( data ) {
+				jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
+			}
+		);
 	}
 
 	jQuery(document).ready(function() {
@@ -19,44 +19,44 @@ $db =& JFactory::getDBO();
 			validClass:"uk-form-success",
 			errorElement: "div",
 			errorPlacement: function(error, element) {
-		    	error.appendTo( element.parent("div") );
-		    	error.addClass("uk-alert uk-alert-danger uk-form-controls-text") 
-		    },
-		    submitHandler: function(form) { 
-		    	MPollAJAX<?php echo $pdata->poll_id; ?>();
-		    }
-	    });
+				error.appendTo( element.parent("div") );
+				error.addClass("uk-alert uk-alert-danger uk-form-controls-text")
+			},
+			submitHandler: function(form) {
+				MPollAJAX<?php echo $pdata->poll_id; ?>();
+			}
+		});
 
 	});
 </script>
 <form name="mpollf<?php echo $pdata->poll_id; ?>" id="mpollf<?php echo $pdata->poll_id; ?>" action="" class="uk-form">
 
-<?php 
-if ($showtitle) {
-	echo '<div class="mpollmod-title">'.$pdata->poll_name.'</div>';
-}
+	<?php
+	if ($showtitle) {
+		echo '<div class="mpollmod-title">'.$pdata->poll_name.'</div>';
+	}
 
-if ($showdesc) {
-    //Message before Questions
-    echo $pdata->poll_desc;
-}
-?>
+	if ($showdesc) {
+		//Message before Questions
+		echo $pdata->poll_desc;
+	}
+	?>
 	<div id="mpollmod<?php echo $pdata->poll_id; ?>" class="mpollmod-pollbody"> <?php
-		
+
 		if ($status != 'closed' && $status != 'done') {
-			
+
 			foreach($qdata as $f) {
-			
+
 				//Debug
 				//echo '<pre>'; print_r($f); echo '</pre>';
-			
+
 				$sname = 'q_'.$f->q_id;
 				if ($ri==1) $ri=0;
 				else $ri=1;
-			
+
 				//Start Row
 				echo '<div class="row-'.$sname.' mpoll-form-poll-row'.($ri % 2).' uk-form-row">';
-			
+
 				//field title/label
 				if ($f->q_type != "message" && $f->q_type != "header") {
 					echo '<div class="uk-form-label uk-text-bold">';
@@ -64,13 +64,13 @@ if ($showdesc) {
 					if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
 					echo '</div>';
 				}
-			
+
 				//Start Field
 				if ($f->q_type == "message") echo '<div class="uk-alert">';
 				else if ($f->q_type == "header") echo '<div class="uk-margin-top uk-text-bold uk-text-large">';
 				else {
-				echo '<div class="uk-form-controls';
-				if ($f->q_type != "cbox" || $f->q_type != "mailchimp" || $f->q_pretext || $f->q_hint) echo ' uk-form-controls-text';
+					echo '<div class="uk-form-controls';
+					if ($f->q_type != "cbox" || $f->q_type != "mailchimp" || $f->q_pretext || $f->q_hint) echo ' uk-form-controls-text';
 					echo '">';
 				}
 
@@ -126,13 +126,13 @@ if ($showdesc) {
 						} else {
 							echo '<span class="uk-text-bold">'.$o->text.'</span><br />';
 						}
-							
+
 					}
 				}
 
 				//radio
 				if ($f->q_type=="multi") {
-						
+
 					$first=true;
 					foreach ($f->options as $o) {
 						if ($o->opt_selectable) {
@@ -152,7 +152,7 @@ if ($showdesc) {
 						} else {
 							echo '<span class="uk-text-bold">'.$o->text.'</span><br />';
 						}
-							
+
 					}
 				}
 
@@ -252,31 +252,31 @@ if ($showdesc) {
 				//End Row
 				echo '</div>';
 			}
-			
+
 			echo '<p align="center">';
 			if ($status == 'open') {
 				echo '<a href="#" onclick="jQuery(\'#mpollf'.$pdata->poll_id.'\').submit(); return false;" class="button uk-button">Submit</a>';
-			} 
-			
-			if ($status == 'regreq') { 
+			}
+
+			if ($status == 'regreq') {
 				echo '<div class="uk-alert uk-alert-warning">'.$pdata->poll_regreqmsg.'</div>';
 			}
-			
-			if ($status == 'accessreq') { 
+
+			if ($status == 'accessreq') {
 				echo '<div class="uk-alert uk-alert-danger">'.$pdata->poll_accessreqmsg.'</div>';
 			}
-			
+
 			if ($params->get( 'showresultslink', 0 )) {
 				echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="button uk-button">Results</a>';
 			}
 			echo '</p>';
-			
+
 			echo '<input type="hidden" name="poll" value="'.$pdata->poll_id.'">';
 			echo '<input type="hidden" name="showresults" value="'.$params->get( 'showresults', 1 ).'">';
 			echo '<input type="hidden" name="showresultslink" value="'.$params->get( 'showresultslink', 0 ).'">';
 			echo '<input type="hidden" name="resultsas" value="'.$params->get( 'resultsas', "count" ).'">';
 			echo JHtml::_('form.token');
-			
+
 		} else if ($status == 'done') {
 			if ($pdata->poll_results_msg_before) echo $pdata->poll_results_msg_before;
 			if ($pdata->poll_showresults && $params->get( 'showresults', 1 )) {
@@ -300,13 +300,13 @@ if ($showdesc) {
 									$qa->group('res_qid');
 									$db->setQuery($qa);
 									$o->anscount = (int)$db->loadResult();
-									$numr = $numr + (int)$db->loadResult();
+									$numr = $numr + $o->anscount;
 								}
 								foreach ($qr->options as $opts) {
 									if ($opts->opt_selectable) {
 										if ($numr != 0) $per = ($opts->anscount)/($numr); else $per=1;
 										echo '<div class="mpollmod-opt">';
-				
+
 										echo '<div class="mpollmod-opt-text">';
 										if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->text.'</div>';
 										else echo $opts->text;
@@ -327,10 +327,10 @@ if ($showdesc) {
 				}
 			}
 			if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
-			
+
 			if ($params->get( 'showresultslink', 0 )) {
 				echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll=').'" class="button uk-button">Results</a></p>';
 			}
 		}
-	?> </div>
+		?> </div>
 </form>

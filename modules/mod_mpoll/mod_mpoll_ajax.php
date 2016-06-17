@@ -70,10 +70,12 @@ foreach ($qdata as &$q) {
 	$registry->loadString($q->params);
 	$q->params = $registry->toObject();
 }
-	
+
 
 try {
 	// Process $data
+	$item = new stdClass();
+	$other = new stdClass();
 	$fids = array();
 	$optfs = array();
 	$moptfs = array();
@@ -103,7 +105,7 @@ try {
 		}
 		$fids[]=$d->uf_id;
 	}
-	
+
 	// Get Options
 	$odsql=$db->getQuery(true);
 	$odsql->select('*');
@@ -114,7 +116,7 @@ try {
 	foreach ($optres as $o) {
 		$optionsdata[$o->opt_id]=$o->opt_txt;
 	}
-	
+
 	// MailChimp List
 	foreach ($mclists as $mclist) {
 		if ($data['q_'.$mclist->q_id])  {
@@ -154,7 +156,7 @@ try {
 			$item->$mcf="Not Subscribed";
 		}
 	}
-	
+
 	// Save results
 	foreach ($qdata as $fl) {
 		$fieldname = 'q_'.$fl->q_id;
@@ -172,9 +174,9 @@ try {
 }
 catch (Exception $e)
 {
-echo $e->getMessage();
+	echo $e->getMessage();
 
-return false;
+	return false;
 }
 
 // Show before results message
@@ -193,7 +195,7 @@ if ($pdata->poll_showresults && $showresults) {
 				case 'mcbox':
 				case 'mlist':
 				case 'dropdown':
-					$numr=0; 
+					$numr=0;
 					foreach ($qr->options as &$o) {
 						$qa = $db->getQuery(true);
 						$qa->select('count(*)');
@@ -203,13 +205,13 @@ if ($pdata->poll_showresults && $showresults) {
 						$qa->group('res_qid');
 						$db->setQuery($qa);
 						$o->anscount = (int)$db->loadResult();
-						$numr = $numr + (int)$db->loadResult();
+						$numr = $numr + $o->anscount;
 					}
 					foreach ($qr->options as $opts) {
 						if ($opts->opt_selectable) {
 							if ($numr != 0) $per = ($opts->anscount)/($numr); else $per=1;
 							echo '<div class="mpollmod-opt">';
-	
+
 							echo '<div class="mpollmod-opt-text">';
 							if ($opts->opt_correct) echo '<div class="mpollmod-opt-correct">'.$opts->text.'</div>';
 							else echo $opts->text;

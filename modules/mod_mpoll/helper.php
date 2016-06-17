@@ -16,7 +16,7 @@ class modMPollHelper
 		$pdata = $db->loadObject();
 		return $pdata;
 	}
-	
+
 	function getQuestions($pollid)
 	{
 		$db = JFactory::getDBO();
@@ -42,12 +42,12 @@ class modMPollHelper
 				$db->setQuery($qo);
 				$q->options = $db->loadObjectList();
 			}
-		
+
 			//Load Question Params
 			$registry = new JRegistry();
 			$registry->loadString($q->params);
 			$q->params = $registry->toObject();
-				
+
 			//Set default/saved values
 			$fn='q_'.$q->q_id;
 			$value = $q->q_default;
@@ -64,12 +64,12 @@ class modMPollHelper
 		}
 		return $qdata;
 	}
-	
+
 	function getCasted($pollid) {
 		$db = JFactory::getDBO();
 		$user = JFactory::getUser();
 		if (!$user->id) return false;
-	
+
 		$query=$db->getQuery(true);
 		$query->select('cm_id');
 		$query->from('#__mpoll_completed');
@@ -77,7 +77,7 @@ class modMPollHelper
 		$query->where('cm_poll='.$pollid);
 		$db->setQuery($query);
 		$data = $db->loadColumn();
-	
+
 		if (count($data)) return true;
 		else return false;
 	}
