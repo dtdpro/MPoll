@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
 	<layout title="Poll Page">
-		<message>Poll Page</message>
+		<message>Poll/Form Page</message>
 	</layout>
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_mpoll/models/fields">
 			<field name="poll" type="modal_mpoll" label="Poll" description="" required="true" />
-			<field name="task" type="radio" default="ballot" label="View" description="View">
+			<field name="task" type="radio" default="ballot" label="View" description="View" class="btn-group">
 				<option value="ballot">Ballot</option>
 				<option value="results">Results</option>
 			</field>
@@ -14,16 +14,16 @@
 	</fields>
 	<fields name="params">
 		<fieldset name="basic">
-			<field name="showreq" type="radio" default="1" label="Indicate Required" description="Show the * to indicate required questions">
+			<field name="showreq" type="radio" default="1" label="Indicate Required" description="Show the * to indicate required questions" class="btn-group">
 				<option value="1">Yes</option>
 				<option value="0">No</option>
 			</field>
-			<field name="showstats" type="radio" default="1" label="Show Results Stats" description="# Voters, First and last vote time">
+			<field name="showstats" type="radio" default="1" label="Show Results Stats" description="# Voters, First and last vote time" class="btn-group">
 				<option value="1">Yes</option>
 				<option value="0">No</option>
 			</field>
 			<field name="rtmpl" type="text" default="" label="Results Template" description="temp=" />
-			<field name="resultsas" type="radio" default="count" label="Results as" description="Show results in the ____ format.">
+			<field name="resultsas" type="radio" default="count" label="Results as" description="Show results in the ____ format." class="btn-group">
 				<option value="count">Count</option>
 				<option value="percent">Percentages</option>
 			</field>
