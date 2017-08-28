@@ -91,7 +91,7 @@ if ($this->task=='ballot') {   ?>
 			if (!empty($f->value) && $f->q_type=="cbox") $checked = ($f->value == '1') ? ' checked="checked"' : '';
 			else if ($f->params->mc_checked == "1") $checked = ' checked="checked"';
 			else $checked = '';
-			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class=""';
+			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="uk-checkbox"';
 			if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo $checked.'/>'."\n";
 			echo '<label for="jform_'.$sname.'">';
@@ -105,7 +105,7 @@ if ($this->task=='ballot') {   ?>
 				if ($o->opt_selectable) {
 					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 					else $checked = '';
-					echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="" id="jform_'.$sname.$o->value.'"';
+					echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="uk-checkbox" id="jform_'.$sname.$o->value.'"';
 					if ($f->q_req && $first) {
 						echo ' data-rule-required="true"';
 						if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -134,7 +134,7 @@ if ($this->task=='ballot') {   ?>
 				if ($o->opt_selectable) {
 					if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 					else $checked = '';
-					echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class=""';
+					echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="uk-radio"';
 					if ($f->q_req && $first) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; $first=false;}
 					if ($o->opt_disabled) $checked .= ' disabled';
 					echo $checked.'/>'."\n";
@@ -154,7 +154,7 @@ if ($this->task=='ballot') {   ?>
 	
 		//dropdown
 		if ($f->q_type=="dropdown") {
-			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="uk-width-1-1"';
+			echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="uk-width-1-1 uk-select"';
 			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>';
 			foreach ($f->options as $o) {
@@ -169,7 +169,7 @@ if ($this->task=='ballot') {   ?>
 	
 		//multilist
 		if ($f->q_type=="mlist") {
-			echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="uk-width-1-1" size="4" multiple="multiple"';
+			echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="uk-width-1-1 uk-select" size="4" multiple="multiple"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
 				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -193,7 +193,7 @@ if ($this->task=='ballot') {   ?>
 	
 		//text field, phone #, email, username
 		if ($f->q_type=="textbox" || $f->q_type=="email") {
-			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field uk-width-1-1" type="text"';
+			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field uk-width-1-1 uk-input" type="text"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
 				if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -211,7 +211,7 @@ if ($this->task=='ballot') {   ?>
 	
 		//text area
 		if ($f->q_type=="textar") {
-			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field uk-width-1-1"';
+			echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field uk-width-1-1 uk-textarea"';
 			if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 			echo '>'.$f->value.'</textarea>';
 		}
@@ -219,7 +219,7 @@ if ($this->task=='ballot') {   ?>
 		//captcha
 		if ($f->q_type=="captcha") {
 			echo '<img id="captcha_img" src="'.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
-			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field uk-width-1-1" type="text"';
+			echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field uk-width-1-1 uk-input" type="text"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
 				echo ' data-msg-required="This Field is required"';
@@ -257,7 +257,7 @@ if ($this->task=='ballot') {   ?>
 	} else {
 		if ( in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
 			echo JHtml::_('form.token');
-			echo '<input name="castvote" id="castvote" value="Submit" type="submit" class="button uk-button">';
+			echo '<input name="castvote" id="castvote" value="Submit" type="submit" class="button uk-button uk-button-default">';
 		} else {
 			echo '<div class="uk-alert uk-alert-danger">'.$this->pdata->poll_accessreqmsg.'</div>';
 		}
@@ -277,8 +277,8 @@ if ($this->task=='results') {
 	//Print button
 	if ($this->pdata->poll_printresults) {
 		$url = 'index.php?option=com_mpoll&task=results&tmpl=component&print=1&poll='.$this->pdata->poll_id.'&cmplid='.$this->cmplid;
-		if ($this->print) echo '<p><a href="javascript:print()" class="button uk-button">Print</a></p>';
-		else echo '<p><a href="'.JRoute::_($url).'" class="button uk-button" target="_blank">Print</a></p>';
+		if ($this->print) echo '<p><a href="javascript:print()" class="button uk-button uk-button-default">Print</a></p>';
+		else echo '<p><a href="'.JRoute::_($url).'" class="button uk-button uk-button-default" target="_blank">Print</a></p>';
 	}
 	
 	//Process results message

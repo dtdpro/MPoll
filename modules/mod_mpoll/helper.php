@@ -26,7 +26,7 @@ class modMPollHelper
 		$query->from('#__mpoll_questions');
 		$query->where('published > 0');
 		$query->where('q_poll = '.$pollid);
-		$query->where('q_type IN ("mcbox","mlist","mailchimp","email","dropdown","multi","cbox","textbox","textar")');
+		$query->where('q_type IN ("mcbox","mlist","mailchimp","email","dropdown","multi","cbox","textbox","textar","captcha")');
 		$query->order('ordering ASC');
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();

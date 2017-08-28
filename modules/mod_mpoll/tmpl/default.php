@@ -95,7 +95,7 @@ $db =& JFactory::getDBO();
 					if (!empty($f->value) && $f->q_type=="cbox") $checked = ($f->value == '1') ? ' checked="checked"' : '';
 					else if ($f->params->mc_checked == "1") $checked = ' checked="checked"';
 					else $checked = '';
-					echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class=""';
+					echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="uk-checkbox"';
 					if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 					echo $checked.'/>'."\n";
 					echo '<label for="jform_'.$sname.'">';
@@ -109,7 +109,7 @@ $db =& JFactory::getDBO();
 						if ($o->opt_selectable) {
 							if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 							else $checked = '';
-							echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="" id="jform_'.$sname.$o->value.'"';
+							echo '<input type="checkbox" name="jform['.$sname.'][]" value="'.$o->value.'" class="uk-checkbox" id="jform_'.$sname.$o->value.'"';
 							if ($f->q_req && $first) {
 								echo ' data-rule-required="true"';
 								if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -138,7 +138,7 @@ $db =& JFactory::getDBO();
 						if ($o->opt_selectable) {
 							if (!empty($f->value)) $checked = in_array($o->value,$f->value) ? ' checked="checked"' : '';
 							else $checked = '';
-							echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class=""';
+							echo '<input type="radio" name="jform['.$sname.']" value="'.$o->value.'" id="jform_'.$sname.$o->value.'" class="uk-radio"';
 							if ($f->q_req && $first) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; $first=false;}
 							if ($o->opt_disabled) $checked .= ' disabled';
 							echo $checked.'/>'."\n";
@@ -158,7 +158,7 @@ $db =& JFactory::getDBO();
 
 				//dropdown
 				if ($f->q_type=="dropdown") {
-					echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="uk-width-1-1"';
+					echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="uk-width-1-1 uk-select"';
 					if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 					echo '>';
 					foreach ($f->options as $o) {
@@ -173,7 +173,7 @@ $db =& JFactory::getDBO();
 
 				//multilist
 				if ($f->q_type=="mlist") {
-					echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="uk-width-1-1" size="4" multiple="multiple"';
+					echo '<select id="jform_'.$sname.'" name="jform['.$sname.'][]" class="uk-width-1-1 uk-select" size="4" multiple="multiple"';
 					if ($f->q_req) {
 						echo ' data-rule-required="true"';
 						if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -197,7 +197,7 @@ $db =& JFactory::getDBO();
 
 				//text field, phone #, email, username
 				if ($f->q_type=="textbox" || $f->q_type=="email") {
-					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field uk-width-1-1" type="text"';
+					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field uk-width-1-1 uk-input" type="text"';
 					if ($f->q_req) {
 						echo ' data-rule-required="true"';
 						if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -215,7 +215,7 @@ $db =& JFactory::getDBO();
 
 				//text area
 				if ($f->q_type=="textar") {
-					echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field uk-width-1-1"';
+					echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="mf_field uk-width-1-1 uk-textarea"';
 					if ($f->q_req) { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
 					echo '>'.$f->value.'</textarea>';
 				}
@@ -223,7 +223,7 @@ $db =& JFactory::getDBO();
 				//captcha
 				if ($f->q_type=="captcha") {
 					echo '<img id="captcha_img" src="'.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
-					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field" type="text"';
+					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field uk-input" type="text"';
 					if ($f->q_req) {
 						echo ' data-rule-required="true"';
 						echo ' data-msg-required="This Field is required"';
@@ -255,7 +255,7 @@ $db =& JFactory::getDBO();
 
 			echo '<p align="center">';
 			if ($status == 'open') {
-				echo '<a href="#" onclick="jQuery(\'#mpollf'.$pdata->poll_id.'\').submit(); return false;" class="button uk-button">Submit</a>';
+				echo '<a href="#" onclick="jQuery(\'#mpollf'.$pdata->poll_id.'\').submit(); return false;" class="button uk-button uk-button-default">Submit</a>';
 			}
 
 			if ($status == 'regreq') {
@@ -267,7 +267,7 @@ $db =& JFactory::getDBO();
 			}
 
 			if ($params->get( 'showresultslink', 0 )) {
-				echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="button uk-button">Results</a>';
+				echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="button uk-button uk-button-default">Results</a>';
 			}
 			echo '</p>';
 
@@ -329,7 +329,7 @@ $db =& JFactory::getDBO();
 			if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
 
 			if ($params->get( 'showresultslink', 0 )) {
-				echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll=').'" class="button uk-button">Results</a></p>';
+				echo '<p align="center"><a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll=').'" class="button uk-button uk-button-default">Results</a></p>';
 			}
 		}
 		?> </div>
