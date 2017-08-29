@@ -1,6 +1,7 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
 $db =& JFactory::getDBO();
+
 ?>
 <script type="text/javascript">
 	function MPollAJAX<?php echo $pdata->poll_id; ?>() {
@@ -28,6 +29,10 @@ $db =& JFactory::getDBO();
 		});
 
 	});
+
+    function reCapChecked<?php echo $pdata->poll_id; ?>() {
+        jQuery('#reCapChecked<?php echo $pdata->poll_id; ?>').val("checked");
+    }
 </script>
 <form name="mpollf<?php echo $pdata->poll_id; ?>" id="mpollf<?php echo $pdata->poll_id; ?>" action="" class="uk-form">
 
@@ -55,13 +60,13 @@ $db =& JFactory::getDBO();
 				else $ri=1;
 
 				//Start Row
-				echo '<div class="row-'.$sname.' mpoll-form-poll-row'.($ri % 2).' uk-form-row">';
+				echo '<div class="row-'.$sname.' mpoll-form-poll-row'.($ri % 2).' uk-form-row uk-margin-top">';
 
 				//field title/label
 				if ($f->q_type != "message" && $f->q_type != "header") {
 					echo '<div class="uk-form-label uk-text-bold">';
 					if ($f->q_req) echo "*";
-					if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
+					if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header") echo $f->q_text;
 					echo '</div>';
 				}
 
@@ -70,7 +75,7 @@ $db =& JFactory::getDBO();
 				else if ($f->q_type == "header") echo '<div class="uk-margin-top uk-text-bold uk-text-large">';
 				else {
 					echo '<div class="uk-form-controls';
-					if ($f->q_type != "cbox" || $f->q_type != "mailchimp" || $f->q_pretext || $f->q_hint) echo ' uk-form-controls-text';
+					if ($f->q_type != "cbox" || $f->q_pretext || $f->q_hint) echo ' uk-form-controls-text';
 					echo '">';
 				}
 
@@ -90,10 +95,9 @@ $db =& JFactory::getDBO();
 				if ($f->q_type == "header") echo $f->q_text;
 
 
-				//checkbox & mailchimp list
-				if ($f->q_type=="cbox" || $f->q_type=="mailchimp") {
+				//checkbox
+				if ($f->q_type=="cbox") {
 					if (!empty($f->value) && $f->q_type=="cbox") $checked = ($f->value == '1') ? ' checked="checked"' : '';
-					else if ($f->params->mc_checked == "1") $checked = ' checked="checked"';
 					else $checked = '';
 					echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="uk-checkbox"';
 					if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
@@ -251,6 +255,17 @@ $db =& JFactory::getDBO();
 
 				//End Row
 				echo '</div>';
+			}
+
+			//reCAPTCHA
+			if ($pdata->poll_recaptcha) {
+				echo '<div class="uk-form-row uk-margin-top mpoll-form-poll-row'.($ri % 2).'">';
+				echo '<div class="uk-form-label">';
+				echo '</div>';
+				echo '<div class="uk-form-controls">';
+				echo '<input type="hidden" id="reCapChecked" name="reCapChecked'.$pdata->poll_id.'" value="" data-rule-required="true" data-msg-required="reCaptcha Required">';
+				echo '<div class="g-recaptcha" data-callback="reCapChecked'.$pdata->poll_id.'" data-theme="'.$cfg->rc_theme.'" data-sitekey="'.$cfg->rc_api_key.'"></div>';
+				echo '</div></div>';
 			}
 
 			echo '<p align="center">';

@@ -138,7 +138,6 @@
 			<option value="message">Message</option>
 			<option value="header">Header</option>
 			<option value="captcha">Captcha</option>
-			<option value="mailchimp">MailChimp List</option>
 		</field>
 	</fieldset>
 	<fields name="params">

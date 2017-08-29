@@ -36,8 +36,15 @@ class MPollViewMPoll extends JViewLegacy
 		//Check for previous submission when only 1 submission allowed
 		if ($this->pdata->poll_only && $user->id) {
 			if ($model->getCasted($this->pollid)) $this->task='results';			
-		} 
-		
+		}
+
+		// Load reCAPTCHA Library
+		if ($this->pdata->poll_recaptcha) {
+			$doc = &JFactory::getDocument();
+			$doc->addScript('https://www.google.com/recaptcha/api.js');
+		}
+
+
 		switch ($this->task) {
 			case "castvote": //save vote results
 				if ($this->cmplid=$model->save($this->pollid)) {

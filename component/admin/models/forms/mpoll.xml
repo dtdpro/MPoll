@@ -71,6 +71,18 @@
 			<option value="form">Form</option>
 			<option value="poll">Poll</option>
 		</field>
+		<field
+				name="poll_recaptcha"
+				type="radio"
+				label="COM_MPOLL_MPOLL_FIELD_RECAPTCHA_LABEL"
+				description="COM_MPOLL_MPOLL_FIELD_RECAPTCHA_DESC"
+				size="1"
+				class="btn-group"
+				required="false"
+				default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
 	</fieldset>
 	<fieldset name="results">
 		<field

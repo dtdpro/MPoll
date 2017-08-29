@@ -7,10 +7,21 @@
 			<option value="1">Yes</option>
 		</field>
 		<field name="wrapperclass" type="text" label="COM_MPOLL_CONFIG_FIELD_WRAPPERCLASS_LABEL" description="COM_MPOLL_CONFIG_FIELD_WRAPPERCLASS_DESC" size="40" class="inputbox" required="false" default="uk-article" />
+		<field name="load_uikit" type="radio" label="COM_MPOLL_CONFIG_FIELD_UIKIT_LABEL" description="COM_MPOLL_CONFIG_FIELD_UIKIT_DESC" default="" class="btn-group">
+			<option value="">None</option>
+			<option value="flat">Flat</option>
+			<option value="almost-flat">Almost Flat</option>
+			<option value="gradient">Gradient</option>
+		</field>
 	</fieldset>
 	<fieldset name="integrations" label="COM_MPOLL_CONFIG_INTEGRATIONS_LABEL" description="COM_MPOLL_CONFIG_INTEGRATIONS_DESC">
-		<field name="spacer_apis0" type="spacer" label="COM_MPOLL_CONFIG_MAILCHIMP_LABEL" />
-		<field name="mckey" type="text" label="COM_MPOLL_CONFIG_FIELD_MCKEY_LABEL" description="COM_MPOLL_CONFIG_FIELD_MCKEY_DESC" size="70" class="inputbox" required="false" default="" />		
+		<field name="spacer_apis1" type="spacer" label="COM_MPOLL_CONFIG_RC_LABEL" />
+		<field name="rc_api_key" type="text" label="COM_MPOLL_CONFIG_FIELD_RC_APIKEY_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_APIKEY_DESC" size="70" class="inputbox" required="false" default="" />
+		<field name="rc_api_secret" type="text" label="COM_MPOLL_CONFIG_FIELD_RC_APISECRET_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_APISECRET_DESC" size="70" class="inputbox" required="false" default="" />
+		<field name="rc_theme" type="radio" label="COM_MPOLL_CONFIG_FIELD_RC_THEME_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_THEME_DESC" default="light" class="btn-group">
+			<option value="dark">Dark</option>
+			<option value="light">Light</option>
+		</field>
 	</fieldset>
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
         	<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" validate="rules" filter="rules" component="com_mpoll" section="component" />

@@ -78,7 +78,7 @@ class MPollModelMPoll extends JModelLegacy
 			if ($q->q_type == 'mlimit' || $q->q_type == 'multi' || $q->q_type == 'dropdown' || $q->q_type == 'mcbox' || $q->q_type == 'mlist') {
 				$q->value=explode(" ",$value);
 				$q->other = $other;
-			} else if ($q->q_type == 'mailchimp' || $q->q_type == 'cbox' || $q->q_type == 'yesno') {
+			} else if ($q->q_type == 'cbox' || $q->q_type == 'yesno') {
 				$q->value=$value;
 			} else if ($q->q_type == 'birthday') {
 				$q->value=$value;
@@ -103,6 +103,7 @@ class MPollModelMPoll extends JModelLegacy
 		$date = new JDate('now');
 		$pollinfo = $this->getPoll($pollid);
 		$jconfig = JFactory::getConfig();
+		$cfg = MPollHelper::getConfig();
 		// Include the content plugins for the on save events.
 		JPluginHelper::importPlugin('content');
 
@@ -124,14 +125,11 @@ class MPollModelMPoll extends JModelLegacy
 			$optfs = array();
 			$moptfs = array();
 			$upfile=array();
-			$mclists = array();
 			$flist = $this->getQuestions($pollid,false);
 			foreach ($flist as $d) {
 				$fieldname = 'q_'.$d->q_id;
 				if ($d->q_type == 'attach') {
 					$upfile[]=$fieldname;
-				} else if ($d->q_type == 'mailchimp') {
-					$mclists[]=$d;
 				} else if ($d->q_type == 'captcha') {
 					$capfield=$fieldname;
 				} else if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
@@ -155,6 +153,33 @@ class MPollModelMPoll extends JModelLegacy
 					if ($other->$fieldname) {
 						$app->setUserState('mpoll.poll'.$pollid.'.'.$fieldname.'_other', $other->$fieldname);
 					}
+				}
+			}
+
+			// reCAPTCHA
+			if ($pollinfo->poll_recaptcha) {
+				$rc_url = 'https://www.google.com/recaptcha/api/siteverify';
+				$rc_data = array(
+					'secret' => $cfg->rc_api_secret,
+					'response' => $_POST["g-recaptcha-response"]
+				);
+				$rc_options = array(
+					'http' => array (
+						'method' => 'POST',
+						'content' => http_build_query($rc_data)
+					)
+				);
+				$rc_context  = stream_context_create($rc_options);
+				$rc_verify = file_get_contents($rc_url, false, $rc_context);
+				$rc_captcha_success=json_decode($rc_verify);
+				if ($rc_captcha_success->success==false) {
+					$this->setError('reCAPTCHA Response Required');
+					return false;
+				} else if ($rc_captcha_success->success==true) {
+
+				} else {
+					$this->setError('reCAPTCHA Error');
+					return false;
 				}
 			}
 
@@ -213,46 +238,6 @@ class MPollModelMPoll extends JModelLegacy
 			$optres = $db->loadObjectList();
 			foreach ($optres as $o) {
 				$optionsdata[$o->opt_id]=$o->opt_txt;
-			}
-
-			// MailChimp List
-			foreach ($mclists as $mclist) {
-				if ($data['q_'.$mclist->q_id])  {
-					if (strstr($mclist->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$mclist->q_default,2);	}
-					$mcf='q_'.$mclist->q_id;
-					include_once 'components/com_mpoll/lib/mailchimp.php';
-					$mc = new MailChimpHelper($mc_key,$mc_list);
-					$mcdata = array('OPTIN_IP'=>$_SERVER['REMOTE_ADDR'], 'OPTIN_TIME'=>$date->toSql(true));
-					$email = $data['q_'.$mclist->params->mc_emailfield];
-					if ($mclist->params->mcvars) {
-						$othervars=$mclist->params->mcvars;
-						foreach ($othervars as $mcv=>$qfid) {
-							$qf='q_'.$qfid;
-							if ($qfid) {
-								if (in_array($qf,$optfs)) {
-									$mcdata[$mcv] = $optionsdata[$item->$qf];
-								} else if (in_array($qf,$moptfs)) {
-									$mcdata[$mcv] = "";
-									foreach (explode(" ",$item->$qf) as $mfo) {
-										$mcdata[$mcv] .= $optionsdata[$mfo]." ";
-									}
-								} else {
-									$mcdata[$mcv] = $item->$qf;
-								}
-							}
-						}
-					}
-					if (!$mc->subStatus($email)) {
-						$mcresult = $mc->subscribeUser(array("email"=>$email),$mcdata,(bool)$mclist->params->mc_doubleoptin,"html");
-						if ($mcresult) { $item->$mcf=$mclist->params->mc_doubleoptin ? "Op-In Sent" : "Subscribed"; }
-						else { $item->$mcf=$mc->error; }
-					} else {
-						$item->$mcf="Already Subscribed";
-					}
-				} else {
-					$mcf='q_'.$mclist->q_id;
-					$item->$mcf="Not Subscribed";
-				}
 			}
 
 			// Save results

@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@dtdpro.com</authorEmail>
 	<authorUrl>www.dtdpro.com</authorUrl>
-	<version>1.9.4</version>
+	<version>1.10.0</version>
 	<description>MOD_MPOLL_DESC</description>
 	<files>
 		<filename module="mod_mpoll">mod_mpoll.php</filename>
@@ -69,4 +69,8 @@
 			</fieldset>
 		</fields>
 	</config>
+	<updateservers>
+		<!-- Note: No spaces or linebreaks allowed between the server tags -->
+		<server type="extension" priority="1" name="DtD Productions - MPoll">http://update.ditzthedaisy.com/mod_mpoll.xml</server>
+	</updateservers>
 </extension>

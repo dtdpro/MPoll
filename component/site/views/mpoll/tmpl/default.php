@@ -6,6 +6,8 @@ if ($this->params->get('divwrapper',1)) {
 echo '<h2 class="title uk-article-title">'.$this->pdata->poll_name.'</h2>';
 
 $user = JFactory::getUser();
+$cfg = MPollHelper::getConfig();
+$ri = 0;
 
 /*** DISPLAY POLL ***/
 if ($this->task=='ballot') {   ?>
@@ -22,7 +24,12 @@ if ($this->task=='ballot') {   ?>
 				}
 		    });
 		});
-	</script>
+
+        function reCapChecked() {
+            jQuery('#reCapChecked').val("checked");
+        }
+
+    </script>
 
 	<?php 
 	
@@ -51,13 +58,13 @@ if ($this->task=='ballot') {   ?>
 		else $ri=1;
 		
 		//Start Row
-		echo '<div class="row-'.$sname.' mpoll-form-'.$this->pdata->poll_pagetype.'-row'.($ri % 2).' uk-form-row">';
+		echo '<div class="row-'.$sname.' mpoll-form-'.$this->pdata->poll_pagetype.'-row'.($ri % 2).' uk-form-row uk-margin-top">';
 		
 		//field title/label
 		if ($f->q_type != "message" && $f->q_type != "header") {
 			echo '<div class="uk-form-label uk-text-bold">';
 			if ($f->q_req && $this->params->get('showreq',1)) echo "*";
-			if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" && $f->q_type != "mailchimp") echo $f->q_text;
+			if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header") echo $f->q_text;
 			echo '</div>';
 		}
 		
@@ -66,7 +73,7 @@ if ($this->task=='ballot') {   ?>
 		else if ($f->q_type == "header") echo '<div class="uk-margin-top uk-text-bold uk-text-large">';
 		else {
 			echo '<div class="uk-form-controls';
-			if ($f->q_type != "cbox" || $f->q_type != "mailchimp" || $f->q_pretext || $f->q_hint) echo ' uk-form-controls-text';
+			if ($f->q_type != "cbox" || $f->q_pretext || $f->q_hint) echo ' uk-form-controls-text';
 			echo '">';
 		}
 		
@@ -86,10 +93,9 @@ if ($this->task=='ballot') {   ?>
 		if ($f->q_type == "header") echo $f->q_text;
 	
 	
-		//checkbox & mailchimp list
-		if ($f->q_type=="cbox" || $f->q_type=="mailchimp") {
+		//checkbox
+		if ($f->q_type=="cbox") {
 			if (!empty($f->value) && $f->q_type=="cbox") $checked = ($f->value == '1') ? ' checked="checked"' : '';
-			else if ($f->params->mc_checked == "1") $checked = ' checked="checked"';
 			else $checked = '';
 			echo '<input type="checkbox" name="jform['.$sname.']" id="jform_'.$sname.'" class="uk-checkbox"';
 			if ($f->q_req && $f->q_type=="cbox") { echo ' data-rule-required="true" data-msg-required="This Field is required"'; }
@@ -249,8 +255,19 @@ if ($this->task=='ballot') {   ?>
 		echo '</div>';
 	}
 
+	//reCAPTCHA
+	if ($this->pdata->poll_recaptcha) {
+		echo '<div class="uk-form-row uk-margin-top mpoll-form-'.$this->pdata->poll_pagetype.'-row'.($ri % 2).'">';
+		echo '<div class="uk-form-label">';
+		echo '</div>';
+		echo '<div class="uk-form-controls">';
+		echo '<input type="hidden" id="reCapChecked" name="reCapChecked" value="" data-rule-required="true" data-msg-required="reCaptcha Required">';
+		echo '<div class="g-recaptcha" data-callback="reCapChecked" data-theme="'.$cfg->rc_theme.'" data-sitekey="'.$cfg->rc_api_key.'"></div>';
+		echo '</div></div>';
+	}
+
 	//Submit
-	echo '<div class="uk-form-row">';
+	echo '<div class="uk-form-row uk-margin-top">';
 	echo '<div class="uk-form-controls">';
 	if ($this->pdata->poll_regreq == 1 && $user->id == 0) {
 		echo '<div class="uk-alert uk-alert-warning">'.$this->pdata->poll_regreqmsg.'</div>';

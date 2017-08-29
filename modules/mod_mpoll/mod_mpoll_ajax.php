@@ -8,12 +8,14 @@ define('JPATH_CORE', JPATH_BASE . '/../..');
 
 require_once ( JPATH_BASE .'/includes/defines.php' );
 require_once ( JPATH_BASE .'/includes/framework.php' );
+require_once ( JPATH_BASE .'/components/com_mpoll/helpers/mpoll.php' );
 
 $mainframe =& JFactory::getApplication('site');
-$jcfg =& JFactory::getConfig();
+$jconfig = JFactory::getConfig();
 $db  =& JFactory::getDBO();
 $user = &JFactory::getUser();
 $date = new JDate('now');
+$cfg = MPollHelper::getConfig();
 
 JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
@@ -33,6 +35,33 @@ $pquery->where('published > 0');
 $db->setQuery( $pquery );
 $pdata = $db->loadObject();
 
+// reCAPTCHA
+if ($pdata->poll_recaptcha) {
+	$rc_url = 'https://www.google.com/recaptcha/api/siteverify';
+	$rc_data = array(
+		'secret' => $cfg->rc_api_secret,
+		'response' => $_POST["g-recaptcha-response"]
+	);
+	$rc_options = array(
+		'http' => array (
+			'method' => 'POST',
+			'content' => http_build_query($rc_data)
+		)
+	);
+	$rc_context  = stream_context_create($rc_options);
+	$rc_verify = file_get_contents($rc_url, false, $rc_context);
+	$rc_captcha_success=json_decode($rc_verify);
+	if ($rc_captcha_success->success==false) {
+		echo '<div class="uk-alert uk-alert-danger" uk-alert=""><h3>Error</h3><p>reCAPTCHA Response Required</p></div>';
+		die;
+	} else if ($rc_captcha_success->success==true) {
+
+	} else {
+		echo '<div class="uk-alert uk-alert-danger" uk-alert=""><h3>Error</h3><p>reCAPTCHA Error</p></div>';
+		die;
+	}
+}
+
 // Save completed
 $cmrec=new stdClass();
 $cmrec->cm_user=$user->id;
@@ -49,7 +78,7 @@ $qquery->select('*');
 $qquery->from('#__mpoll_questions');
 $qquery->where('published > 0');
 $qquery->where('q_poll = '.$pollid);
-$qquery->where('q_type IN ("mcbox","mlist","mailchimp","email","dropdown","multi","cbox","textbox","textar")');
+$qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar")');
 $qquery->order('ordering ASC');
 $db->setQuery( $qquery );
 $qdata = $db->loadObjectList();
@@ -80,13 +109,10 @@ try {
 	$optfs = array();
 	$moptfs = array();
 	$upfile=array();
-	$mclists = array();
 	foreach ($qdata as $d) {
 		$fieldname = 'q_'.$d->q_id;
 		if ($d->q_type == 'attach') {
 			$upfile[]=$fieldname;
-		} else if ($d->q_type == 'mailchimp') {
-			$mclists[]=$d;
 		} else if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
 			if (is_array($data[$fieldname])) $item->$fieldname = implode(" ",$data[$fieldname]);
 			else $item->$fieldname = "";
@@ -117,46 +143,6 @@ try {
 		$optionsdata[$o->opt_id]=$o->opt_txt;
 	}
 
-	// MailChimp List
-	foreach ($mclists as $mclist) {
-		if ($data['q_'.$mclist->q_id])  {
-			if (strstr($mclist->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$mclist->q_default,2);	}
-			$mcf='q_'.$mclist->q_id;
-			include_once '../../components/com_mpoll/lib/mailchimp.php';
-			$mc = new MailChimpHelper($mc_key,$mc_list);
-			$mcdata = array('OPTIN_IP'=>$_SERVER['REMOTE_ADDR'], 'OPTIN_TIME'=>$date->toSql(true));
-			$email = $data['q_'.$mclist->params->mc_emailfield];
-			if ($mclist->params->mcvars) {
-				$othervars=$mclist->params->mcvars;
-				foreach ($othervars as $mcv=>$qfid) {
-					$qf='q_'.$qfid;
-					if ($qfid) {
-						if (in_array($qf,$optfs)) {
-							$mcdata[$mcv] = $optionsdata[$item->$qf];
-						} else if (in_array($qf,$moptfs)) {
-							$mcdata[$mcv] = "";
-							foreach (explode(" ",$item->$qf) as $mfo) {
-								$mcdata[$mcv] .= $optionsdata[$mfo]." ";
-							}
-						} else {
-							$mcdata[$mcv] = $item->$qf;
-						}
-					}
-				}
-			}
-			if (!$mc->subStatus($email)) {
-				$mcresult = $mc->subscribeUser(array("email"=>$email),$mcdata,(bool)$mclist->params->mc_doubleoptin,"html");
-				if ($mcresult) { $item->$mcf=$mclist->params->mc_doubleoptin ? "Op-In Sent" : "Subscribed"; }
-				else { $item->$mcf=$mc->error; }
-			} else {
-				$item->$mcf="Already Subscribed";
-			}
-		} else {
-			$mcf='q_'.$mclist->q_id;
-			$item->$mcf="Not Subscribed";
-		}
-	}
-
 	// Save results
 	foreach ($qdata as $fl) {
 		$fieldname = 'q_'.$fl->q_id;
@@ -170,6 +156,49 @@ try {
 			$cmres->res_ans_other=$db->escape($other->$fieldname);
 			$db->insertObject('#__mpoll_results',$cmres);
 		}
+	}
+
+	// Results email
+	if ($pdata->poll_resultsemail) {
+		$requery=$db->getQuery(true);
+		$requery->select('*');
+		$requery->from('#__mpoll_questions');
+		$requery->where('published > 0');
+		$requery->where('q_poll = '.$pollid);
+		$requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar")');
+		$requery->order('ordering ASC');
+		$db->setQuery( $requery );
+		$flist = $db->loadObjectList();
+		$resultsemail = "";
+		foreach ($flist as $d) {
+			if ($d->q_type != "captcha" && $d->q_type != "message" && $d->q_type != "header") {
+				$fieldname = 'q_'.$d->q_id;
+				$resultsemail .= "<b>".$d->q_text.'</b><br />';
+				if ($d->q_type=="attach") {
+					if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
+				} else if (in_array($fieldname,$optfs)) {
+					$resultsemail .= $optionsdata[$item->$fieldname];
+					if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
+					$resultsemail .= '<br />';
+					$resultsemail .= '<br />';
+				}  else if (in_array($fieldname,$moptfs)) {
+					$ans = explode(" ",$item->$fieldname);
+					foreach ($ans as $i) {
+						$resultsemail .= $optionsdata[$i].'<br />';
+					}
+					$resultsemail .= '<br />';
+				} else if ($d->q_type != "captcha") {
+					$resultsemail .= $item->$fieldname.'<br />';
+				}
+			}
+		}
+		$resultsemail .= "<br /><br /><b>User Agent:</b> ".$_SERVER['HTTP_USER_AGENT'];
+		$resultsemail .= "<br /><b>IP:</b> ".$_SERVER['REMOTE_ADDR'];
+		$emllist = Array();
+		$emllist = explode(",",$pdata->poll_emailto);
+
+		$mail = &JFactory::getMailer();
+		$sent = $mail->sendMail ($jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $pdata->poll_emailsubject, $resultsemail, true);
 	}
 }
 catch (Exception $e)

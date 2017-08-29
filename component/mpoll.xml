@@ -7,7 +7,7 @@
 	<authorUrl>http://www.ditzthedaisy.com</authorUrl>
 	<copyright>(c)2008-2015</copyright>
 	<license>GPL v2</license>
-	<version>1.22.4</version>
+	<version>1.23.0</version>
     <releaseDate>2016.06.17</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
@@ -18,6 +18,7 @@
 		<filename>router.php</filename>
 		<filename>controller.php</filename>
 		<folder>views</folder>
+		<folder>helpers</folder>
 		<folder>models</folder>
 		<folder>lib</folder>
 	</files>
@@ -37,6 +38,7 @@
 		<folder>images</folder>
 		<folder>upload</folder>
 		<folder>scripts</folder>
+		<folder>uikit</folder>
 	</media>	
 	<languages folder="site">
 		<language tag="en-GB">language/en-GB.com_mpoll.ini</language>
@@ -69,7 +71,10 @@
 			<language tag="en-GB">language/en-GB.com_mpoll.sys.ini</language>
 		</languages>		
 	</administration>
-
+	<updateservers>
+		<!-- Note: No spaces or linebreaks allowed between the server tags -->
+		<server type="extension" priority="1" name="DtD Productions - MPoll">http://update.ditzthedaisy.com/com_mpoll.xml</server>
+	</updateservers>
 
 	
 </extension>

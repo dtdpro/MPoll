@@ -15,6 +15,15 @@ JHtml::_('jquery.framework');
 $doc->addScript('media/com_mpoll/scripts/jquery.validate.js');
 $doc->addScript('media/com_mpoll/scripts/additional-methods.js');
 
+// Load helper
+require_once('components/com_mpoll/helpers/mpoll.php');
+$cfg = MPollHelper::getConfig();
+
+if ($cfg->load_uikit) {
+	$doc->addStyleSheet('media/com_mpoll/uikit/uikit.'.$cfg->load_uikit.'.min.css');
+	$doc->addScript('media/com_mpoll/uikit/uikit.min.js');
+}
+
 $user =& JFactory::getUser();
 		
 $pdata   = modMPollHelper::getPoll($params->get( 'poll', 0 ));
@@ -46,6 +55,12 @@ if ( $pdata && $pdata->poll_id ) {
 	// Check if ACL Met
 	if ($user->id && !in_array($pdata->access,$user->getAuthorisedViewLevels())) {
 		$status="accessreq";
+	}
+
+	// Load reCAPTCHA Library
+	if ($pdata->poll_recaptcha) {
+		$doc = &JFactory::getDocument();
+		$doc->addScript('https://www.google.com/recaptcha/api.js');
 	}
 	
 	
