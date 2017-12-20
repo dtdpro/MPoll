@@ -70,9 +70,12 @@ JHtml::_('formbehavior.chosen', 'select');
 					}
 					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp') { echo $item->$fn; }
 					if ($qu->q_type == 'textar') { echo nl2br($item->$fn);; }
-					if ($qu->q_type == 'attach') { 
-						if (strpos($item->$fn,"ERROR:") === FALSE && $item->$fn != "") {
-							echo '<a href="'.$item->$fn.'">Right Click Download</a>';
+					if ($qu->q_type == 'attach') {
+					    if (strpos($item->$fn,"ERROR:") === FALSE && $item->$fn != "") {
+						    $uploaded_files = explode(",",$item->$fn);
+							foreach ($uploaded_files as $uf) {
+								echo 'Download: <a href="' . $uf . '">'.basename($uf).'</a><br>';
+							}
 						} else {
 							echo $item->$fn;
 						}

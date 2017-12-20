@@ -93,6 +93,7 @@ class MPollModelMPoll extends JModelLegacy
 	{
 		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 		// Initialise variables;
+		$jinput = JFactory::getApplication()->input;
 		$data		= JRequest::getVar('jform', array(), 'post', 'array');
 		$dispatcher = JDispatcher::getInstance();
 		$isNew = true;
@@ -210,23 +211,26 @@ class MPollModelMPoll extends JModelLegacy
 
 			// Upload files
 			foreach ($upfile as $u) {
-				$userfile = JRequest::getVar($u, null, 'files', 'array');
-				if (!empty($userfile['name'])) {
+				$config		= JFactory::getConfig();
+				$userfiles = $jinput->files->get($u, array(), 'array'); //JRequest::getVar($u.'[]', array(), 'files', 'array');
+				$uploaded_files = array();
+				foreach ($userfiles as $uf) {
 					// Build the appropriate paths
-					$config		= JFactory::getConfig();
-					$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$userfile['name'];
-					$tmp_src	= $userfile['tmp_name'];
+					$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$uf['name'];
+					$tmp_src	= $uf['tmp_name'];
 
 					// Move uploaded file
 					jimport('joomla.filesystem.file');
-					if ($this->canUpload($userfile,$err)) {
+					if ($this->canUpload($uf,$err)) {
 						$uploaded = JFile::upload($tmp_src, $tmp_dest);
-						$item->$u = '/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$userfile['name'];
+						$uploaded_files[] = '/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$uf['name'];
 					} else {
 						$this->setError($err);
 						return false;
 					}
-				} else { $item->$u = ""; }
+				}
+				if (count($uploaded_files)) $item->$u = implode(",",$uploaded_files);
+				else $item->$u = "";
 			}
 
 			// Get Options
@@ -268,7 +272,12 @@ class MPollModelMPoll extends JModelLegacy
 						$fieldname = 'q_'.$d->q_id;
 						$resultsemail .= "<b>".$d->q_text.'</b><br />';
 						if ($d->q_type=="attach") {
-							if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
+							if($item->$fieldname) {
+								$uploaded_files = explode(",",$item->$fieldname);
+								foreach ($uploaded_files as $uf) {
+									$resultsemail .= 'Download: <a href="' . JURI::base() . $uf . '">'.basename($uf).'</a><br>';
+								}
+							}
 						} else if (in_array($fieldname,$optfs)) {
 							$resultsemail .= $optionsdata[$item->$fieldname];
 							if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;

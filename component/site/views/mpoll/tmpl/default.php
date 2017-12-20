@@ -238,7 +238,7 @@ if ($this->task=='ballot') {   ?>
 		
 		//File Attachment
 		if ($f->q_type == 'attach') {
-			echo '<input name="q_'.$f->q_id.'" id="jform_'.$sname.'" type="file" size="40" class="mf_file"';
+			echo '<input name="q_'.$f->q_id.'[]" id="jform_'.$sname.'" type="file" size="40" multiple="multiple" class="mf_file"';
 			if ($f->q_req) {
 				echo ' data-rule-required="true"';
 				echo ' data-msg-required="This Field is required"';
