@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@dtdpro.com</authorEmail>
 	<authorUrl>www.dtdpro.com</authorUrl>
-	<version>1.10.0</version>
+	<version>1.11.0</version>
 	<description>MOD_MPOLL_DESC</description>
 	<files>
 		<filename module="mod_mpoll">mod_mpoll.php</filename>

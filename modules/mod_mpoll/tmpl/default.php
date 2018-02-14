@@ -4,15 +4,25 @@ $db =& JFactory::getDBO();
 
 ?>
 <script type="text/javascript">
-	function MPollAJAX<?php echo $pdata->poll_id; ?>() {
-		var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
-		/* Send the data using post and put the results in a div */
-		jQuery.post( url, jQuery("#mpollf<?php echo $pdata->poll_id; ?>").serialize(),
-			function( data ) {
-				jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
-			}
-		);
-	}
+
+	jQuery("#mpollf<?php echo $pdata->poll_id; ?>").submit(function(e) {
+	    e.preventDefault();
+        var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
+        var formData = new FormData(this);
+        jQuery.ajax({
+            type: "POST",
+            url: url,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function( data ) {
+                jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
+            },
+            error: function(errResponse) {
+                jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( errResponse );
+            }
+        });
+    });
 
 	jQuery(document).ready(function() {
 		jQuery("#mpollf<?php echo $pdata->poll_id; ?>").validate({
@@ -24,7 +34,21 @@ $db =& JFactory::getDBO();
 				error.addClass("uk-alert uk-alert-danger uk-form-controls-text")
 			},
 			submitHandler: function(form) {
-				MPollAJAX<?php echo $pdata->poll_id; ?>();
+                var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
+                var formData = new FormData(jQuery("#mpollf<?php echo $pdata->poll_id; ?>")[0]);
+                jQuery.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function( data ) {
+                        jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
+                    },
+                    error: function(errResponse) {
+                        jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( errResponse );
+                    }
+                });
 			}
 		});
 
@@ -34,7 +58,7 @@ $db =& JFactory::getDBO();
         jQuery('#reCapChecked<?php echo $pdata->poll_id; ?>').val("checked");
     }
 </script>
-<form name="mpollf<?php echo $pdata->poll_id; ?>" id="mpollf<?php echo $pdata->poll_id; ?>" action="" class="uk-form">
+<form name="mpollf<?php echo $pdata->poll_id; ?>" id="mpollf<?php echo $pdata->poll_id; ?>" enctype="multipart/form-data" action="" class="uk-form">
 
 	<?php
 	if ($showtitle) {
@@ -238,9 +262,10 @@ $db =& JFactory::getDBO();
 					echo '</div>';
 				}
 
+
 				//File Attachment
 				if ($f->q_type == 'attach') {
-					echo '<input name="q_'.$f->q_id.'" id="jform_'.$sname.'" type="file" size="40" class="mf_file"';
+					echo '<input name="q_'.$f->q_id.'[]" id="jform_'.$sname.'" type="file" size="40" multiple="multiple" class="mf_file"';
 					if ($f->q_req) {
 						echo ' data-rule-required="true"';
 						echo ' data-msg-required="This Field is required"';
@@ -270,7 +295,7 @@ $db =& JFactory::getDBO();
 
 			echo '<p align="center">';
 			if ($status == 'open') {
-				echo '<a href="#" onclick="jQuery(\'#mpollf'.$pdata->poll_id.'\').submit(); return false;" class="button uk-button uk-button-default">Submit</a>';
+				echo '<button type="submit" hclass="button uk-button uk-button-default">Submit</button>';
 			}
 
 			if ($status == 'regreq') {

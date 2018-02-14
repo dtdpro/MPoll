@@ -78,7 +78,7 @@ $qquery->select('*');
 $qquery->from('#__mpoll_questions');
 $qquery->where('published > 0');
 $qquery->where('q_poll = '.$pollid);
-$qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar")');
+$qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach")');
 $qquery->order('ordering ASC');
 $db->setQuery( $qquery );
 $qdata = $db->loadObjectList();
@@ -103,6 +103,7 @@ foreach ($qdata as &$q) {
 
 try {
 	// Process $data
+	$jinput = JFactory::getApplication()->input;
 	$item = new stdClass();
 	$other = new stdClass();
 	$fids = array();
@@ -141,6 +142,30 @@ try {
 	$optres = $db->loadObjectList();
 	foreach ($optres as $o) {
 		$optionsdata[$o->opt_id]=$o->opt_txt;
+	}
+
+	// Upload files
+	foreach ($upfile as $u) {
+		$config		= JFactory::getConfig();
+		$userfiles = $jinput->files->get($u, array(), 'array');
+		$uploaded_files = array();
+		foreach ($userfiles as $uf) {
+			// Build the appropriate paths
+			$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$uf['name'];
+			$tmp_src	= $uf['tmp_name'];
+
+			// Move uploaded file
+			jimport('joomla.filesystem.file');
+			if (canUpload($uf,$err)) {
+				$uploaded = JFile::upload($tmp_src, $tmp_dest);
+				$uploaded_files[] = '/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$uf['name'];
+			} else {
+				$this->setError($err);
+				return false;
+			}
+		}
+		if (count($uploaded_files)) $item->$u = implode(",",$uploaded_files);
+		else $item->$u = "";
 	}
 
 	// Save results
@@ -265,4 +290,54 @@ if ($pdata->poll_showresults && $showresults) {
 if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
 if ($showresultslink) {
 	echo '<p align="center"><a href="'.$resultslink.'" class="button">Results</a></p>';
+}
+
+function canUpload($file,&$err)
+{
+	$params = JComponentHelper::getParams('com_media');
+
+	//Check for File
+	if (empty($file['name'])) {
+		$err="No File";
+		return false;
+	}
+
+	//Check filename is safe
+	jimport('joomla.filesystem.file');
+	if ($file['name'] !== JFile::makesafe($file['name'])) {
+		$err="Bad file name";
+		return false;
+	}
+
+	$format = strtolower(JFile::getExt($file['name']));
+
+	//Check if type allowed
+	$allowable = explode(',', $params->get('upload_extensions'));
+	$ignored = explode(',', $params->get('ignore_extensions'));
+	if (!in_array($format, $allowable) && !in_array($format, $ignored))
+	{
+		$err="Filetype Not Allowed";
+		return false;
+	}
+
+	//Check for size
+	$maxSize = (int) ($params->get('upload_maxsize', 0) * 1024 * 1024);
+	if ($maxSize > 0 && (int) $file['size'] > $maxSize)
+	{
+		$err = 'File too Large';
+		return false;
+	}
+
+
+	//other checks
+	$xss_check =  JFile::read($file['tmp_name'], false, 256);
+	$html_tags = array('abbr', 'acronym', 'address', 'applet', 'area', 'audioscope', 'base', 'basefont', 'bdo', 'bgsound', 'big', 'blackface', 'blink', 'blockquote', 'body', 'bq', 'br', 'button', 'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'comment', 'custom', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'fn', 'font', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'html', 'iframe', 'ilayer', 'img', 'input', 'ins', 'isindex', 'keygen', 'kbd', 'label', 'layer', 'legend', 'li', 'limittext', 'link', 'listing', 'map', 'marquee', 'menu', 'meta', 'multicol', 'nobr', 'noembed', 'noframes', 'noscript', 'nosmartquotes', 'object', 'ol', 'optgroup', 'option', 'param', 'plaintext', 'pre', 'rt', 'ruby', 's', 'samp', 'script', 'select', 'server', 'shadow', 'sidebar', 'small', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'tt', 'ul', 'var', 'wbr', 'xml', 'xmp', '!DOCTYPE', '!--');
+	foreach($html_tags as $tag) {
+		// A tag is '<tagname ', so we need to add < and a space or '<tagname>'
+		if (stristr($xss_check, '<'.$tag.' ') || stristr($xss_check, '<'.$tag.'>')) {
+			$err="Bad file";
+			return false;
+		}
+	}
+	return true;
 }
