@@ -295,7 +295,7 @@ $db =& JFactory::getDBO();
 
 			echo '<p align="center">';
 			if ($status == 'open') {
-				echo '<button type="submit" hclass="button uk-button uk-button-default">Submit</button>';
+				echo '<button type="submit" class="button uk-button uk-button-default">Submit</button>';
 			}
 
 			if ($status == 'regreq') {

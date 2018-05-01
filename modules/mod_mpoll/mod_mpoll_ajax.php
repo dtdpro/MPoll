@@ -150,18 +150,25 @@ try {
 		$userfiles = $jinput->files->get($u, array(), 'array');
 		$uploaded_files = array();
 		foreach ($userfiles as $uf) {
-			// Build the appropriate paths
-			$tmp_dest	= JPATH_BASE.'/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$uf['name'];
-			$tmp_src	= $uf['tmp_name'];
+			if (!$uf['error']) {
+				// Build the appropriate paths
+				$tmp_dest = JPATH_BASE . '/media/com_mpoll/upload/' . $subid . "_" . str_replace( "q_",
+						"",
+						$u ) . "_" . $uf['name'];
+				$tmp_src  = $uf['tmp_name'];
 
-			// Move uploaded file
-			jimport('joomla.filesystem.file');
-			if (canUpload($uf,$err)) {
-				$uploaded = JFile::upload($tmp_src, $tmp_dest);
-				$uploaded_files[] = '/media/com_mpoll/upload/' . $subid."_".str_replace("q_","",$u)."_".$uf['name'];
-			} else {
-				$this->setError($err);
-				return false;
+				// Move uploaded file
+				jimport( 'joomla.filesystem.file' );
+				if ( canUpload( $uf, $err ) ) {
+					$uploaded = JFile::upload( $tmp_src, $tmp_dest );
+					$uploaded_files[] = '/media/com_mpoll/upload/' . $subid . "_" . str_replace( "q_",
+							"",
+							$u ) . "_" . $uf['name'];
+				} else {
+					$this->setError( $err );
+
+					return false;
+				}
 			}
 		}
 		if (count($uploaded_files)) $item->$u = implode(",",$uploaded_files);
