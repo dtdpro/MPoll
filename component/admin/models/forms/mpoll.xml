@@ -181,7 +181,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_CONFMSG_LABEL"
 			description="COM_MPOLL_MPOLL_FIELDB_CONFMSG_DESC"
 			class="inputbox"
-			filter="safehtml"
+			filter="JComponentHelper::filterText"
 			buttons="true"
 			hide="readmore,pagebreak"
 		/>
@@ -193,7 +193,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_DESC_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_DESC_DESC"
 			class="inputbox"
-			filter="safehtml"
+			filter="JComponentHelper::filterText"
 			buttons="true"
 			hide="readmore,pagebreak"
 		/>
@@ -203,7 +203,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_RMSGB_LABEL"
 			description="COM_MPOLL_MPOLL_FIELDB_RMSG_DESC"
 			class="inputbox"
-			filter="safehtml"
+			filter="JComponentHelper::filterText"
 			buttons="true"
 			hide="readmore,pagebreak"
 		/>
@@ -213,7 +213,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_RMSGA_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_RMSGA_DESC"
 			class="inputbox"
-			filter="safehtml"
+			filter="JComponentHelper::filterText"
 			buttons="true"
 			hide="readmore,pagebreak"
 		/>
@@ -223,7 +223,7 @@
 			label="COM_MPOLL_MPOLL_FIELD_RMSGM_LABEL"
 			description="COM_MPOLL_MPOLL_FIELD_RMSGM_DESC"
 			class="inputbox"
-			filter="safehtml"
+			filter="JComponentHelper::filterText"
 			buttons="true"
 			hide="readmore,pagebreak"
 		/>
