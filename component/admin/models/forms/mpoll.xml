@@ -246,6 +246,18 @@
 			size="22"
 		/>
 		<field
+				name="poll_showended"
+				type="radio"
+				label="COM_MPOLL_MPOLL_FIELD_SHOWENDED_LABEL"
+				description="COM_MPOLL_MPOLL_FIELD_SHOWENDED_DESC"
+				size="1"
+				class="btn-group"
+				required="false"
+				default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
+		<field
 			name="poll_only"
 			type="radio"
 			label="COM_MPOLL_MPOLL_FIELD_ONLY_LABEL"

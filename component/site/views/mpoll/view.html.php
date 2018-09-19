@@ -15,7 +15,8 @@ class MPollViewMPoll extends JViewLegacy
 		$this->pollid = JRequest::getVar( 'poll' );
 		$this->task = JRequest::getVar('task');
 		$this->cmplid = JRequest::getVar( 'cmplid' );
-		$this->pdata=$model->getPoll($this->pollid); 
+		$this->pdata=$model->getPoll($this->pollid);
+		$this->ended=false;
 		
 		//check if poll exists
 		if (empty($this->pdata)) { 
@@ -28,9 +29,12 @@ class MPollViewMPoll extends JViewLegacy
 			JError::raiseError(404, JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'));
 			return false;
 		}
-		if ((strtotime($this->pdata->poll_end) < strtotime(date("Y-m-d H:i:s"))) && $this->pdata->poll_start != '0000-00-00 00:00:00') { 
-			JError::raiseError(404, JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'));
-			return false;
+		if ((strtotime($this->pdata->poll_end) < strtotime(date("Y-m-d H:i:s"))) && $this->pdata->poll_start != '0000-00-00 00:00:00') {
+			$this->ended=true;
+			if (!$this->pdata->poll_showended) {
+				JError::raiseError(404, JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'));
+				return false;
+			}
 		}
 		
 		//Check for previous submission when only 1 submission allowed

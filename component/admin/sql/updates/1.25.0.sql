@@ -1,0 +1,1 @@
+ALTER TABLE  `#__mpoll_polls` ADD  `poll_showended` BOOLEAN NOT NULL DEFAULT FALSE AFTER  `poll_end`
