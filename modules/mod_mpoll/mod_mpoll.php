@@ -8,7 +8,7 @@ require_once (dirname(__FILE__).'/helper.php');
 
 $tabclass_arr = array ('sectiontableentry2', 'sectiontableentry1');
 
-$doc = &JFactory::getDocument();
+$doc = JFactory::getDocument();
 $doc->addStyleSheet('media/com_mpoll/mpoll.css');
 
 JHtml::_('jquery.framework');
@@ -24,7 +24,7 @@ if ($cfg->load_uikit) {
 	$doc->addScript('media/com_mpoll/uikit/uikit.min.js');
 }
 
-$user =& JFactory::getUser();
+$user = JFactory::getUser();
 		
 $pdata   = modMPollHelper::getPoll($params->get( 'poll', 0 ));
 $showtitle = $params->get( 'showtitle', 1 );

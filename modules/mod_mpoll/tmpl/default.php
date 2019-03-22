@@ -1,6 +1,6 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
-$db =& JFactory::getDBO();
+$db = JFactory::getDBO();
 
 ?>
 <script type="text/javascript">
@@ -74,6 +74,7 @@ $db =& JFactory::getDBO();
 
 		if ($status != 'closed' && $status != 'done') {
 
+		    $ri=0;
 			foreach($qdata as $f) {
 
 				//Debug

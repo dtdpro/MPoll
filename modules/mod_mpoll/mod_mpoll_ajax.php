@@ -10,10 +10,10 @@ require_once ( JPATH_BASE .'/includes/defines.php' );
 require_once ( JPATH_BASE .'/includes/framework.php' );
 require_once ( JPATH_BASE .'/components/com_mpoll/helpers/mpoll.php' );
 
-$mainframe =& JFactory::getApplication('site');
+$mainframe = JFactory::getApplication('site');
 $jconfig = JFactory::getConfig();
-$db  =& JFactory::getDBO();
-$user = &JFactory::getUser();
+$db  = JFactory::getDBO();
+$user = JFactory::getUser();
 $date = new JDate('now');
 $cfg = MPollHelper::getConfig();
 
@@ -106,7 +106,6 @@ try {
 	$jinput = JFactory::getApplication()->input;
 	$item = new stdClass();
 	$other = new stdClass();
-	$fids = array();
 	$optfs = array();
 	$moptfs = array();
 	$upfile=array();
@@ -124,13 +123,14 @@ try {
 		}
 		if ($d->q_type=="multi" || $d->q_type=="dropdown") {
 			$optfs[]=$fieldname;
-			$other->$fieldname=$data[$fieldname."_other"];
+			if (isset($data[$fieldname."_other"])) $other->$fieldname=$data[$fieldname."_other"];
+			else $other->$fieldname="";
 		}
 		if ($d->q_type=="mcbox" || $d->q_type=="mlist") {
 			$moptfs[]=$fieldname;
-			$other->$fieldname=$data[$fieldname."_other"];
+			if (isset($data[$fieldname."_other"])) $other->$fieldname=$data[$fieldname."_other"];
+			else $other->$fieldname="";
 		}
-		$fids[]=$d->uf_id;
 	}
 
 	// Get Options
