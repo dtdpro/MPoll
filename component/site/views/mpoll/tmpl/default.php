@@ -378,7 +378,9 @@ if ($this->task=='ballot') {   ?>
 
 		echo '<input type="hidden" name="option" value="com_mpoll">';
 		echo '<input type="hidden" name="task" value="castvote">';
-		echo '<input type="hidden" name="return" value="' . base64_encode( $this->return ) . '">';
+		if (isset($this->return)) {
+			echo '<input type="hidden" name="return" value="' . base64_encode( $this->return ) . '">';
+		}
 		echo '</form>';
 	}
 	
@@ -405,7 +407,7 @@ if ($this->task=='results') {
 					}					
 				} else { $answer = $q->answer; }
 			} else {
-				$answers = explode(" ",$q->qnswer);
+				$answers = explode(" ",$q->answer);
 				$result = array();
 				foreach ($q->options as $o) {
 					if (in_array($o->value,$answers)) $result[] = $o->text;

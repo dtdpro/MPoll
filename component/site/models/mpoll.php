@@ -60,7 +60,8 @@ class MPollModelMPoll extends JModelLegacy
 							$qa->group('res_qid');
 							$db->setQuery($qa);
 							$o->anscount = (int)$db->loadResult();
-							$q->anscount = $q->anscount + $o->anscount;
+							if (isset($q->anscount)) $q->anscount = $q->anscount + $o->anscount;
+							else $q->anscount = $o->anscount;
 						}
 					}
 				}

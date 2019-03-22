@@ -44,7 +44,7 @@ class MPollViewMPoll extends JViewLegacy
 
 		// Load reCAPTCHA Library
 		if ($this->pdata->poll_recaptcha) {
-			$doc = &JFactory::getDocument();
+			$doc = JFactory::getDocument();
 			$doc->addScript('https://www.google.com/recaptcha/api.js');
 		}
 

@@ -22,14 +22,18 @@ function MPollBuildRoute(&$query)
 	$menu	= $app->getMenu();
 	$items	= $menu->getItems('component', 'com_mpoll');
 
+	if (isset($query['poll'])) $poll = $query['poll']; else $poll =0;
+
 	foreach ($items as $mi) {
 		if (!$founditem) {
-			if (!empty($mi->query['poll']) && ((int)$mi->query['poll'] == (int)$query['poll'])) {
-				if (!empty($mi->query['task']) && ($mi->query['task'] == 'results') && $query['task'] == 'results') {
-					$founditem = $mi->id;
-				} else if (!empty($mi->query['task']) && ($mi->query['task'] == 'ballot') && $query['task'] == 'ballot') {
-					$founditem = $mi->id;
-				} 
+			if (isset($mi->query['poll'])) {
+				if ( ! empty( $mi->query['poll'] ) && ( (int) $mi->query['poll'] == (int) $poll ) ) {
+					if ( ! empty( $mi->query['task'] ) && ( $mi->query['task'] == 'results' ) && $query['task'] == 'results' ) {
+						$founditem = $mi->id;
+					} else if ( ! empty( $mi->query['task'] ) && ( $mi->query['task'] == 'ballot' ) && $query['task'] == 'ballot' ) {
+						$founditem = $mi->id;
+					}
+				}
 			}
 		}
 	}
