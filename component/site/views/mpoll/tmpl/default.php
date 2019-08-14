@@ -1,29 +1,41 @@
 <?php // no direct access
-defined('_JEXEC') or die('Restricted access'); 
-if ($this->params->get('divwrapper',1)) {
-	echo '<div id="system" class="'.$this->params->get('wrapperclass','uk-article').'">';
+defined( '_JEXEC' ) or die( 'Restricted access' );
+if ( $this->params->get( 'divwrapper', 1 ) ) {
+	echo '<div id="system" class="' . $this->params->get( 'wrapperclass', 'uk-article' ) . '">';
 }
-echo '<h2 class="title uk-article-title">'.$this->pdata->poll_name.'</h2>';
+echo '<h2 class="title uk-article-title">' . $this->pdata->poll_name . '</h2>';
 
 $user = JFactory::getUser();
-$cfg = MPollHelper::getConfig();
-$ri = 0;
+$cfg  = MPollHelper::getConfig();
+$ri   = 0;
 
 /*** DISPLAY POLL ***/
-if ($this->task=='ballot') {   ?>
+if ( $this->task == 'ballot' ) { ?>
 
-	<script type="text/javascript">
-		jQuery(document).ready(function() {
-			jQuery("#mpollform").validate({
-				errorClass:"uk-form-danger",
-				validClass:"uk-form-success",
-				errorElement: "div",
-				errorPlacement: function(error, element) {
-			    	error.appendTo( element.parent("div"));
-			    	error.addClass("uk-alert uk-alert-danger uk-form-controls-text");	
-				}
-		    });
-		});
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            jQuery("#mpollform").validate({
+                errorClass: "uk-form-danger",
+                validClass: "uk-form-success",
+                errorElement: "div",
+                errorPlacement: function (error, element) {
+                    error.appendTo(element.parent("div"));
+                    error.addClass("uk-alert uk-alert-danger uk-form-controls-text");
+                },
+                submitHandler: function (form) {
+                    if (typeof ga === 'function') {
+                        ga('send', 'event', 'MPoll', 'submit', '<?php echo $this->pdata->poll_name; ?>');
+                    }
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'submit', {
+                            'event_category': 'MPoll',
+                            'event_label': '<?php echo $this->pdata->poll_name; ?>'
+                        });
+                    }
+                    $(form).submit();
+                }
+            });
+        });
 
         function reCapChecked() {
             jQuery('#reCapChecked').val("checked");
@@ -31,19 +43,19 @@ if ($this->task=='ballot') {   ?>
 
     </script>
 
-	<?php 
-	
+	<?php
+
 	//Alert based on user status
-	if ($this->pdata->poll_regreq == 1 && $user->id == 0) {
-		echo '<div class="uk-alert uk-alert-warning">'.$this->pdata->poll_regreqmsg.'</div>';
-	} else if ( !in_array($this->pdata->access,$user->getAuthorisedViewLevels())) {
-		echo '<div class="uk-alert uk-alert-danger">'.$this->pdata->poll_accessreqmsg.'</div>';
+	if ( $this->pdata->poll_regreq == 1 && $user->id == 0 ) {
+		echo '<div class="uk-alert uk-alert-warning">' . $this->pdata->poll_regreqmsg . '</div>';
+	} else if ( ! in_array( $this->pdata->access, $user->getAuthorisedViewLevels() ) ) {
+		echo '<div class="uk-alert uk-alert-danger">' . $this->pdata->poll_accessreqmsg . '</div>';
 	}
-	
+
 	//Message before Questions
 	echo $this->pdata->poll_desc;
 
-	if (!$this->ended) {
+	if ( ! $this->ended ) {
 
 		//Begin Form
 		echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data" class="uk-form';
@@ -378,107 +390,141 @@ if ($this->task=='ballot') {   ?>
 
 		echo '<input type="hidden" name="option" value="com_mpoll">';
 		echo '<input type="hidden" name="task" value="castvote">';
-		if (isset($this->return)) {
+		if ( isset( $this->return ) ) {
 			echo '<input type="hidden" name="return" value="' . base64_encode( $this->return ) . '">';
 		}
 		echo '</form>';
 	}
-	
-} 
+
+}
 
 /*** DISPLAY POLL RESULTS ***/
-if ($this->task=='results') { 
-	
+if ( $this->task == 'results' ) {
+
 	//Print button
-	if ($this->pdata->poll_printresults) {
-		$url = 'index.php?option=com_mpoll&task=results&tmpl=component&print=1&poll='.$this->pdata->poll_id.'&cmplid='.$this->cmplid;
-		if ($this->print) echo '<p><a href="javascript:print()" class="button uk-button uk-button-default">Print</a></p>';
-		else echo '<p><a href="'.JRoute::_($url).'" class="button uk-button uk-button-default" target="_blank">Print</a></p>';
-	}
-	
-	//Process results message
-	foreach ($this->qdata as $q) {
-		if ($q->answer) {
-			$answer="";
-			if ($q->q_type != 'mcbox' && $q->q_type != "mlist") {
-				if ($q->q_type == "multi" || $q->q_type == "dropdown") {
-					foreach ($q->options as $o) {
-						if ($o->value == $q->answer) $answer=$o->text;
-					}					
-				} else { $answer = $q->answer; }
-			} else {
-				$answers = explode(" ",$q->answer);
-				$result = array();
-				foreach ($q->options as $o) {
-					if (in_array($o->value,$answers)) $result[] = $o->text;
-				}
-				$answer = implode(", ",$answers);
-			}
-			$this->pdata->poll_results_msg_before = str_replace("{i".$q->q_id."}",$answer,$this->pdata->poll_results_msg_before);
+	if ( $this->pdata->poll_printresults ) {
+		$url = 'index.php?option=com_mpoll&task=results&tmpl=component&print=1&poll=' . $this->pdata->poll_id . '&cmplid=' . $this->cmplid;
+		if ( $this->print ) {
+			echo '<p><a href="javascript:print()" class="button uk-button uk-button-default">Print</a></p>';
+		} else {
+			echo '<p><a href="' . JRoute::_( $url ) . '" class="button uk-button uk-button-default" target="_blank">Print</a></p>';
 		}
 	}
-	
+
+	//Process results message
+	foreach ( $this->qdata as $q ) {
+		if ( $q->answer ) {
+			$answer = "";
+			if ( $q->q_type != 'mcbox' && $q->q_type != "mlist" ) {
+				if ( $q->q_type == "multi" || $q->q_type == "dropdown" ) {
+					foreach ( $q->options as $o ) {
+						if ( $o->value == $q->answer ) {
+							$answer = $o->text;
+						}
+					}
+				} else {
+					$answer = $q->answer;
+				}
+			} else {
+				$answers = explode( " ", $q->answer );
+				$result  = array();
+				foreach ( $q->options as $o ) {
+					if ( in_array( $o->value, $answers ) ) {
+						$result[] = $o->text;
+					}
+				}
+				$answer = implode( ", ", $answers );
+			}
+			$this->pdata->poll_results_msg_before = str_replace( "{i" . $q->q_id . "}",
+				$answer,
+				$this->pdata->poll_results_msg_before );
+		}
+	}
+
 	//Display before results message
-	if ($this->pdata->poll_results_msg_before) {
-		$this->pdata->poll_results_msg_before = str_replace("{resid}",$this->cmplid,$this->pdata->poll_results_msg_before);
+	if ( $this->pdata->poll_results_msg_before ) {
+		$this->pdata->poll_results_msg_before = str_replace( "{resid}",
+			$this->cmplid,
+			$this->pdata->poll_results_msg_before );
 		echo $this->pdata->poll_results_msg_before;
 	}
-	
+
 	//Display results for multi/single choice questions
-	if ($this->pdata->poll_showresults) {
-		foreach ($this->qdata as $q) {
-			if ($q->q_type == "mcbox" || $q->q_type == "multi" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
+	if ( $this->pdata->poll_showresults ) {
+		foreach ( $this->qdata as $q ) {
+			if ( $q->q_type == "mcbox" || $q->q_type == "multi" || $q->q_type == "dropdown" || $q->q_type == "mlist" ) {
 				echo '<div class="mpollcom-question">';
-				$anscor=false;
-				echo '<div class="mpollcom-question-text">'.$q->q_text.'</div>';
-				switch ($q->q_type) {
+				$anscor = false;
+				echo '<div class="mpollcom-question-text">' . $q->q_text . '</div>';
+				switch ( $q->q_type ) {
 					case 'multi':
 					case 'mcbox':
 					case 'mlist':
 					case 'dropdown':
-						$numr=0;
-						foreach ($q->options as $opts) {
-							if ($opts->opt_selectable) {
-								if ($q->anscount != 0) $per = ($opts->anscount)/($q->anscount); else $per=1;
+						$numr = 0;
+						foreach ( $q->options as $opts ) {
+							if ( $opts->opt_selectable ) {
+								if ( $q->anscount != 0 ) {
+									$per = ( $opts->anscount ) / ( $q->anscount );
+								} else {
+									$per = 1;
+								}
 								echo '<div class="mpollcom-opt">';
 								echo '<div class="mpollcom-opt-text">';
-								if ($opts->opt_correct) echo '<div class="mpollcom-opt-correct">'.$opts->text.'</div>';
-								else echo $opts->text;
+								if ( $opts->opt_correct ) {
+									echo '<div class="mpollcom-opt-correct">' . $opts->text . '</div>';
+								} else {
+									echo $opts->text;
+								}
 								echo '</div>';
 								echo '<div class="mpollcom-opt-count">';
-								if ($this->params->get('resultsas','percent') == "percent") echo (int)($per*100)."%";
-								else echo ($opts->anscount);
+								if ( $this->params->get( 'resultsas', 'percent' ) == "percent" ) {
+									echo (int) ( $per * 100 ) . "%";
+								} else {
+									echo( $opts->anscount );
+								}
 								echo '</div>';
-								echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: '.$opts->opt_color.'; width:'.($per*100).'%"></div></div>';
+								echo '<div class="mpollcom-opt-bar-box"><div class="mpollcom-opt-bar-bar" style="background-color: ' . $opts->opt_color . '; width:' . ( $per * 100 ) . '%"></div></div>';
 								echo '</div>';
 							}
 						}
 						break;
-					default: break;
+					default:
+						break;
 				}
 				echo '</div>';
 			}
 		}
 	}
-	
+
 	//Display After results message
-	if ($this->pdata->poll_results_msg_after) echo $this->pdata->poll_results_msg_after;
-	
+	if ( $this->pdata->poll_results_msg_after ) {
+		echo $this->pdata->poll_results_msg_after;
+	}
+
 	//Display stats
-	if ($this->params->get('showstats',1)) {
+	if ( $this->params->get( 'showstats', 1 ) ) {
 		echo '<p>';
-		echo '<b>Number of Voters:</b> '.$this->ncast.'<br />';
+		echo '<b>Number of Voters:</b> ' . $this->ncast . '<br />';
 		echo '<b>First Vote:</b> ';
-		if ($this->ncast) echo date("l, F j, Y, g:i a",strtotime($this->fcast)).'<br />';
-		else echo 'No Votes Yet<br />';
+		if ( $this->ncast ) {
+			echo date( "l, F j, Y, g:i a", strtotime( $this->fcast ) ) . '<br />';
+		} else {
+			echo 'No Votes Yet<br />';
+		}
 		echo '<b>Last Vote:</b> ';
-		if ($this->ncast) echo date("l, F j, Y, g:i a",strtotime($this->lcast)).'<br />';
-		else echo 'No Votes Yet<br />';
+		if ( $this->ncast ) {
+			echo date( "l, F j, Y, g:i a", strtotime( $this->lcast ) ) . '<br />';
+		} else {
+			echo 'No Votes Yet<br />';
+		}
 		echo '</p>';
 	}
-	
+
 }
-if ($this->params->get('divwrapper',1)) { echo '</div>'; }
+if ( $this->params->get( 'divwrapper', 1 ) ) {
+	echo '</div>';
+}
 ?>
 
 

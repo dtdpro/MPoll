@@ -23,7 +23,7 @@ class MPollModelPollResults extends JModelList
 	function getResponses($questions)
 	{
 		$pollid = $this->getState('poll');
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		//Get Completions
 		$q = 'SELECT *';
@@ -49,7 +49,7 @@ class MPollModelPollResults extends JModelList
 	}	
 	
 	function getOptions($questions) {
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		//Get QIDs
 		$qids=array();
@@ -75,14 +75,14 @@ class MPollModelPollResults extends JModelList
 		$query  = ' SELECT * FROM #__mpoll_questions ';
 		$query .= 'WHERE q_type NOT IN ("captcha","message","header") && q_poll ='.$pollid.' ';
 		$query .= 'ORDER BY ordering ASC';
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$db->setQuery($query);
 		$data = $db->loadObjectList();
 		return $data;
 	}	
 	
 	function getUsers() {
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$qo = "SELECT * FROM #__users";
 		$db->setQuery($qo);
 		$ures = $db->loadObjectList();

@@ -28,7 +28,7 @@ class MPollModelTally extends JModelList
 	function getPoll()
 	{
 		$pollid = $this->getState('poll');
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_polls WHERE poll_id = '.$pollid.'';
 		$db->setQuery( $query ); 
 		$pdata = $db->loadObject();
@@ -38,7 +38,7 @@ class MPollModelTally extends JModelList
 	function getQuestions()
 	{
 		$pollid = $this->getState('poll');
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = 'SELECT * FROM #__mpoll_questions ';
 		$query .= 'WHERE Q_type IN ("multi","mcbox","dropdown") && q_poll = '.$pollid.' && published = 1 ORDER BY ordering ASC';
 		$db->setQuery( $query ); 
