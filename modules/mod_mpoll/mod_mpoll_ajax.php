@@ -185,7 +185,9 @@ try {
 			$cmres->res_qid=$fl->q_id;
 			$cmres->res_ans=$db->escape($item->$fieldname);
 			$cmres->res_cm=$subid;
-			$cmres->res_ans_other=$db->escape($other->$fieldname);
+			if (isset($other->$fieldname)) {
+				$cmres->res_ans_other = $db->escape( $other->$fieldname );
+			}
 			$db->insertObject('#__mpoll_results',$cmres);
 		}
 	}

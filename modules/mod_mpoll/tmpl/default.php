@@ -5,25 +5,6 @@ $db = JFactory::getDBO();
 ?>
 <script type="text/javascript">
 
-	jQuery("#mpollf<?php echo $pdata->poll_id; ?>").submit(function(e) {
-	    e.preventDefault();
-        var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
-        var formData = new FormData(this);
-        jQuery.ajax({
-            type: "POST",
-            url: url,
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function( data ) {
-                jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
-            },
-            error: function(errResponse) {
-                jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( errResponse );
-            }
-        });
-    });
-
 	jQuery(document).ready(function() {
 		jQuery("#mpollf<?php echo $pdata->poll_id; ?>").validate({
 			errorClass:"uk-form-danger",
@@ -34,6 +15,12 @@ $db = JFactory::getDBO();
 				error.addClass("uk-alert uk-alert-danger uk-form-controls-text")
 			},
 			submitHandler: function(form) {
+                if (typeof ga === 'function') {
+                    ga('send', 'event', 'MPoll', 'submit', '<?php echo $pdata->poll_name; ?>');
+                }
+                if (typeof gtag === 'function') {
+                    gtag('event', 'submit', { 'event_category' : 'MPoll', 'event_label' : '<?php echo $pdata->poll_name; ?>' });
+                }
                 var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
                 var formData = new FormData(jQuery("#mpollf<?php echo $pdata->poll_id; ?>")[0]);
                 jQuery.ajax({

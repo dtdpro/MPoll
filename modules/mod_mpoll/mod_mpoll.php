@@ -59,7 +59,7 @@ if ( $pdata && $pdata->poll_id ) {
 
 	// Load reCAPTCHA Library
 	if ($pdata->poll_recaptcha) {
-		$doc = &JFactory::getDocument();
+		$doc = JFactory::getDocument();
 		$doc->addScript('https://www.google.com/recaptcha/api.js');
 	}
 	
