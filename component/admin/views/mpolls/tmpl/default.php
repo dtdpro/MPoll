@@ -164,12 +164,14 @@ $sortFields = $this->getSortFields();
 		<?php endforeach; ?>
 		</tbody>
 	</table>
-	
 
+
+		<?php
+		echo '<h3>Webhook URL</h3>';
+		echo '<p>'.JUri::root().'index.php?option=com_mpoll&task=paypal_webhook'.'</p>';
+		?>
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
 		<?php echo JHtml::_('form.token'); ?>
 </div>
 </form>
-
-

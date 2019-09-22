@@ -327,20 +327,6 @@ if ( $this->task == 'ballot' ) { ?>
 				echo '>' . $f->value . '</textarea>';
 			}
 
-			//captcha
-			if ( $f->q_type == "captcha" ) {
-				echo '<img id="captcha_img" src="' . JURI::base( true ) . '/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
-				echo '<input name="jform[' . $sname . ']" id="jform_' . $sname . '" value="" class="mf_field uk-width-1-1 uk-input" type="text"';
-				if ( $f->q_req ) {
-					echo ' data-rule-required="true"';
-					echo ' data-msg-required="This Field is required"';
-				}
-				echo '>';
-				echo '<div class="uk-text-small">';
-				echo '<a href="#" onclick="document.getElementById(\'captcha_img\').src = \'' . JURI::base( true ) . '/components/com_mpoll/lib/securimage/securimage_show.php?\' + Math.random(); return false">Reload Image</a>';
-				echo '</div>';
-			}
-
 			//File Attachment
 			if ( $f->q_type == 'attach' ) {
 				echo '<input name="q_' . $f->q_id . '[]" id="jform_' . $sname . '" type="file" size="40" multiple="multiple" class="mf_file"';
@@ -380,8 +366,10 @@ if ( $this->task == 'ballot' ) { ?>
 			echo '<div class="uk-alert uk-alert-warning">' . $this->pdata->poll_regreqmsg . '</div>';
 		} else {
 			if ( in_array( $this->pdata->access, $user->getAuthorisedViewLevels() ) ) {
+			    $buttontext = "Submit";
+			    if ($this->pdata->poll_payment_enabled) $buttontext .= " & Pay";
 				echo JHtml::_( 'form.token' );
-				echo '<input name="castvote" id="castvote" value="Submit" type="submit" class="button uk-button uk-button-default">';
+				echo '<input name="castvote" id="castvote" value="'.$buttontext.'" type="submit" class="button uk-button uk-button-default">';
 			} else {
 				echo '<div class="uk-alert uk-alert-danger">' . $this->pdata->poll_accessreqmsg . '</div>';
 			}
@@ -400,6 +388,21 @@ if ( $this->task == 'ballot' ) { ?>
 
 /*** DISPLAY POLL RESULTS ***/
 if ( $this->task == 'results' ) {
+
+    if ($this->completition) {
+        if ($this->completition->cm_status == "paid" || $this->completition->cm_status == "approved") {
+            echo '<div class="uk-alert uk-alert-success">Paid, Thank You</div>';
+        }
+	    if ($this->completition->cm_status == "unpaid") {
+		    echo '<div class="uk-alert uk-alert-waring">Payment needed, please <a href="'.$this->payurl.'">pay here</a></div>';
+	    }
+	    if ($this->completition->cm_status == "refunded") {
+		    echo '<div class="uk-alert uk-alert-waring">Payment refunded</div>';
+	    }
+	    if ($this->completition->cm_status == "error") {
+		    echo '<div class="uk-alert uk-alert-danger">Payment error, please contact us</div>';
+	    }
+    }
 
 	//Print button
 	if ( $this->pdata->poll_printresults ) {
@@ -522,6 +525,69 @@ if ( $this->task == 'results' ) {
 	}
 
 }
+
+
+/*** Payment ***/
+if ( $this->task == 'pay' ) {
+	echo '<div class="mpollcom-payment-instructions">'.$this->pdata->poll_payment_instructions.'</div>';
+	echo '<hr>';
+
+	// Certficitaion Details
+	echo '<div class="uk-grid">';
+	echo '<div class="uk-width-1-2">';
+	echo '<strong>' . $this->pdata->poll_payment_title . '</strong><br>';
+	echo 'Date of submission: ' . date( "F j, Y", strtotime( $this->completition->cm_time ) );
+	echo '</div>';
+	echo '<div class="uk-width-1-2" style="text-align: right;"><h2>$';
+	echo number_format($this->pdata->poll_payment_amount,2);
+	echo '</h2>';
+	echo '</div>';
+	echo '</div>';
+	echo '<hr>';
+	?>
+    <script>
+        var CREATE_PAYMENT_URL  = '<?php echo JUri::root().'index.php?option=com_mpoll&task=paypal_create&poll=' . $this->pdata->poll_id.'&payment='.$this->payment; ?>';
+        var EXECUTE_PAYMENT_URL = '<?php echo JUri::root().'index.php?option=com_mpoll&task=paypal_execute&poll=' . $this->pdata->poll_id.'&payment='.$this->payment; ?>';
+        var CANCEL_PAYMENT_URL = '<?php echo JUri::root().'index.php?option=com_mpoll&task=paypal_cancel&poll=' . $this->pdata->poll_id.'&payment='.$this->payment; ?>';
+
+        paypal.Button.render({
+            style: { size: 'responsive', tagline:false, fundingicons: true },
+            env: '<?php echo $cfg->paypal_mode ?>',
+            commit: true,
+            payment: function() {
+                return paypal.request.post(CREATE_PAYMENT_URL).then(function(data) {
+                    return data.id;
+                });
+            },
+            onAuthorize: function(data) {
+                return paypal.request.post(EXECUTE_PAYMENT_URL, {
+                    paymentID: data.paymentID,
+                    payerID:   data.payerID
+                }).then(function(data) {
+                    window.location.href = "<?php echo JRoute::_('index.php?option=com_mpoll&task=results&poll=' . $this->pdata->poll_id.'&cmpl='.$this->payment,false); ?>";
+                });
+            },
+            onCancel: function(data) {
+                console.log(data);
+                jQuery.post(CANCEL_PAYMENT_URL, {paymentID: data.paymentID}, function(data) {
+                    window.location.href = "<?php echo JRoute::_('index.php?option=com_mpoll&task=results&poll=' . $this->pdata->poll_id.'&cmpl='.$this->payment,false); ?>";
+                });
+            }
+        }, '#paypal-button');
+    </script>
+	<?php
+	echo '<div class="uk-grid">';
+	echo '<div class="uk-width-1-3">';
+	echo '</div>';
+	echo '<div class="uk-width-1-3">';
+	echo '<div id="paypal-button"></div>';
+	echo '</div>';
+	echo '<div class="uk-width-1-3">';
+	echo '</div>';
+	echo '</div>';
+
+}
+
 if ( $this->params->get( 'divwrapper', 1 ) ) {
 	echo '</div>';
 }

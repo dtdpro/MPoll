@@ -25,6 +25,12 @@ JHtml::_('formbehavior.chosen', 'select');
 			<th>
 				<?php echo JText::_( 'ID#' ); ?>
 			</th>
+            <th>
+				<?php echo JText::_( 'Public ID' ); ?>
+            </th>
+            <th>
+				<?php echo JText::_( 'Status' ); ?>
+            </th>
 			<th>
 				<?php echo JText::_( 'Users Name' ); ?>
 			</th>
@@ -50,6 +56,12 @@ JHtml::_('formbehavior.chosen', 'select');
 			<td>
 				<?php echo $item->cm_id; ?>
 			</td>
+            <td>
+				<?php echo $item->cm_pubid; ?>
+            </td>
+            <td>
+				<?php echo $item->cm_status; ?>
+            </td>
 			<td>
 				<?php 
 				if ($item->cm_user == 0) echo 'Guest';

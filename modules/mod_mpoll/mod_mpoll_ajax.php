@@ -231,8 +231,14 @@ try {
 		$emllist = Array();
 		$emllist = explode(",",$pdata->poll_emailto);
 
+		$replyTo = null;
+		if ($pdata->poll_emailreplyto) {
+			$replyToField = 'q_'.$pdata->poll_emailreplyto;
+			if ($item->$replyToField) $replyTo = $item->$replyToField;
+		}
+
 		$mail = &JFactory::getMailer();
-		$sent = $mail->sendMail ($jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $pdata->poll_emailsubject, $resultsemail, true);
+		$sent = $mail->sendMail ($jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $pdata->poll_emailsubject, $resultsemail, true, null, null, null, $replyTo);
 	}
 }
 catch (Exception $e)

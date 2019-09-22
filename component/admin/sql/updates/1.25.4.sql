@@ -1,0 +1,1 @@
+ALTER TABLE  `#__mpoll_polls` ADD  `poll_emailreplyto` int(11) NOT NULL AFTER  `poll_emailsubject`

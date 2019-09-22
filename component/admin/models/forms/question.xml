@@ -137,7 +137,6 @@
 			<option value="attach">Attachment</option>
 			<option value="message">Message</option>
 			<option value="header">Header</option>
-			<option value="captcha">Captcha</option>
 		</field>
 	</fieldset>
 	<fields name="params">

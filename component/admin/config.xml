@@ -23,6 +23,15 @@
 			<option value="light">Light</option>
 		</field>
 	</fieldset>
+	<fieldset name="paypal" label="PayPal Settings">
+		<field name="paypal_mode" type="radio" class="btn-group" label="PayPal Mode">
+			<option value="sandbox">Sandbox</option>
+			<option value="production">Production</option>
+		</field>
+		<field name="paypal_api_id" type="text" label="API ID" size="70" class="inputbox" required="false" default="" />
+		<field name="paypal_api_secret" type="text" label="API Secret" size="70" class="inputbox" required="false" default="" />
+		<field name="paypal_api_webhook" type="text" label="API Webhook ID" size="70" class="inputbox" required="false" default="" />
+	</fieldset>
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
         	<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" validate="rules" filter="rules" component="com_mpoll" section="component" />
         </fieldset>

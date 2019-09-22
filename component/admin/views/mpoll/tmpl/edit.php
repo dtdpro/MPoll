@@ -12,7 +12,7 @@ $params = $this->form->getFieldsets('params');
 <script type="text/javascript">
 	Joomla.submitbutton = function(task)
 	{
-		if (task == 'product.cancel' || document.formvalidator.isValid(document.id('mpoll-form'))) {
+		if (task == 'mpoll.cancel' || document.formvalidator.isValid(document.id('mpoll-form'))) {
 			Joomla.submitform(task, document.getElementById('mpoll-form'));
 		}
 	}
@@ -61,7 +61,7 @@ $params = $this->form->getFieldsets('params');
 					<?php endforeach; ?>
 					<div class="control-group">
 						<?php echo $this->form->getLabel('poll_confmsg').$this->form->getInput('poll_confmsg'); ?>
-						<div style="clear:both">{name} Users full name<br />{email} Users email<br />{username} Users username<br />{resid} Results id
+						<div style="clear:both">{name} Users full name<br />{email} Users email<br />{username} Users username<br />{resid} Results id<br />{resurl} Results URL<br />{payurl} Pay URL
 							<?php 
 								if ($this->item->poll_id) {
 									foreach ($this->questions as $q) {
@@ -83,6 +83,29 @@ $params = $this->form->getFieldsets('params');
 				</div>	
 			</div>				
 		<?php echo JHtml::_('bootstrap.endTab'); ?>
+	<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'payment', JText::_('Payment', true)); ?>
+    <div class="row-fluid">
+        <div class="span10 form-horizontal">
+			<?php foreach($this->form->getFieldset('paymentemail') as $field): ?>
+                <div class="control-group">
+                    <div class="control-label"><?php echo $field->label;?></div>
+                    <div class="controls"><?php echo $field->input;?></div>
+                </div>
+			<?php endforeach; ?>
+            <div class="control-group">
+				<?php echo $this->form->getLabel('poll_payment_body').$this->form->getInput('poll_payment_body'); ?>
+            </div>
+        </div>
+        <div class="span2">
+			<?php foreach($this->form->getFieldset('paymentdetails') as $field): ?>
+                <div class="control-group">
+                    <div class="control-label"><?php echo $field->label;?></div>
+                    <div class="controls"><?php echo $field->input;?></div>
+                </div>
+			<?php endforeach; ?>
+        </div>
+    </div>
+	<?php echo JHtml::_('bootstrap.endTab'); ?>
 		<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'desc1', JText::_('COM_MPOLL_MPOLL_FIELD_DESC_LABEL', true)); ?>
 			<p><?php echo jText::_('COM_MPOLL_MPOLL_FIELD_DESC_DESC'); ?></p>
 			<div class="control-group">

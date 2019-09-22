@@ -40,7 +40,7 @@ function MPollBuildRoute(&$query)
 
 	
 	
-	if (!$founditem) {
+	if (!$founditem && isset($query['Itemid'])) {
 		$default = $query['Itemid'];
 	}
 		
