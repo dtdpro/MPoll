@@ -23,6 +23,8 @@ if ( $this->task == 'ballot' ) { ?>
                     error.addClass("uk-alert uk-alert-danger uk-form-controls-text");
                 },
                 submitHandler: function (form) {
+                    jQuery("#castvote").attr("disabled", true);
+                    jQuery("#castvote").prop("value", "Submitting...");
                     if (typeof ga === 'function') {
                         ga('send', 'event', 'MPoll', 'submit', '<?php echo $this->pdata->poll_name; ?>');
                     }
@@ -51,6 +53,13 @@ if ( $this->task == 'ballot' ) { ?>
 	} else if ( ! in_array( $this->pdata->access, $user->getAuthorisedViewLevels() ) ) {
 		echo '<div class="uk-alert uk-alert-danger">' . $this->pdata->poll_accessreqmsg . '</div>';
 	}
+
+	// Show ended message
+	if ($this->ended && $this->pdata->poll_end_msg) {
+	    echo '<div class="uk-alert uk-alert-warning" uk-alert>';
+		echo $this->pdata->poll_end_msg;
+	    echo '</div>';
+    }
 
 	//Message before Questions
 	echo $this->pdata->poll_desc;
@@ -506,7 +515,7 @@ if ( $this->task == 'results' ) {
 	}
 
 	//Display stats
-	if ( $this->params->get( 'showstats', 1 ) ) {
+	if ( $this->params->get( 'showstats', 0 ) ) {
 		echo '<p>';
 		echo '<b>Number of Voters:</b> ' . $this->ncast . '<br />';
 		echo '<b>First Vote:</b> ';
@@ -551,7 +560,7 @@ if ( $this->task == 'pay' ) {
         var CANCEL_PAYMENT_URL = '<?php echo JUri::root().'index.php?option=com_mpoll&task=paypal_cancel&poll=' . $this->pdata->poll_id.'&payment='.$this->payment; ?>';
 
         paypal.Button.render({
-            style: { size: 'responsive', tagline:false, fundingicons: true },
+            style: { size: 'responsive', tagline:true, fundingicons: false, label: "checkout" },
             env: '<?php echo $cfg->paypal_mode ?>',
             commit: true,
             payment: function() {

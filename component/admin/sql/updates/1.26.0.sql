@@ -32,6 +32,7 @@ ALTER TABLE `#__mpoll_polls` ADD `poll_payment_fromname` VARCHAR(255) NOT NULL A
 ALTER TABLE `#__mpoll_polls` ADD `poll_payment_fromemail` VARCHAR(255) NOT NULL AFTER `poll_payment_fromname`;
 ALTER TABLE `#__mpoll_polls` ADD `poll_payment_subject` VARCHAR(255) NOT NULL AFTER `poll_payment_fromemail`;
 ALTER TABLE `#__mpoll_polls` ADD `poll_payment_body` TEXT NOT NULL AFTER `poll_payment_subject`;
+ALTER TABLE `#__mpoll_polls` ADD `poll_results_emails` TEXT NOT NULL AFTER `poll_resultsemail`;
 
 ALTER TABLE `#__mpoll_polls` ADD `poll_payment_title` VARCHAR(255) NOT NULL AFTER `poll_payment_amount`;
 ALTER TABLE `#__mpoll_polls` ADD `poll_payment_instructions` TEXT NOT NULL AFTER `poll_payment_title`;

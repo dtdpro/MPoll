@@ -53,28 +53,16 @@ $params = $this->form->getFieldsets('params');
 		<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'results', JText::_('COM_MPOLL_MPOLL_RESULTS', true)); ?>
 			<div class="row-fluid">
 				<div class="span10 form-horizontal">
-					<?php foreach($this->form->getFieldset('confirmation') as $field): ?>
-						<div class="control-group">
-							<div class="control-label"><?php echo $field->label;?></div>
-							<div class="controls"><?php echo $field->input;?></div>
-						</div>
-					<?php endforeach; ?>
-					<div class="control-group">
-						<?php echo $this->form->getLabel('poll_confmsg').$this->form->getInput('poll_confmsg'); ?>
-						<div style="clear:both">{name} Users full name<br />{email} Users email<br />{username} Users username<br />{resid} Results id<br />{resurl} Results URL<br />{payurl} Pay URL
-							<?php 
-								if ($this->item->poll_id) {
-									foreach ($this->questions as $q) {
-										echo '<br />{i'.$q->value.'} '.$q->text;
-									}
-								}
-							
-							?>
-						</div>
-					</div>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $this->form->getLabel('poll_resultsemail');?></div>
+                        <div class="controls"><?php echo $this->form->getInput('poll_resultsemail');?></div>
+                    </div>
+                    <h4>Email Results by Options</h4>
+                    <p>Specify an email to go to a specific address based on an option selection. To set the reply to address use the field to the right. The all results email is separate and can be activated/deactivated by using the selector above.</p>
+					<?php echo $this->form->getInput('poll_results_emails'); ?>
 				</div>
 				<div class="span2">
-					<?php foreach($this->form->getFieldset('results') as $field): ?>
+					<?php foreach($this->form->getFieldset('results_all') as $field): ?>
 						<div class="control-group">
 							<div class="control-label"><?php echo $field->label;?></div>
 							<div class="controls"><?php echo $field->input;?></div>
@@ -83,6 +71,33 @@ $params = $this->form->getFieldsets('params');
 				</div>	
 			</div>				
 		<?php echo JHtml::_('bootstrap.endTab'); ?>
+	<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'confirmation', JText::_('Confirmation', true)); ?>
+    <div class="row-fluid">
+        <div class="span10 form-horizontal">
+            <div class="control-group">
+				<?php echo $this->form->getLabel('poll_confmsg').$this->form->getInput('poll_confmsg'); ?>
+                <div style="clear:both">{name} Users full name<br />{email} Users email<br />{username} Users username<br />{resid} Results id<br />{resurl} Results URL<br />{payurl} Pay URL
+					<?php
+					if ($this->item->poll_id) {
+						foreach ($this->questions as $q) {
+							echo '<br />{i'.$q->value.'} '.$q->text;
+						}
+					}
+
+					?>
+                </div>
+            </div>
+        </div>
+        <div class="span2">
+	        <?php foreach($this->form->getFieldset('confirmation') as $field): ?>
+                <div class="control-group">
+                    <div class="control-label"><?php echo $field->label;?></div>
+                    <div class="controls"><?php echo $field->input;?></div>
+                </div>
+	        <?php endforeach; ?>
+        </div>
+    </div>
+	<?php echo JHtml::_('bootstrap.endTab'); ?>
 	<?php echo JHtml::_('bootstrap.addTab', 'myTab', 'payment', JText::_('Payment', true)); ?>
     <div class="row-fluid">
         <div class="span10 form-horizontal">

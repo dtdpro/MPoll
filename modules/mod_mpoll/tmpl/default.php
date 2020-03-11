@@ -1,7 +1,6 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
 $db = JFactory::getDBO();
-
 ?>
 <script type="text/javascript">
 
@@ -283,7 +282,9 @@ $db = JFactory::getDBO();
 
 			echo '<p align="center">';
 			if ($status == 'open') {
-				echo '<button type="submit" class="button uk-button uk-button-default">Submit</button>';
+				$buttontext = "Submit";
+				if ($pdata->poll_payment_enabled) $buttontext .= " & Pay";
+				echo '<button type="submit" class="button uk-button uk-button-default">'.$buttontext.'</button>';
 			}
 
 			if ($status == 'regreq') {
@@ -302,6 +303,8 @@ $db = JFactory::getDBO();
 			echo '<input type="hidden" name="poll" value="'.$pdata->poll_id.'">';
 			echo '<input type="hidden" name="showresults" value="'.$params->get( 'showresults', 1 ).'">';
 			echo '<input type="hidden" name="showresultslink" value="'.$params->get( 'showresultslink', 0 ).'">';
+			echo '<input type="hidden" name="resultslink" value="'.JRoute::_(JUri::root().'index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'">';
+			echo '<input type="hidden" name="paylink" value="'.JRoute::_(JUri::root().'index.php?option=com_mpoll&task=pay&poll='.$pdata->poll_id).'">';
 			echo '<input type="hidden" name="resultsas" value="'.$params->get( 'resultsas', "count" ).'">';
 			echo JHtml::_('form.token');
 

@@ -4,6 +4,9 @@
 defined('_JEXEC') or die();
 
 jimport( 'joomla.application.component.model' );
+use Joomla\Registry\Registry;
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 class MPollModelMPoll extends JModelLegacy
 {
@@ -19,6 +22,15 @@ class MPollModelMPoll extends JModelLegacy
 		$query->where('published > 0');
 		$db->setQuery( $query );
 		$pdata = $db->loadObject();
+
+
+		if (property_exists($pdata, 'poll_results_emails') && $pdata->poll_results_emails !== null)
+		{
+			$registry = new Registry;
+			$registry->loadString($pdata->poll_results_emails);
+			$pdata->poll_results_emails = $registry->toArray();
+		}
+
 		return $pdata;
 	}
 
@@ -292,8 +304,6 @@ class MPollModelMPoll extends JModelLegacy
 				}
 				$resultsemail .= "<br /><br /><b>User Agent:</b> ".$_SERVER['HTTP_USER_AGENT'];
 				$resultsemail .= "<br /><b>IP:</b> ".$_SERVER['REMOTE_ADDR'];
-				$emllist = Array();
-				$emllist = explode(",",$pollinfo->poll_emailto);
 
 				$replyTo = null;
 				if ($pollinfo->poll_emailreplyto) {
@@ -301,8 +311,29 @@ class MPollModelMPoll extends JModelLegacy
 					if ($item->$replyToField) $replyTo = $item->$replyToField;
 				}
 
-				$mail = &JFactory::getMailer();
-				$sent = $mail->sendMail ($jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $pollinfo->poll_emailsubject, $resultsemail, true, null, null, null, $replyTo);
+
+				// Email Results by Options
+				if (count($pollinfo->poll_results_emails)) {
+					foreach ($pollinfo->poll_results_emails as $re) {
+						$option = explode("_",$re['option']);
+						$question = 'q_'.$option[0];
+						$answer = $option[1];
+						if ($item->$question == $answer) {
+							$emllist = Array();
+							$emllist = explode(",",$re['emailto']);
+							$mail = JFactory::getMailer();
+							$sent = $mail->sendMail( $jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $re['subject'], $resultsemail, true, null, null, null, $replyTo );
+						}
+					}
+				}
+
+				// All Results email
+				if ($pollinfo->poll_emailto) {
+					$emllist = Array();
+					$emllist = explode(",",$pollinfo->poll_emailto);
+					$mail = JFactory::getMailer();
+					$sent = $mail->sendMail( $jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $pollinfo->poll_emailsubject, $resultsemail, true, null, null, null, $replyTo );
+				}
 			}
 
 			// Confirmation email

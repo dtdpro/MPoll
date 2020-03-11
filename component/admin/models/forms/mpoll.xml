@@ -83,19 +83,43 @@
             <option value="0">No</option>
         </field>
     </fieldset>
-    <fieldset name="results">
+    <fieldset name="results_opts">
         <field
-                name="poll_printresults"
-                type="radio"
-                label="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_LABEL"
-                description="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_DESC"
-                size="1"
-                class="btn-group"
-                required="false"
-                default="0">
-            <option value="1">Yes</option>
-            <option value="0">No</option>
+                name="poll_results_emails"
+                type="subform"
+                label="Email Results by Options"
+                description=""
+                layout="joomla.form.field.subform.repeatable-table"
+                icon="list"
+                multiple="true"
+        >
+            <form hidden="true" name="result_options" repeat="true">
+                <field
+                        name="option"
+                        type="ResultOptions"
+                        label="Option"
+                        description=""
+                        size="40"
+                        class="inputbox"
+                        required="false"
+                        default=""
+                />
+                <field
+                        name="emailto"
+                        type="text"
+                        label="Email To"
+                        size="30"
+                />
+                <field
+                        name="subject"
+                        type="text"
+                        label="Subject"
+                        size="30"
+                />
+            </form>
         </field>
+    </fieldset>
+    <fieldset name="results">
         <field
                 name="poll_resultsemail"
                 type="radio"
@@ -108,6 +132,8 @@
             <option value="1">Yes</option>
             <option value="0">No</option>
         </field>
+    </fieldset>
+    <fieldset name="results_all">
         <field
                 name="poll_emailto"
                 type="text"
@@ -396,6 +422,16 @@
             <option value="0">No</option>
         </field>
         <field
+                name="poll_end_msg"
+                type="text"
+                label="COM_MPOLL_MPOLL_FIELD_ENDMSG_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_ENDMSG_DESC"
+                size="40"
+                class="inputbox"
+                required="false"
+                default=""
+        />
+        <field
                 name="poll_only"
                 type="radio"
                 label="COM_MPOLL_MPOLL_FIELD_ONLY_LABEL"
@@ -450,6 +486,18 @@
                 class="btn-group"
                 required="true"
                 default="1">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </field>
+        <field
+                name="poll_printresults"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="0">
             <option value="1">Yes</option>
             <option value="0">No</option>
         </field>

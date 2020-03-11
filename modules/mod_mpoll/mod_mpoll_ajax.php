@@ -25,6 +25,7 @@ $showresults  = JRequest::getVar('showresults');
 $showresultslink  = JRequest::getVar('showresultslink');
 $resultsas  = JRequest::getVar('resultsas');
 $resultslink  = urldecode(JRequest::getVar('resultslink'));
+$paylink  = urldecode(JRequest::getVar('paylink'));
 
 // Get poll data
 $pquery = $db->getQuery(true);
@@ -34,6 +35,11 @@ $pquery->where('poll_id = '.$pollid);
 $pquery->where('published > 0');
 $db->setQuery( $pquery );
 $pdata = $db->loadObject();
+
+if (property_exists($pdata, 'poll_results_emails') && $pdata->poll_results_emails !== null)
+{
+	$pdata->poll_results_emails = json_decode($pdata->poll_results_emails,true);
+}
 
 // reCAPTCHA
 if ($pdata->poll_recaptcha) {
@@ -63,9 +69,13 @@ if ($pdata->poll_recaptcha) {
 }
 
 // Save completed
+$pubid = bin2hex(random_bytes(16));
 $cmrec=new stdClass();
 $cmrec->cm_user=$user->id;
 $cmrec->cm_poll=$pollid;
+$cmrec->cm_pubid=$pubid;
+if ($pdata->poll_payment_enabled) $cmrec->cm_status="unpaid";
+else $cmrec->cm_status="completed";
 $cmrec->cm_useragent=$_SERVER['HTTP_USER_AGENT'];
 $cmrec->cm_ipaddr=$_SERVER['REMOTE_ADDR'];
 $db->insertObject('#__mpoll_completed',$cmrec);
@@ -194,6 +204,7 @@ try {
 
 	// Results email
 	if ($pdata->poll_resultsemail) {
+		$resultsemail = 'A submission has been made to the form <strong>'.$pdata->poll_name.'</strong> with  ID #<strong>'.$subid.'</strong> Submission data is below.<br /><br />';
 		$requery=$db->getQuery(true);
 		$requery->select('*');
 		$requery->from('#__mpoll_questions');
@@ -203,7 +214,6 @@ try {
 		$requery->order('ordering ASC');
 		$db->setQuery( $requery );
 		$flist = $db->loadObjectList();
-		$resultsemail = "";
 		foreach ($flist as $d) {
 			if ($d->q_type != "captcha" && $d->q_type != "message" && $d->q_type != "header") {
 				$fieldname = 'q_'.$d->q_id;
@@ -237,8 +247,74 @@ try {
 			if ($item->$replyToField) $replyTo = $item->$replyToField;
 		}
 
-		$mail = &JFactory::getMailer();
+		// Email Results by Options
+		if (count($pdata->poll_results_emails)) {
+			foreach ($pdata->poll_results_emails as $re) {
+				$option = explode("_",$re['option']);
+				$question = 'q_'.$option[0];
+				$answer = $option[1];
+				if ($item->$question == $answer) {
+					$emllist = Array();
+					$emllist = explode(",",$re['emailto']);
+					$mail = JFactory::getMailer();
+					$sent = $mail->sendMail( $jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $re['subject'], $resultsemail, true, null, null, null, $replyTo );
+				}
+			}
+		}
+
+		$mail = JFactory::getMailer();
 		$sent = $mail->sendMail ($jconfig->get( 'mailfrom' ), $jconfig->get( 'fromname' ), $emllist, $pdata->poll_emailsubject, $resultsemail, true, null, null, null, $replyTo);
+	}
+
+	// Confirmation email
+	if ($pdata->poll_confemail && $pdata->poll_confemail_to) {
+		$requery=$db->getQuery(true);
+		$requery->select('*');
+		$requery->from('#__mpoll_questions');
+		$requery->where('published > 0');
+		$requery->where('q_poll = '.$pollid);
+		$requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar")');
+		$requery->order('ordering ASC');
+		$db->setQuery( $requery );
+		$flist = $db->loadObjectList();
+		$completedid = base64_encode('cmplid='.$subid.'&id=' . $pubid);
+		$cmplurl = $resultslink.'&cmpl=' . $completedid;
+		$payurl = $paylink. '&payment=' . $completedid;
+
+		$confemail = $pdata->poll_confmsg;
+		$confemail = str_replace("{name}",$user->name,$confemail);
+		$confemail = str_replace("{username}",$user->username,$confemail);
+		$confemail = str_replace("{email}",$user->email,$confemail);
+		$confemail = str_replace("{resid}",$subid,$confemail);
+		$confemail = str_replace("{resurl}",$cmplurl,$confemail);
+		$confemail = str_replace("{payurl}",$payurl,$confemail);
+		foreach ($flist as $d) {
+			$fieldname = 'q_'.$d->q_id;
+			if ($d->q_type=="attach") {
+
+			} else if (in_array($fieldname,$optfs)) {
+				$youropts="";
+				$youropts = $optionsdata[$item->$fieldname];
+				if ($other->$fieldname) $youropts .= ': '.$other->$fieldname;
+				$confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
+			} else if (in_array($fieldname,$moptfs)) {
+				$youropts="";
+				$ans = explode(" ",$item->$fieldname);
+				foreach ($ans as $i) {
+					$youropts .= $optionsdata[$i].' ';
+				}
+				$confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
+			} else {
+				$confemail = str_replace("{i".$d->q_id."}",$item->$fieldname,$confemail);
+			}
+		}
+		$confTo = null;
+		if ($pdata->poll_confemail_to) {
+			$confToField = 'q_'.$pdata->poll_confemail_to;
+			if ($item->$confToField) $confTo = $item->$confToField;
+		}
+		$mail = JFactory::getMailer();
+		$sent = $mail->sendMail ($pdata->poll_conffromemail, $pdata->poll_conffromname, $confTo, $pdata->poll_confsubject, $confemail, true);
 	}
 }
 catch (Exception $e)
@@ -251,6 +327,11 @@ catch (Exception $e)
 // Show before results message
 if ($pdata->poll_results_msg_before) echo $pdata->poll_results_msg_before;
 
+if ($pdata->poll_payment_enabled) {
+	$completedid = base64_encode( 'cmplid=' . $subid . '&id=' . $pubid );
+	$payurl = $paylink. '&payment=' . $completedid;
+	echo '<p align="center"><a href="'.$payurl.'" class="button uk-button uk-button-default">Pay Here</a></p>';
+}
 
 // Show results
 if ($pdata->poll_showresults && $showresults) {
@@ -304,7 +385,9 @@ if ($pdata->poll_showresults && $showresults) {
 // Show after results module message
 if ($pdata->poll_results_msg_mod) echo $pdata->poll_results_msg_mod;
 if ($showresultslink) {
-	echo '<p align="center"><a href="'.$resultslink.'" class="button">Results</a></p>';
+	$completedid = base64_encode( 'cmplid=' . $subid . '&id=' . $pubid );
+	$cmplurl = $resultslink.'&cmpl=' . $completedid;
+	echo '<p align="center"><a href="'.$cmplurl.'" class="button uk-button uk-button-default">Results</a></p>';
 }
 
 function canUpload($file,&$err)

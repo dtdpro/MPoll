@@ -15,6 +15,7 @@ class MPollViewPollResults extends JViewLegacy
 		$model = $this->getModel('pollresults');
 		$this->items = $model->getResponses($this->questions);
 		$this->options = $model->getOptions($this->questions);
+		$this->poll = $model->getPoll();
 		$this->users = $model->getUsers();
 	
 		MPOLLHelper::addPollSubmenu(JRequest::getVar('view'),$this->polltitle);

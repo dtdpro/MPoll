@@ -110,6 +110,20 @@ class MPollModelPollResults extends JModelList
 			return "NO POLL";
 		}
 	}
+
+	public function getPoll() {
+		$db = JFactory::getDBO();
+		$query = $db->getQuery(true);
+		$pollId = $this->getState('poll');
+
+		if (is_numeric($pollId)) {
+			$query->select('*');
+			$query->from('#__mpoll_polls');
+			$query->where('poll_id = '.(int) $pollId);
+			$db->setQuery($query);
+			return $db->loadObject();
+		}
+	}
 	
 	public function delete(&$pks)
 	{

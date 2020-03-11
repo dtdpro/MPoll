@@ -5,6 +5,9 @@ defined('_JEXEC') or die('Restricted access');
 
 // import Joomla modelform library
 jimport('joomla.application.component.modeladmin');
+use Joomla\Registry\Registry;
+use Joomla\String\StringHelper;
+use Joomla\Utilities\ArrayHelper;
 
 class MPollModelMPoll extends JModelAdmin
 {
@@ -29,7 +32,23 @@ class MPollModelMPoll extends JModelAdmin
 		}
 		return $form;
 	}
-	
+
+	public function getItem($pk = null)
+	{
+		$result = parent::getItem($pk);
+		if ($result)
+		{
+			if (property_exists($result, 'poll_results_emails') && $result->poll_results_emails !== null)
+			{
+				$registry = new Registry;
+				$registry->loadString($result->poll_results_emails);
+				$result->poll_results_emails = $registry->toArray();
+			}
+
+		}
+		return $result;
+	}
+
 	protected function loadFormData() 
 	{
 		// Check the session for previously entered form data.

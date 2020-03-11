@@ -9,8 +9,6 @@ class JFormFieldPollEmailFields extends JFormField
 
 	protected function getInput()
 	{
-		$type = $this->form->getValue('q_type');
-		
 		$id	= (int) $this->form->getValue('poll_id');
 		if (!$id) return '<input type="hidden" name="' . $name . '" value="0" />' . '<span class="readonly">Available Once Poll is Saved</span>';
 

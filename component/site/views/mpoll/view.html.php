@@ -29,12 +29,15 @@ class MPollViewMPoll extends JViewLegacy
 				return false;
 			}
 
-			//Check Availablity
+			//Check Availablity - Start
 			if ( ( strtotime( $this->pdata->poll_start ) > strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				JError::raiseError( 404, JText::_( 'COM_MPOLL_POLL_NOT_AVAILABLE' ) );
 
 				return false;
 			}
+
+
+			//Check Availablity - End
 			if ( ( strtotime( $this->pdata->poll_end ) < strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				$this->ended = true;
 				if ( ! $this->pdata->poll_showended ) {

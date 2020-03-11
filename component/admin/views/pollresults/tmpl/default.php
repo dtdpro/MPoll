@@ -58,6 +58,9 @@ JHtml::_('formbehavior.chosen', 'select');
 			</td>
             <td>
 				<?php echo $item->cm_pubid; ?>
+                <?php if ($this->poll->poll_payment_enabled && $item->cm_status != "paid") { ?>
+                    <br><small><a href="<?php echo JRoute::_(JUri::root().'index.php?option=com_mpoll&task=pay&poll='.$this->poll->poll_id. '&payment=' . base64_encode('cmplid='.$item->cm_id.'&id=' . $item->cm_pubid),false); ?>">Payment Link</a></small>
+                <?php } ?>
             </td>
             <td>
 				<?php echo $item->cm_status; ?>
@@ -81,7 +84,9 @@ JHtml::_('formbehavior.chosen', 'select');
 						if ($item->$fno) { echo ': '.$item->$fno; }
 					}
 					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp') { echo $item->$fn; }
-					if ($qu->q_type == 'textar') { echo nl2br($item->$fn);; }
+					if ($qu->q_type == 'textar') {
+					    echo nl2br(stripcslashes($item->$fn));
+					}
 					if ($qu->q_type == 'attach') {
 					    if (strpos($item->$fn,"ERROR:") === FALSE && $item->$fn != "") {
 						    $uploaded_files = explode(",",$item->$fn);

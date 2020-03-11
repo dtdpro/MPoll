@@ -18,7 +18,7 @@
 				<option value="1">Yes</option>
 				<option value="0">No</option>
 			</field>
-			<field name="showstats" type="radio" default="1" label="Show Results Stats" description="# Voters, First and last vote time" class="btn-group">
+			<field name="showstats" type="radio" default="0" label="Show Results Stats" description="# Voters, First and last vote time" class="btn-group">
 				<option value="1">Yes</option>
 				<option value="0">No</option>
 			</field>

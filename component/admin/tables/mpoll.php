@@ -6,6 +6,7 @@ defined('_JEXEC') or die('Restricted access');
 
 // import Joomla table library
 jimport('joomla.database.table');
+use Joomla\Registry\Registry;
 
 class MPollTableMPoll extends JTable
 {
@@ -18,7 +19,19 @@ class MPollTableMPoll extends JTable
 	{
 		parent::__construct('#__mpoll_polls', 'poll_id', $db);
 	}
-	
+
+
+	public function bind($src, $ignore = '')
+	{
+		if (isset($src['poll_results_emails']) && is_array($src['poll_results_emails']))
+		{
+			$registry = new Registry;
+			$registry->loadArray($src['poll_results_emails']);
+			$src['poll_results_emails'] = (string) $registry;
+		}
+		return parent::bind($src, $ignore);
+	}
+
 	public function store($updateNulls = false)
 	{
 		$date	= JFactory::getDate();
