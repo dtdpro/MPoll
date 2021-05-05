@@ -175,9 +175,8 @@ try {
 							"",
 							$u ) . "_" . $uf['name'];
 				} else {
-					$this->setError( $err );
-
-					return false;
+					echo '<div class="uk-alert uk-alert-danger" uk-alert=""><h3>Error</h3><p>'.$err.'</p></div>';
+					die;
 				}
 			}
 		}
@@ -210,7 +209,7 @@ try {
 		$requery->from('#__mpoll_questions');
 		$requery->where('published > 0');
 		$requery->where('q_poll = '.$pollid);
-		$requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar")');
+		$requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach")');
 		$requery->order('ordering ASC');
 		$db->setQuery( $requery );
 		$flist = $db->loadObjectList();
@@ -219,7 +218,12 @@ try {
 				$fieldname = 'q_'.$d->q_id;
 				$resultsemail .= "<b>".$d->q_text.'</b><br />';
 				if ($d->q_type=="attach") {
-					if($item->$fieldname) $resultsemail .= '<a href="'.JURI::base(  ).$item->$fieldname.'">Download</a>';
+					if($item->$fieldname) {
+						$uploaded_files = explode(",",$item->$fieldname);
+						foreach ($uploaded_files as $uf) {
+							$resultsemail .= 'Download: <a href="' . str_replace("/modules/mod_mpoll","",JURI::base()) . $uf . '">'.basename($uf).'</a><br>';
+						}
+					}
 				} else if (in_array($fieldname,$optfs)) {
 					$resultsemail .= $optionsdata[$item->$fieldname];
 					if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
@@ -396,14 +400,14 @@ function canUpload($file,&$err)
 
 	//Check for File
 	if (empty($file['name'])) {
-		$err="No File";
+		$err="No File.  Please resubmit.";
 		return false;
 	}
 
 	//Check filename is safe
 	jimport('joomla.filesystem.file');
 	if ($file['name'] !== JFile::makesafe($file['name'])) {
-		$err="Bad file name";
+		$err="Bad file name.  Please resubmit.";
 		return false;
 	}
 
@@ -414,7 +418,7 @@ function canUpload($file,&$err)
 	$ignored = explode(',', $params->get('ignore_extensions'));
 	if (!in_array($format, $allowable) && !in_array($format, $ignored))
 	{
-		$err="Filetype Not Allowed";
+		$err="Filetype Not Allowed.  Please resubmit.";
 		return false;
 	}
 
@@ -422,7 +426,7 @@ function canUpload($file,&$err)
 	$maxSize = (int) ($params->get('upload_maxsize', 0) * 1024 * 1024);
 	if ($maxSize > 0 && (int) $file['size'] > $maxSize)
 	{
-		$err = 'File too Large';
+		$err = 'File too Large.  Please resubmit.';
 		return false;
 	}
 
@@ -433,7 +437,7 @@ function canUpload($file,&$err)
 	foreach($html_tags as $tag) {
 		// A tag is '<tagname ', so we need to add < and a space or '<tagname>'
 		if (stristr($xss_check, '<'.$tag.' ') || stristr($xss_check, '<'.$tag.'>')) {
-			$err="Bad file";
+			$err="Bad file.  Please resubmit.";
 			return false;
 		}
 	}

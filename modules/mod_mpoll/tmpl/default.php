@@ -32,7 +32,7 @@ $db = JFactory::getDBO();
                         jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
                     },
                     error: function(errResponse) {
-                        jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( errResponse );
+                        jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).append( errResponse );
                     }
                 });
 			}

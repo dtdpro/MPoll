@@ -122,7 +122,7 @@ class MPollModelMPoll extends JModelLegacy
 		JPluginHelper::importPlugin('content');
 
 		if ($pollinfo->poll_regreq == 1 && $user->id == 0) {
-			$this->setError('Login required');
+			$this->setError('Login required.  Please resubmit.');
 			return false;
 		} else {
 			if ( !in_array($pollinfo->access,$user->getAuthorisedViewLevels())) {
@@ -185,12 +185,12 @@ class MPollModelMPoll extends JModelLegacy
 				$rc_verify = file_get_contents($rc_url, false, $rc_context);
 				$rc_captcha_success=json_decode($rc_verify);
 				if ($rc_captcha_success->success==false) {
-					$this->setError('reCAPTCHA Response Required');
+					$this->setError('reCAPTCHA Response Required.  Please resubmit.');
 					return false;
 				} else if ($rc_captcha_success->success==true) {
 
 				} else {
-					$this->setError('reCAPTCHA Error');
+					$this->setError('reCAPTCHA Error.  Please resubmit.');
 					return false;
 				}
 			}
@@ -206,7 +206,7 @@ class MPollModelMPoll extends JModelLegacy
 			$cmrec->cm_useragent=$_SERVER['HTTP_USER_AGENT'];
 			$cmrec->cm_ipaddr=$_SERVER['REMOTE_ADDR'];
 			if (!$db->insertObject('#__mpoll_completed',$cmrec)) {
-				$this->setError("Error saving compleition record");
+				$this->setError("Error saving compleition record.  Please resubmit.");
 				return false;
 			}
 			$subid = $db->insertid();
@@ -234,7 +234,6 @@ class MPollModelMPoll extends JModelLegacy
 									$u ) . "_" . $uf['name'];
 						} else {
 							$this->setError( $err );
-
 							return false;
 						}
 					}
@@ -266,7 +265,7 @@ class MPollModelMPoll extends JModelLegacy
 				$cmres->res_cm=$subid;
 				$cmres->res_ans_other=$db->escape($other->$fieldname);
 				if (!$db->insertObject('#__mpoll_results',$cmres)) {
-					$this->setError("Error saving additional information");
+					$this->setError("Error saving additional information.  Please resubmit.");
 					return false;
 				}
 			}
@@ -477,14 +476,14 @@ class MPollModelMPoll extends JModelLegacy
 
 		//Check for File
 		if (empty($file['name'])) {
-			$err="No File";
+			$err="No File.  Please resubmit.";
 			return false;
 		}
 
 		//Check filename is safe
 		jimport('joomla.filesystem.file');
 		if ($file['name'] !== JFile::makesafe($file['name'])) {
-			$err="Bad file name";
+			$err="Bad file name. Please resubmit.";
 			return false;
 		}
 
@@ -495,7 +494,7 @@ class MPollModelMPoll extends JModelLegacy
 		$ignored = explode(',', $params->get('ignore_extensions'));
 		if (!in_array($format, $allowable) && !in_array($format, $ignored))
 		{
-			$err="Filetype Not Allowed";
+			$err="Filetype Not Allowed.  Please resubmit.";
 			return false;
 		}
 
@@ -503,7 +502,7 @@ class MPollModelMPoll extends JModelLegacy
 		$maxSize = (int) ($params->get('upload_maxsize', 0) * 1024 * 1024);
 		if ($maxSize > 0 && (int) $file['size'] > $maxSize)
 		{
-			$err = 'File too Large';
+			$err = 'File too Large.  Please resubmit.';
 			return false;
 		}
 
@@ -514,7 +513,7 @@ class MPollModelMPoll extends JModelLegacy
 		foreach($html_tags as $tag) {
 			// A tag is '<tagname ', so we need to add < and a space or '<tagname>'
 			if (stristr($xss_check, '<'.$tag.' ') || stristr($xss_check, '<'.$tag.'>')) {
-				$err="Bad file";
+				$err="Bad file.  Please resubmit.";
 				return false;
 			}
 		}
