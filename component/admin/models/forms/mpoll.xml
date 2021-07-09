@@ -432,6 +432,28 @@
                 default=""
         />
         <field
+                name="poll_shownotstarted"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_SHOWNOTSTARTED_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_SHOWNOTSTARTED_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="0">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </field>
+        <field
+                name="poll_notstart_msg"
+                type="text"
+                label="COM_MPOLL_MPOLL_FIELD_NOTSTARTMSG_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_NOTSTARTMSG_DESC"
+                size="40"
+                class="inputbox"
+                required="false"
+                default=""
+        />
+        <field
                 name="poll_only"
                 type="radio"
                 label="COM_MPOLL_MPOLL_FIELD_ONLY_LABEL"

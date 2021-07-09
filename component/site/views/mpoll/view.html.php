@@ -21,6 +21,7 @@ class MPollViewMPoll extends JViewLegacy
 		if ($this->task != "paypal_webhook") {
 			$this->pdata = $model->getPoll( $this->pollid );
 			$this->ended = false;
+			$this->started = true;
 
 			//check if poll exists
 			if ( empty( $this->pdata ) ) {
@@ -31,9 +32,11 @@ class MPollViewMPoll extends JViewLegacy
 
 			//Check Availablity - Start
 			if ( ( strtotime( $this->pdata->poll_start ) > strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
-				JError::raiseError( 404, JText::_( 'COM_MPOLL_POLL_NOT_AVAILABLE' ) );
-
-				return false;
+				$this->started=false;
+				if ( ! $this->pdata->poll_shownotstarted ) {
+					JError::raiseError( 404, JText::_( 'COM_MPOLL_POLL_NOT_AVAILABLE' ) );
+					return false;
+				}
 			}
 
 
@@ -42,7 +45,6 @@ class MPollViewMPoll extends JViewLegacy
 				$this->ended = true;
 				if ( ! $this->pdata->poll_showended ) {
 					JError::raiseError( 404, JText::_( 'COM_MPOLL_POLL_NOT_AVAILABLE' ) );
-
 					return false;
 				}
 			}

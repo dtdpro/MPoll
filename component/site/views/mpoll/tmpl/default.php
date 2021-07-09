@@ -54,6 +54,13 @@ if ( $this->task == 'ballot' ) { ?>
 		echo '<div class="uk-alert uk-alert-danger">' . $this->pdata->poll_accessreqmsg . '</div>';
 	}
 
+	// Show not started message
+	if (!$this->started && $this->pdata->poll_notstart_msg) {
+		echo '<div class="uk-alert uk-alert-warning" uk-alert>';
+		echo $this->pdata->poll_notstart_msg;
+		echo '</div>';
+	}
+
 	// Show ended message
 	if ($this->ended && $this->pdata->poll_end_msg) {
 	    echo '<div class="uk-alert uk-alert-warning" uk-alert>';
@@ -64,7 +71,7 @@ if ( $this->task == 'ballot' ) { ?>
 	//Message before Questions
 	echo $this->pdata->poll_desc;
 
-	if ( ! $this->ended ) {
+	if ( ! $this->ended && $this->started) {
 
 		//Begin Form
 		echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data" class="uk-form';

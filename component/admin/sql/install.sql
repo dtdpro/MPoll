@@ -15,6 +15,8 @@ CREATE TABLE `#__mpoll_polls` (
   `poll_alias` varchar(255) NOT NULL,
   `poll_desc` text NOT NULL,
   `poll_start` datetime NOT NULL,
+  `poll_shownotstarted` tinyint(1) NOT NULL DEFAULT '0',
+  `poll_notstart_msg` varchar(255) NOT NULL,
   `poll_end` datetime NOT NULL,
   `poll_end_msg` varchar(255) NOT NULL,
   `poll_showended` tinyint(1) NOT NULL DEFAULT '0',
