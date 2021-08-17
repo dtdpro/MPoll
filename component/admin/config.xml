@@ -13,6 +13,7 @@
 			<option value="almost-flat">Almost Flat</option>
 			<option value="gradient">Gradient</option>
 		</field>
+		<field name="two_col_threshold" type="text" label="COM_MPOLL_CONFIG_FIELD_TWO_COL_THRESHOLD_LABEL" description="COM_MPOLL_CONFIG_FIELD_TWO_COL_THRESHOLD_DESC" size="40" class="inputbox" required="false" default="10" />
 	</fieldset>
 	<fieldset name="integrations" label="COM_MPOLL_CONFIG_INTEGRATIONS_LABEL" description="COM_MPOLL_CONFIG_INTEGRATIONS_DESC">
 		<field name="spacer_apis1" type="spacer" label="COM_MPOLL_CONFIG_RC_LABEL" />

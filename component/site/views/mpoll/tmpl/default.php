@@ -9,6 +9,10 @@ $user = JFactory::getUser();
 $cfg  = MPollHelper::getConfig();
 $ri   = 0;
 
+// setup 2 column threshold
+$twoColThreshold = $cfg->two_col_threshold;
+if (!$twoColThreshold) $twoColThreshold = 10;
+
 /*** DISPLAY POLL ***/
 if ( $this->task == 'ballot' ) { ?>
 
@@ -169,6 +173,20 @@ if ( $this->task == 'ballot' ) { ?>
 			//multi checkbox
 			if ( $f->q_type == "mcbox" ) {
 				$first = true;
+				$numOptions = count($f->options);
+				$twoCol = false;
+				$optCount = 0;
+				if ($numOptions >= $twoColThreshold) {
+					if($numOptions % 2 == 0) {
+						$numPerCol = ( $numOptions / 2 );
+					} else {
+						$numPerCol = ( ($numOptions+1) / 2 );
+					}
+					$twoCol=true;
+				}
+				if ($twoCol) {
+				    echo '<div class="row uk-grid" uk-grid><div class="col-md-6 uk-width-medium-1-2 uk-width-1-2@m">';
+				}
 				foreach ( $f->options as $o ) {
 					if ( $o->opt_selectable ) {
 						if ( ! empty( $f->value ) ) {
@@ -203,7 +221,13 @@ if ( $this->task == 'ballot' ) { ?>
 					} else {
 						echo '<span class="uk-text-bold">' . $o->text . '</span><br />';
 					}
-
+					$optCount++;
+					if ($optCount == $numPerCol) {
+						echo '</div><div class="col-md-6 uk-width-medium-1-2 uk-width-1-2@m">';
+					}
+				}
+				if ($twoCol) {
+					echo '</div></div>';
 				}
 			}
 
