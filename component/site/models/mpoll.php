@@ -7,6 +7,14 @@ jimport( 'joomla.application.component.model' );
 use Joomla\Registry\Registry;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
+
+// Load Extra Pakcages
+require JPATH_COMPONENT."/vendor/autoload.php";
+
+use MReCaptcha\MReCaptcha;
 
 class MPollModelMPoll extends JModelLegacy
 {
@@ -23,12 +31,12 @@ class MPollModelMPoll extends JModelLegacy
 		$db->setQuery( $query );
 		$pdata = $db->loadObject();
 
-
-		if (property_exists($pdata, 'poll_results_emails') && $pdata->poll_results_emails !== null)
-		{
-			$registry = new Registry;
-			$registry->loadString($pdata->poll_results_emails);
-			$pdata->poll_results_emails = $registry->toArray();
+		if ($pdata) {
+			if ( property_exists( $pdata, 'poll_results_emails' ) && $pdata->poll_results_emails !== null ) {
+				$registry = new Registry;
+				$registry->loadString( $pdata->poll_results_emails );
+				$pdata->poll_results_emails = $registry->toArray();
+			}
 		}
 
 		return $pdata;
@@ -38,6 +46,7 @@ class MPollModelMPoll extends JModelLegacy
 	{
 		$db = JFactory::getDBO();
 		$app=Jfactory::getApplication();
+		$jinput = JFactory::getApplication()->input;
 		$query=$db->getQuery(true);
 		$query->select('*');
 		$query->from('#__mpoll_questions');
@@ -86,14 +95,17 @@ class MPollModelMPoll extends JModelLegacy
 
 			//Set default/saved values
 			$fn='q_'.$q->q_id;
-			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,$q->q_default);
+			$value = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn,null);
+			if (!$value) {
+				$value = $jinput->getVar($fn,$q->q_default);
+			}
 			$other = $app->getUserState('mpoll.poll'.$pollid.'.'.$fn.'_other',$q->q_default);
 			if ($q->q_type == 'mlimit' || $q->q_type == 'multi' || $q->q_type == 'dropdown' || $q->q_type == 'mcbox' || $q->q_type == 'mlist') {
 				$q->value=explode(" ",$value);
 				$q->other = $other;
 			} else if ($q->q_type == 'cbox' || $q->q_type == 'yesno') {
 				$q->value=$value;
-			} else if ($q->q_type == 'birthday') {
+			} else if ($q->q_type == 'datedropdown') {
 				$q->value=$value;
 			} else {
 				$q->value=$value;
@@ -104,11 +116,10 @@ class MPollModelMPoll extends JModelLegacy
 
 	public function save($pollid)
 	{
-		JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+		$this->checkToken();
 		// Initialise variables;
 		$jinput = JFactory::getApplication()->input;
-		$data		= JRequest::getVar('jform', array(), 'post', 'array');
-		$dispatcher = JDispatcher::getInstance();
+		$data		= $jinput->getVar('jform', array(), 'post', 'array');
 		$isNew = true;
 		$db		= $this->getDbo();
 		$app=Jfactory::getApplication();
@@ -148,9 +159,17 @@ class MPollModelMPoll extends JModelLegacy
 					$item->$fieldname = implode(" ",$data[$fieldname]);
 				} else if ($d->q_type=='cbox') {
 					$item->$fieldname = ($data[$fieldname]=='on') ? "1" : "0";
+				} else if ($d->q_type=='datedropdown') {
+					$fmonth = (int)$data[$fieldname.'_month'];
+					$fday = (int)$data[$fieldname.'_day'];
+					$fyear = (int)$data[$fieldname.'_year'];
+					if ($fmonth < 10) $fmonth = "0".$fmonth;
+					if ($fday < 10) $fday = "0".$fday;
+					$item->$fieldname = $fmonth.'-'.$fday.'-'.$fyear;
 				} else {
 					$item->$fieldname = $data[$fieldname];
 				}
+
 				if ($d->q_type=="multi" || $d->q_type=="dropdown") {
 					$optfs[]=$fieldname;
 					$other->$fieldname=$data[$fieldname."_other"];
@@ -170,27 +189,18 @@ class MPollModelMPoll extends JModelLegacy
 
 			// reCAPTCHA
 			if ($pollinfo->poll_recaptcha) {
-				$rc_url = 'https://www.google.com/recaptcha/api/siteverify';
-				$rc_data = array(
-					'secret' => $cfg->rc_api_secret,
-					'response' => $_POST["g-recaptcha-response"]
-				);
-				$rc_options = array(
-					'http' => array (
-						'method' => 'POST',
-						'content' => http_build_query($rc_data)
-					)
-				);
-				$rc_context  = stream_context_create($rc_options);
-				$rc_verify = file_get_contents($rc_url, false, $rc_context);
-				$rc_captcha_success=json_decode($rc_verify);
-				if ($rc_captcha_success->success==false) {
-					$this->setError('reCAPTCHA Response Required.  Please resubmit.');
-					return false;
-				} else if ($rc_captcha_success->success==true) {
+				$recaptchaCheck = new MReCaptcha($cfg->rc_api_secret);
 
+				if ($cfg->rc_theme == "v3") {
+					$resp = $recaptchaCheck->setScoreThreshold(0.75)
+					                  ->setExpectedAction('submit')
+					                  ->verify($_POST["g-recaptcha-response"]);
 				} else {
-					$this->setError('reCAPTCHA Error.  Please resubmit.');
+					$resp = $recaptchaCheck->verify($_POST["g-recaptcha-response"]);
+				}
+
+				if (!$resp->isSuccess()) {
+					$this->setError('reCAPTCHA verification unsuccessful.  Please resubmit.');
 					return false;
 				}
 			}
@@ -215,7 +225,7 @@ class MPollModelMPoll extends JModelLegacy
 			// Upload files
 			foreach ($upfile as $u) {
 				$config		= JFactory::getConfig();
-				$userfiles = $jinput->files->get($u, array(), 'array'); //JRequest::getVar($u.'[]', array(), 'files', 'array');
+				$userfiles = $jinput->files->get($u, array(), 'array');
 				$uploaded_files = array();
 				foreach ($userfiles as $uf) {
 					if (!$uf['error']) {
@@ -413,7 +423,7 @@ class MPollModelMPoll extends JModelLegacy
 		$q->from('#__mpoll_completed');
 		$q->where('cm_id = '.$cmid);
 		if ($pubid) $q->where('cm_pubid = "'.$pubid.'"');
-		$q->limit('1');
+		$q->setLimit('1');
 		$db->setQuery($q);
 		$data = $db->loadObject();
 		return $data;
@@ -425,7 +435,7 @@ class MPollModelMPoll extends JModelLegacy
 		$q->from('#__mpoll_completed');
 		$q->where('cm_poll = '.$pollid);
 		$q->order('cm_time ASC');
-		$q->limit('1');
+		$q->setLimit('1');
 		$db->setQuery($q);
 		$data = $db->loadAssoc();
 		return $data['cm_time'];
@@ -437,7 +447,7 @@ class MPollModelMPoll extends JModelLegacy
 		$q->from('#__mpoll_completed');
 		$q->where('cm_poll = '.$pollid);
 		$q->order('cm_time DESC');
-		$q->limit('1');
+		$q->setLimit('1');
 		$db->setQuery($q);
 		$data = $db->loadAssoc();
 		return $data['cm_time'];
@@ -490,7 +500,8 @@ class MPollModelMPoll extends JModelLegacy
 		$format = strtolower(JFile::getExt($file['name']));
 
 		//Check if type allowed
-		$allowable = explode(',', $params->get('upload_extensions'));
+		if (JVersion::MAJOR_VERSION == 3) $allowable = explode(',', $params->get('upload_extensions'));
+		else $allowable = explode(',', $params->get('restrict_uploads_extensions'));
 		$ignored = explode(',', $params->get('ignore_extensions'));
 		if (!in_array($format, $allowable) && !in_array($format, $ignored))
 		{
@@ -508,7 +519,7 @@ class MPollModelMPoll extends JModelLegacy
 
 
 		//other checks
-		$xss_check =  JFile::read($file['tmp_name'], false, 256);
+		$xss_check =  file_get_contents($file['tmp_name'], false, null, -1, 256);
 		$html_tags = array('abbr', 'acronym', 'address', 'applet', 'area', 'audioscope', 'base', 'basefont', 'bdo', 'bgsound', 'big', 'blackface', 'blink', 'blockquote', 'body', 'bq', 'br', 'button', 'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'comment', 'custom', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'fn', 'font', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'html', 'iframe', 'ilayer', 'img', 'input', 'ins', 'isindex', 'keygen', 'kbd', 'label', 'layer', 'legend', 'li', 'limittext', 'link', 'listing', 'map', 'marquee', 'menu', 'meta', 'multicol', 'nobr', 'noembed', 'noframes', 'noscript', 'nosmartquotes', 'object', 'ol', 'optgroup', 'option', 'param', 'plaintext', 'pre', 'rt', 'ruby', 's', 'samp', 'script', 'select', 'server', 'shadow', 'sidebar', 'small', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'tt', 'ul', 'var', 'wbr', 'xml', 'xmp', '!DOCTYPE', '!--');
 		foreach($html_tags as $tag) {
 			// A tag is '<tagname ', so we need to add < and a space or '<tagname>'
@@ -521,7 +532,6 @@ class MPollModelMPoll extends JModelLegacy
 	}
 
 	public function PayPalCreate($poll,$completition) {
-		include_once JPATH_BASE.'/components/com_mpoll/lib/PayPal-PHP-SDK/autoload.php';
 
 		$cfg = MPollHelper::getConfig();
 		$db = JFactory::getDBO();
@@ -604,14 +614,15 @@ class MPollModelMPoll extends JModelLegacy
 	}
 
 	public function PayPalExecute($poll,$completition) {
-		include_once JPATH_BASE.'/components/com_mpoll/lib/PayPal-PHP-SDK/autoload.php';
 
 		$cfg = MPollHelper::getConfig();
 		$db = JFactory::getDBO();
 		$user = JFactory::getUser();
 
-		$paymentId = JRequest::getVar('paymentID');
-		$payerId = JRequest::getVar('payerID');
+		$jinput = JFactory::getApplication()->input;
+
+		$paymentId = $jinput->getVar('paymentID');
+		$payerId = $jinput->getVar('payerID');
 
 		if (!$payerId || !$paymentId) {
 			$this->setError("Payment ID or Payer ID Not provided");
@@ -747,8 +758,9 @@ class MPollModelMPoll extends JModelLegacy
 		$cfg = MPollHelper::getConfig();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
+		$jinput = JFactory::getApplication()->input;
 
-		$paymentId = JRequest::getVar('paymentID');
+		$paymentId = $jinput->getVar('paymentID');
 
 		$paymentquery = $db->getQuery(true);
 		$paymentquery->select('*');
@@ -782,7 +794,6 @@ class MPollModelMPoll extends JModelLegacy
 	}
 
 	public function PayPalWebhook() {
-		include_once JPATH_BASE.'/components/com_mpoll/lib/PayPal-PHP-SDK/autoload.php';
 		$cfg = MPollHelper::getConfig();
 		$db   = JFactory::getDBO();
 		$jinput = JFactory::getApplication()->input;
@@ -965,6 +976,26 @@ class MPollModelMPoll extends JModelLegacy
 		if ($headers) $newpaylog->log_headers=$db->escape($headers);
 		if ($data) $newpaylog->log_data=$db->escape($data);
 		$db->insertObject('#__mpoll_payment_log',$newpaylog);
+	}
+
+	public function checkToken($method = 'post', $redirect = true)
+	{
+		$valid = Session::checkToken($method);
+
+		if (!$valid && $redirect)
+		{
+			$referrer = $this->input->server->getString('HTTP_REFERER');
+
+			if (!Uri::isInternal($referrer))
+			{
+				$referrer = 'index.php';
+			}
+
+			$this->app->enqueueMessage(Text::_('JINVALID_TOKEN_NOTICE'), 'warning');
+			$this->app->redirect($referrer);
+		}
+
+		return $valid;
 	}
 
 

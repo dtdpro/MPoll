@@ -6,6 +6,11 @@
 			type="hidden"
 		/>
 		<field
+				name="q_match"
+				type="hidden"
+				default="0"
+		/>
+		<field
 			name="published"
 			type="list"
 			id="published"
@@ -134,6 +139,7 @@
 			<option value="mlist">Multi Select</option>
 			<option value="cbox">Check Box</option>
 			<option value="mcbox">Multi Checkbox</option>
+			<option value="datedropdown">Date Dropdown</option>
 			<option value="attach">Attachment</option>
 			<option value="message">Message</option>
 			<option value="header">Header</option>

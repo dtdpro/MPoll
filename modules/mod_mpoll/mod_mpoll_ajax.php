@@ -10,22 +10,56 @@ require_once ( JPATH_BASE .'/includes/defines.php' );
 require_once ( JPATH_BASE .'/includes/framework.php' );
 require_once ( JPATH_BASE .'/components/com_mpoll/helpers/mpoll.php' );
 
-$mainframe = JFactory::getApplication('site');
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
+if (JVersion::MAJOR_VERSION == 3) {
+	$mainframe = JFactory::getApplication( 'site' );
+} else {
+	//$startTime = microtime(1);
+	//$startMem  = memory_get_usage();
+	if (!file_exists(JPATH_LIBRARIES . '/vendor/autoload.php') || !is_dir(JPATH_ROOT . '/media/vendor'))
+	{
+		echo file_get_contents(JPATH_ROOT . '/templates/system/build_incomplete.html');
+
+		exit;
+	}
+
+	// Set profiler start time and memory usage and mark afterLoad in the profiler.
+	//JDEBUG && \Joomla\CMS\Profiler\Profiler::getInstance('Application')->setStart($startTime, $startMem)->mark('afterLoad');
+
+	// Boot the DI container
+	$container = \Joomla\CMS\Factory::getContainer();
+
+	$container->alias('session.web', 'session.web.site')
+	          ->alias('session', 'session.web.site')
+	          ->alias('JSession', 'session.web.site')
+	          ->alias(\Joomla\CMS\Session\Session::class, 'session.web.site')
+	          ->alias(\Joomla\Session\Session::class, 'session.web.site')
+	          ->alias(\Joomla\Session\SessionInterface::class, 'session.web.site');
+
+	// Instantiate the application.
+	$app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
+
+	// Set the application as global app
+	\Joomla\CMS\Factory::$application = $app;
+}
 $jconfig = JFactory::getConfig();
+$jinput = JFactory::getApplication()->input;
 $db  = JFactory::getDBO();
 $user = JFactory::getUser();
 $date = new JDate('now');
 $cfg = MPollHelper::getConfig();
 
-JRequest::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+checkToken() or die(Text::_('JINVALID_TOKEN'));
 
-$data = JRequest::getVar('jform', array(), 'post', 'array');
-$pollid  = JRequest::getVar('poll');
-$showresults  = JRequest::getVar('showresults');
-$showresultslink  = JRequest::getVar('showresultslink');
-$resultsas  = JRequest::getVar('resultsas');
-$resultslink  = urldecode(JRequest::getVar('resultslink'));
-$paylink  = urldecode(JRequest::getVar('paylink'));
+$data = $jinput->getVar('jform', array(), 'post', 'array');
+$pollid  = $jinput->getVar('poll');
+$showresults  = $jinput->getVar('showresults');
+$showresultslink  = $jinput->getVar('showresultslink');
+$resultsas  = $jinput->getVar('resultsas');
+$resultslink  = urldecode($jinput->getVar('resultslink'));
+$paylink  = urldecode($jinput->getVar('paylink'));
 
 // Get poll data
 $pquery = $db->getQuery(true);
@@ -43,27 +77,20 @@ if (property_exists($pdata, 'poll_results_emails') && $pdata->poll_results_email
 
 // reCAPTCHA
 if ($pdata->poll_recaptcha) {
-	$rc_url = 'https://www.google.com/recaptcha/api/siteverify';
-	$rc_data = array(
-		'secret' => $cfg->rc_api_secret,
-		'response' => $_POST["g-recaptcha-response"]
-	);
-	$rc_options = array(
-		'http' => array (
-			'method' => 'POST',
-			'content' => http_build_query($rc_data)
-		)
-	);
-	$rc_context  = stream_context_create($rc_options);
-	$rc_verify = file_get_contents($rc_url, false, $rc_context);
-	$rc_captcha_success=json_decode($rc_verify);
-	if ($rc_captcha_success->success==false) {
-		echo '<div class="uk-alert uk-alert-danger" uk-alert=""><h3>Error</h3><p>reCAPTCHA Response Required</p></div>';
-		die;
-	} else if ($rc_captcha_success->success==true) {
+	require JPATH_BASE.'/components/com_mpoll/vendor/autoload.php';
 
+	$recaptcha = new \MReCaptcha\MReCaptcha($cfg->rc_api_secret);
+
+	if ($cfg->rc_theme == "v3") {
+		$resp = $recaptcha->setScoreThreshold(0.75)
+		                  ->setExpectedAction('submit')
+		                  ->verify($_POST["g-recaptcha-response"]);
 	} else {
-		echo '<div class="uk-alert uk-alert-danger" uk-alert=""><h3>Error</h3><p>reCAPTCHA Error</p></div>';
+		$resp = $recaptcha->verify($_POST["g-recaptcha-response"]);
+	}
+
+	if (!$resp->isSuccess()) {
+		echo '<div class="uk-alert uk-alert-danger" uk-alert=""><h3>Error</h3><p>reCAPTCHA verification unsuccessful.</p></div>';
 		die;
 	}
 }
@@ -88,7 +115,7 @@ $qquery->select('*');
 $qquery->from('#__mpoll_questions');
 $qquery->where('published > 0');
 $qquery->where('q_poll = '.$pollid);
-$qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach")');
+$qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach","datedropdown")');
 $qquery->order('ordering ASC');
 $db->setQuery( $qquery );
 $qdata = $db->loadObjectList();
@@ -128,6 +155,13 @@ try {
 			else $item->$fieldname = "";
 		} else if ($d->q_type=='cbox') {
 			$item->$fieldname = ($data[$fieldname]=='on') ? "1" : "0";
+		} else if ($d->q_type=='datedropdown') {
+			$fmonth = (int)$data[$fieldname.'_month'];
+			$fday = (int)$data[$fieldname.'_day'];
+			$fyear = (int)$data[$fieldname.'_year'];
+			if ($fmonth < 10) $fmonth = "0".$fmonth;
+			if ($fday < 10) $fday = "0".$fday;
+			$item->$fieldname = $fmonth.'-'.$fday.'-'.$fyear;
 		} else {
 			$item->$fieldname = $data[$fieldname];
 		}
@@ -196,6 +230,8 @@ try {
 			$cmres->res_cm=$subid;
 			if (isset($other->$fieldname)) {
 				$cmres->res_ans_other = $db->escape( $other->$fieldname );
+			} else {
+				$cmres->res_ans_other = "";
 			}
 			$db->insertObject('#__mpoll_results',$cmres);
 		}
@@ -414,7 +450,8 @@ function canUpload($file,&$err)
 	$format = strtolower(JFile::getExt($file['name']));
 
 	//Check if type allowed
-	$allowable = explode(',', $params->get('upload_extensions'));
+	if (JVersion::MAJOR_VERSION == 3) $allowable = explode(',', $params->get('upload_extensions'));
+	else $allowable = explode(',', $params->get('restrict_uploads_extensions'));
 	$ignored = explode(',', $params->get('ignore_extensions'));
 	if (!in_array($format, $allowable) && !in_array($format, $ignored))
 	{
@@ -432,7 +469,7 @@ function canUpload($file,&$err)
 
 
 	//other checks
-	$xss_check =  JFile::read($file['tmp_name'], false, 256);
+	$xss_check =  file_get_contents($file['tmp_name'], false, null, -1, 256);
 	$html_tags = array('abbr', 'acronym', 'address', 'applet', 'area', 'audioscope', 'base', 'basefont', 'bdo', 'bgsound', 'big', 'blackface', 'blink', 'blockquote', 'body', 'bq', 'br', 'button', 'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'comment', 'custom', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'fn', 'font', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'html', 'iframe', 'ilayer', 'img', 'input', 'ins', 'isindex', 'keygen', 'kbd', 'label', 'layer', 'legend', 'li', 'limittext', 'link', 'listing', 'map', 'marquee', 'menu', 'meta', 'multicol', 'nobr', 'noembed', 'noframes', 'noscript', 'nosmartquotes', 'object', 'ol', 'optgroup', 'option', 'param', 'plaintext', 'pre', 'rt', 'ruby', 's', 'samp', 'script', 'select', 'server', 'shadow', 'sidebar', 'small', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title', 'tr', 'tt', 'ul', 'var', 'wbr', 'xml', 'xmp', '!DOCTYPE', '!--');
 	foreach($html_tags as $tag) {
 		// A tag is '<tagname ', so we need to add < and a space or '<tagname>'
@@ -442,4 +479,11 @@ function canUpload($file,&$err)
 		}
 	}
 	return true;
+}
+
+function checkToken($method = 'post', $redirect = true)
+{
+	$valid = Session::checkToken($method);
+
+	return $valid;
 }

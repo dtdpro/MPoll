@@ -6,6 +6,8 @@ defined('_JEXEC') or die('Restricted access');
 // import Joomla controlleradmin library
 jimport('joomla.application.component.controlleradmin');
 
+use Joomla\Utilities\ArrayHelper;
+
 
 class MPollControllerMPolls extends JControllerAdmin
 {
@@ -26,7 +28,9 @@ class MPollControllerMPolls extends JControllerAdmin
 	function copy()
 	{
 		// Check for request forgeries
-		JRequest::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		$this->checkToken();
+
+		$jinput = JFactory::getApplication()->input;
 	
 		// Access check.
 		if (!$this->allowAdd())
@@ -46,7 +50,7 @@ class MPollControllerMPolls extends JControllerAdmin
 		}
 		
 		// Get items to remove from the request.
-		$cid = JRequest::getVar('cid', array(), '', 'array');
+		$cid = $jinput->get('cid', array(), 'array');
 	
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -58,8 +62,7 @@ class MPollControllerMPolls extends JControllerAdmin
 			$model = $this->getModel();
 				
 			// Make sure the item ids are integers
-			jimport('joomla.utilities.arrayhelper');
-			JArrayHelper::toInteger($cid);
+			ArrayHelper::toInteger($cid);
 				
 			// Remove the items.
 			if ($model->copy($cid))
@@ -78,7 +81,7 @@ class MPollControllerMPolls extends JControllerAdmin
 	function questions()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		$this->checkToken();
 		$app = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$context = "com_mpoll.questions";

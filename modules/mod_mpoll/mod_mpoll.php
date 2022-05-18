@@ -17,6 +17,10 @@ $doc->addScript('media/com_mpoll/scripts/additional-methods.js');
 
 // Load helper
 require_once('components/com_mpoll/helpers/mpoll.php');
+
+// Load Router
+require_once('components/com_mpoll/router.php');
+
 $cfg = MPollHelper::getConfig();
 
 if ($cfg->load_uikit) {
@@ -57,10 +61,14 @@ if ( $pdata && $pdata->poll_id ) {
 		$status="accessreq";
 	}
 
-	// Load reCAPTCHA Library
-	if ($pdata->poll_recaptcha) {
+	// Load reCAPTCHA JS if enabled
+	if ( $pdata->poll_recaptcha ) {
 		$doc = JFactory::getDocument();
-		$doc->addScript('https://www.google.com/recaptcha/api.js');
+		if ($cfg->rc_theme == "v3") { // v3
+			$doc->addScript( 'https://www.google.com/recaptcha/api.js?render=' . $cfg->rc_api_key );
+		} else { // v2
+			$doc->addScript( 'https://www.google.com/recaptcha/api.js' );
+		}
 	}
 	
 	

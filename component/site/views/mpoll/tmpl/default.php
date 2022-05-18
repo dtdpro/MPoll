@@ -6,27 +6,33 @@ if ( $this->params->get( 'divwrapper', 1 ) ) {
 echo '<h2 class="title uk-article-title">' . $this->pdata->poll_name . '</h2>';
 
 $user = JFactory::getUser();
-$cfg  = MPollHelper::getConfig();
+$cfg  = $this->cfg;
 $ri   = 0;
 
-// setup 2 column threshold
-$twoColThreshold = $cfg->two_col_threshold;
-if (!$twoColThreshold) $twoColThreshold = 10;
-
 /*** DISPLAY POLL ***/
-if ( $this->task == 'ballot' ) { ?>
+if ( $this->task == 'ballot' ) {
 
+    // setup 2 column threshold
+    $twoColThreshold = $cfg->two_col_threshold;
+    if (!$twoColThreshold) $twoColThreshold = 10;
+    ?>
     <script type="text/javascript">
         jQuery(document).ready(function () {
-            jQuery("#mpollform").validate({
+            var validator = jQuery("#mpollform").validate({
                 errorClass: "uk-form-danger",
                 validClass: "uk-form-success",
+                ignore: ".ignore",
                 errorElement: "div",
                 errorPlacement: function (error, element) {
                     error.appendTo(element.parent("div"));
                     error.addClass("uk-alert uk-alert-danger uk-form-controls-text");
                 },
-                submitHandler: function (form) {
+                onsubmit: false
+            });
+
+            jQuery("#mpollform").submit(function( event ) {
+                event.preventDefault();
+                if (validator.form()) {
                     jQuery("#castvote").attr("disabled", true);
                     jQuery("#castvote").prop("value", "Submitting...");
                     if (typeof ga === 'function') {
@@ -38,7 +44,16 @@ if ( $this->task == 'ballot' ) { ?>
                             'event_label': '<?php echo $this->pdata->poll_name; ?>'
                         });
                     }
-                    $(form).submit();
+	                <?php if ( $this->pdata->poll_recaptcha && $cfg->rc_theme == "v3") { ?>
+                    grecaptcha.ready(function() {
+                        grecaptcha.execute('<?php echo $cfg->rc_api_key; ?>', {action: 'submit'}).then(function(token) {
+                            jQuery('#reCapResponse').val(token);
+                            jQuery("#mpollform")[0].submit();
+                        });
+                    });
+	                <?php } else { ?>
+                    jQuery("#mpollform")[0].submit();
+	                <?php } ?>
                 }
             });
         });
@@ -254,7 +269,9 @@ if ( $this->task == 'ballot' ) { ?>
 						echo '<label for="jform_' . $sname . $o->value . '">';
 						echo ' ' . $o->text;
 						if ( $o->opt_other ) {
-							echo ' <input type="text" value="' . $f->other . '" name="jform[' . $sname . '_other]" id="jform_' . $sname . $o->value . '_other" class="">';
+							echo ' <input type="text" value="';
+                            if ($f->other) echo $f->other;
+                            echo '" name="jform[' . $sname . '_other]" id="jform_' . $sname . $o->value . '_other" class="">';
 						}
 						echo '</label>';
 						echo '<br />' . "\n";
@@ -326,7 +343,9 @@ if ( $this->task == 'ballot' ) { ?>
 
 			//text field, phone #, email, username
 			if ( $f->q_type == "textbox" || $f->q_type == "email" ) {
-				echo '<input name="jform[' . $sname . ']" id="jform_' . $sname . '" value="' . $f->value . '" class="mf_field uk-width-1-1 uk-input" type="text"';
+				echo '<input name="jform[' . $sname . ']" id="jform_' . $sname . '" value="';
+                if ($f->value) echo $f->value;
+                echo '" class="mf_field uk-width-1-1 uk-input" type="text"';
 				if ( $f->q_req ) {
 					echo ' data-rule-required="true"';
 					if ( $f->q_min ) {
@@ -364,7 +383,9 @@ if ( $this->task == 'ballot' ) { ?>
 				if ( $f->q_req ) {
 					echo ' data-rule-required="true" data-msg-required="This Field is required"';
 				}
-				echo '>' . $f->value . '</textarea>';
+				echo '>';
+                if ($f->value) echo $f->value;
+                echo '</textarea>';
 			}
 
 			//File Attachment
@@ -375,6 +396,49 @@ if ( $this->task == 'ballot' ) { ?>
 					echo ' data-msg-required="This Field is required"';
 				}
 				echo ' />';
+			}
+
+            // Date Dropdown
+			if ( $f->q_type == 'datedropdown' ) {
+				$value = $f->value;
+				$selected = ' selected="selected"';
+				$html = "";
+				$html .= '<select id="jform_' . $sname . '_month" name="jform[' . $sname . '_month]" class="form-control mf_field input-sm uk-select uk-width-1-3">';
+				$html .= '<option value="01"'; $html .= (substr($value,0,2) == "01") ? $selected : ''; $html .= '>01 - January</option>';
+				$html .= '<option value="02"'; $html .= (substr($value,0,2) == "02") ? $selected : ''; $html .= '>02 - February</option>';
+				$html .= '<option value="03"'; $html .= (substr($value,0,2) == "03") ? $selected : ''; $html .= '>03 - March</option>';
+				$html .= '<option value="04"'; $html .= (substr($value,0,2) == "04") ? $selected : ''; $html .= '>04 - April</option>';
+				$html .= '<option value="05"'; $html .= (substr($value,0,2) == "05") ? $selected : ''; $html .= '>05 - May</option>';
+				$html .= '<option value="06"'; $html .= (substr($value,0,2) == "06") ? $selected : ''; $html .= '>06 - June</option>';
+				$html .= '<option value="07"'; $html .= (substr($value,0,2) == "07") ? $selected : ''; $html .= '>07 - July</option>';
+				$html .= '<option value="08"'; $html .= (substr($value,0,2) == "08") ? $selected : ''; $html .= '>08 - August</option>';
+				$html .= '<option value="09"'; $html .= (substr($value,0,2) == "09") ? $selected : ''; $html .= '>09 - September</option>';
+				$html .= '<option value="10"'; $html .= (substr($value,0,2) == "10") ? $selected : ''; $html .= '>10 - October</option>';
+				$html .= '<option value="11"'; $html .= (substr($value,0,2) == "11") ? $selected : ''; $html .= '>11 - November</option>';
+				$html .= '<option value="12"'; $html .= (substr($value,0,2) == "12") ? $selected : ''; $html .= '>12 - December</option>';
+				$html .= '</select>';
+
+				$html .= '<select id="jform_'.$sname.'_day" name="jform[' . $sname . '_day]" class="form-control mf_field input-sm uk-select uk-width-1-3">';
+				for ($i=1;$i<=31;$i++) {
+					if ($i<10) $val = "0".$i;
+					else $val=$i;
+					$html .= '<option value="'.$val.'"';
+					$html .= (substr($value,3,2) == $val) ? $selected : '';
+					$html .= '>'.$val.'</option>';
+				}
+				$html .=  '</select>';
+
+				$html .= '<select id="jform_'.$sname.'_year" name="jform[' . $sname . '_year]" class="form-control mf_field input-sm uk-select uk-width-1-3">';
+				for ($i=$f->q_min;$i<=$f->q_max;$i++) {
+					if ($i<10) $val = "0".$i;
+					else $val=$i;
+					$html .= '<option value="'.$val.'"';
+					$html .= (substr($value,6,4) == $val) ? $selected : '';
+					$html .= '>'.$val.'</option>';
+				}
+				$html .=  '</select>';
+
+                echo $html;
 			}
 
 			if ( $f->q_hint && $f->q_type != "captcha" ) {
@@ -389,14 +453,16 @@ if ( $this->task == 'ballot' ) { ?>
 		}
 
 		//reCAPTCHA
-		if ( $this->pdata->poll_recaptcha ) {
-			echo '<div class="uk-form-row uk-margin-top mpoll-form-' . $this->pdata->poll_pagetype . '-row' . ( $ri % 2 ) . '">';
-			echo '<div class="uk-form-label">';
-			echo '</div>';
-			echo '<div class="uk-form-controls">';
-			echo '<input type="hidden" id="reCapChecked" name="reCapChecked" value="" data-rule-required="true" data-msg-required="reCaptcha Required">';
-			echo '<div class="g-recaptcha" data-callback="reCapChecked" data-theme="' . $cfg->rc_theme . '" data-sitekey="' . $cfg->rc_api_key . '"></div>';
-			echo '</div></div>';
+		if ( $this->pdata->poll_recaptcha && $cfg->rc_theme != "v3" ) {
+            echo '<div class="uk-form-row uk-margin-top mpoll-form-' . $this->pdata->poll_pagetype . '-row' . ( $ri % 2 ) . '">';
+            echo '<div class="uk-form-label">';
+            echo '</div>';
+            echo '<div class="uk-form-controls">';
+            echo '<input type="hidden" id="reCapChecked" name="reCapChecked" value="" data-rule-required="true" data-msg-required="reCaptcha Required">';
+            echo '<div class="g-recaptcha" data-callback="reCapChecked" data-theme="' . $cfg->rc_theme . '" data-sitekey="' . $cfg->rc_api_key . '"></div>';
+            echo '</div></div>';
+		} else if ($this->pdata->poll_recaptcha && $cfg->rc_theme == "v3") {
+			echo '<input type="hidden" id="reCapResponse" name="g-recaptcha-response" value="" class="ignore">';
 		}
 
 		//Submit
@@ -409,7 +475,7 @@ if ( $this->task == 'ballot' ) { ?>
 			    $buttontext = "Submit";
 			    if ($this->pdata->poll_payment_enabled) $buttontext .= " & Pay";
 				echo JHtml::_( 'form.token' );
-				echo '<input name="castvote" id="castvote" value="'.$buttontext.'" type="submit" class="button uk-button uk-button-default">';
+				echo '<input name="castvote" id="castvote" value="'.$buttontext.'" type="submit" class="btn btn-'.$cfg->btncolor.' uk-button uk-button-'.$cfg->btncolor.'">';
 			} else {
 				echo '<div class="uk-alert uk-alert-danger">' . $this->pdata->poll_accessreqmsg . '</div>';
 			}

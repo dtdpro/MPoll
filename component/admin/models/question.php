@@ -6,6 +6,8 @@ defined('_JEXEC') or die('Restricted access');
 // import Joomla modelform library
 jimport('joomla.application.component.modeladmin');
 
+use Joomla\Utilities\ArrayHelper;
+
 class MPollModelQuestion extends JModelAdmin
 {
 
@@ -33,6 +35,7 @@ class MPollModelQuestion extends JModelAdmin
 	
 	protected function loadFormData() 
 	{
+		$jinput = JFactory::getApplication()->input;
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_mpoll.edit.question.data', array());
 		if (empty($data)) 
@@ -40,7 +43,7 @@ class MPollModelQuestion extends JModelAdmin
 			$data = $this->getItem();
 			if ($this->getState('question.q_id') == 0) {
 				$app = JFactory::getApplication();
-				$data->set('q_poll', JRequest::getInt('q_poll', $app->getUserState('com_mpoll.questions.poll')));
+				$data->set('q_poll', $jinput->getInt('q_poll', $app->getUserState('com_mpoll.questions.poll')));
 			}
 		}
 		return $data;
@@ -96,7 +99,7 @@ class MPollModelQuestion extends JModelAdmin
 	
 		// Convert to the JObject before adding other data.
 		$properties = $table->getProperties(1);
-		$item = JArrayHelper::toObject($properties, 'JObject');
+		$item = ArrayHelper::toObject($properties, 'JObject');
 	
 		if (property_exists($item, 'params'))
 		{

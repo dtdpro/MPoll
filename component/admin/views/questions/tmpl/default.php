@@ -3,9 +3,9 @@
 defined('_JEXEC') or die('Restricted Access');
 // load tooltip behavior
 JHtml::_('bootstrap.tooltip');
-JHtml::_('behavior.multiselect');
+//JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
-JHtml::_('formbehavior.chosen', 'select');
+//JHtml::_('formbehavior.chosen', 'select');
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 $app	= JFactory::getApplication();
@@ -90,7 +90,7 @@ if ($saveOrder) {
 		foreach($this->items as $i => $item):
 			?>
 				<tr class="row<?php echo $i % 2; ?>" sortable-group-id="pollquestions">
-					<td class="order nowrap center hidden-phone">
+					<td class="order nowrap center text-center hidden-phone">
 						<?php 
 						$disableClassName = '';
 						$disabledLabel	  = '';
@@ -107,29 +107,32 @@ if ($saveOrder) {
 					<td>
 						<?php echo JHtml::_('grid.id', $i, $item->q_id); ?>
 					</td>
-					<td class="center">
+					<td class="center text-center">
 						<div class="btn-group">
 							<?php echo JHtml::_('jgrid.published', $item->published, $i, 'questions.', true);?>
-							<?php echo JHtml::_('mpolladministrator.options',$i, $item->q_type, true); ?>
 							<?php
-								// Create dropdown items
-								
-								if ($item->published) :
-									JHtml::_('actionsdropdown.unpublish', 'cb' . $i, 'questions');
-								else :
-									JHtml::_('actionsdropdown.publish', 'cb' . $i, 'questions');
-								endif;
-								
-								JHtml::_('actionsdropdown.divider');
-								
-								if ($trashed) :
-									JHtml::_('actionsdropdown.untrash', 'cb' . $i, 'questions');
-								else :
-									JHtml::_('actionsdropdown.trash', 'cb' . $i, 'questions');
-								endif;
-								
-								// Render dropdown list
-								echo JHtml::_('actionsdropdown.render');
+
+							    if ( JVersion::MAJOR_VERSION == 3 ) {
+								    echo JHtml::_( 'mpolladministrator.options', $i, $item->q_type, true );
+								    // Create dropdown items
+
+								    if ( $item->published ) :
+									    JHtml::_( 'actionsdropdown.unpublish', 'cb' . $i, 'questions' );
+								    else :
+									    JHtml::_( 'actionsdropdown.publish', 'cb' . $i, 'questions' );
+								    endif;
+
+								    JHtml::_( 'actionsdropdown.divider' );
+
+								    if ( $trashed ) :
+									    JHtml::_( 'actionsdropdown.untrash', 'cb' . $i, 'questions' );
+								    else :
+									    JHtml::_( 'actionsdropdown.trash', 'cb' . $i, 'questions' );
+								    endif;
+
+								    // Render dropdown list
+								    echo JHtml::_( 'actionsdropdown.render' );
+							    }
 							?>
 						</div>
 					</td>
@@ -152,15 +155,20 @@ if ($saveOrder) {
 									case "captcha": echo 'Captcha'; break;
 									case "mlist": echo 'Multi Select'; break;
 									case "mailchimp": echo 'Mailchimp List'; break;
+                                    case "datedropdown": echo 'Date Dropdown'; break;
 								} ?>
 								<?php 
 									if ($item->q_type=='mlist' ||$item->q_type=='multi' || $item->q_type=='mcbox' || $item->q_type=='dropdown') {
-										echo ' | <strong>Options:</strong> '.$item->options; 
+										echo ' | <strong>Options:</strong> '.$item->options;
+								        if ( JVersion::MAJOR_VERSION == 4 ) {
+                                            echo ' | ';
+									        echo JHtml::_( 'mpolladministrator.options', $i, $item->q_type, true );
+								        }
 									}
 								?>
 							</div>
 					</td>
-					<td align="center" class="small">
+					<td class="small center text-center">
 						<?php echo ($item->q_req) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
 					<td>

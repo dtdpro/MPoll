@@ -36,7 +36,8 @@ class MPollViewOption extends JViewLegacy
 	
 	protected function addToolBar() 
 	{
-		JRequest::setVar('hidemainmenu', true);
+		$jinput = JFactory::getApplication()->input;
+		$jinput->set('hidemainmenu', true);
 		$user = JFactory::getUser();
 		$userId = $user->id;
 		$isNew = $this->item->opt_id == 0;

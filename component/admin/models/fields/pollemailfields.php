@@ -10,7 +10,7 @@ class JFormFieldPollEmailFields extends JFormField
 	protected function getInput()
 	{
 		$id	= (int) $this->form->getValue('poll_id');
-		if (!$id) return '<input type="hidden" name="' . $name . '" value="0" />' . '<span class="readonly">Available Once Poll is Saved</span>';
+		if (!$id) return '<input type="hidden" name="' . $this->name . '" value="0" />' . '<span class="readonly">Available Once Poll is Saved</span>';
 
 		$html = array();
 		$attr = '';
@@ -24,8 +24,8 @@ class JFormFieldPollEmailFields extends JFormField
 		if (!$id) return $this->getTextField();
 
 		// Build the query for the ordering list.
-		$html[] = '<select name="'.$this->name.'" class="inputbox" '.$attr.'>';
-		$html[] = '<option value="">None</option>';
+		$html[] = '<select name="'.$this->name.'" class="inputbox form-select" '.$attr.'>';
+		$html[] = '<option value="0">-- None --</option>';
 		$query = 'SELECT q_id AS value, q_name AS text' .
 		         ' FROM #__mpoll_questions' .
 		         ' WHERE q_type = "email" && q_poll = ' . $id .

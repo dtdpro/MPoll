@@ -36,13 +36,11 @@ class MPollTableMPoll extends JTable
 	{
 		$date	= JFactory::getDate();
 		$user	= JFactory::getUser();
-		if ($this->poll_id) {
-			// Existing item
-			$this->poll_modified		= $date->toSql();
-			$this->poll_modified_by	= $user->get('id');
-		} else {
-			// New weblink. A weblink created and created_by field can be set by the user,
-			// so we don't touch either of these if they are set.
+
+		$this->poll_modified = $date->toSql();
+		$this->poll_modified_by	= $user->get('id');
+
+		if (!$this->poll_id) {
 			if (!intval($this->poll_created)) {
 				$this->poll_created = $date->toSql();
 			}
@@ -82,7 +80,7 @@ class MPollTableMPoll extends JTable
 		if (empty($this->poll_alias)) {
 			$this->poll_alias = $this->poll_name;
 		}
-		$this->poll_alias = JApplication::stringURLSafe($this->poll_alias);
+		$this->poll_alias = JApplicationHelper::stringURLSafe($this->poll_alias);
 		if (trim(str_replace('-','',$this->poll_alias)) == '') {
 			$this->poll_alias = JFactory::getDate()->format("Y-m-d-H-i-s");
 		}

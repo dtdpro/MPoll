@@ -79,30 +79,51 @@ JHtml::_('formbehavior.chosen', 'select');
             		$fno='q_'.$qu->q_id.'_other';
 					echo '<td>';
 					$qnum = 'q'.$qu->q_id.'ans';
-					if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') { 
-						echo $this->options[$item->$fn];
-						if ($item->$fno) { echo ': '.$item->$fno; }
-					}
-					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp') { echo $item->$fn; }
-					if ($qu->q_type == 'textar') {
-					    echo nl2br(stripcslashes($item->$fn));
-					}
-					if ($qu->q_type == 'attach') {
-					    if (strpos($item->$fn,"ERROR:") === FALSE && $item->$fn != "") {
-						    $uploaded_files = explode(",",$item->$fn);
-							foreach ($uploaded_files as $uf) {
-								echo 'Download: <a href="' . $uf . '">'.basename($uf).'</a><br>';
+					if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown') {
+						if (property_exists($item,$fn)) {
+							echo $this->options[ $item->$fn ];
+							if ( property_exists($item,$fno)) {
+								echo ': ' . $item->$fno;
 							}
-						} else {
-							echo $item->$fn;
 						}
 					}
-					if ($qu->q_type == 'email') { echo $item->$fn; }
-					if ($qu->q_type == 'cbox') { if ($item->$fn) echo 'Yes'; else echo 'No'; }
+					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown') {
+						if (property_exists($item,$fn)) {
+                            echo $item->$fn;
+                        }
+					}
+					if ($qu->q_type == 'textar') {
+						if (property_exists($item,$fn)) {
+							echo nl2br( stripcslashes( $item->$fn ) );
+						}
+					}
+					if ($qu->q_type == 'attach') {
+						if (property_exists($item,$fn)) {
+							if ( strpos( $item->$fn, "ERROR:" ) === false && $item->$fn != "" ) {
+								$uploaded_files = explode( ",", $item->$fn );
+								foreach ( $uploaded_files as $uf ) {
+									echo 'Download: <a href="' . $uf . '">' . basename( $uf ) . '</a><br>';
+								}
+							} else {
+								echo $item->$fn;
+							}
+						}
+					}
+					if ($qu->q_type == 'cbox') {
+						if ( property_exists( $item, $fn ) ) {
+							if ( $item->$fn ) {
+								echo 'Yes';
+							} else {
+								echo 'No';
+							}
+						}
+					}
 					if ($qu->q_type == 'mcbox' || $qu->q_type=="mlist") {
-						$item->$fn = explode(" ",$item->$fn);
-						foreach ($item->$fn as $o) {
-							echo $this->options[$o].'<br />';  
+						if (property_exists($item,$fn)) {
+							$item->$fn = explode( " ", $item->$fn );
+							foreach ( $item->$fn as $o ) {
+								echo $this->options[ $o ] . '<br />';
+							}
 						}
 					}
 					echo '</td>';

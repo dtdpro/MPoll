@@ -16,10 +16,10 @@ class MPollViewPollResults extends JViewLegacy
 		$opts = $model->getOptions($questions);
 		$users = $model->getUsers();
 		
-		$this->assignRef('questions',$questions);
-		$this->assignRef('items',$items);
-		$this->assignRef('options',$opts);
-		$this->assignRef('users',$users);
+		$this->questions = $questions;
+		$this->items = $items;
+		$this->options = $opts;
+		$this->users = $users;
 		parent::display($tpl);
 	}
 }

@@ -15,6 +15,8 @@ class MPollViewOptions extends JViewLegacy
 	
 	function display($tpl = null)
 	{
+		$jinput = JFactory::getApplication()->input;
+
 		// Get data from the model
 		$this->state = $this->get('State');
 		$this->items = $this->get('Items');
@@ -22,8 +24,8 @@ class MPollViewOptions extends JViewLegacy
 		$this->questiontitle = $this->get('QuestionTitle');
 		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');
-	
-		MPOLLHelper::addQuestionSubmenu(JRequest::getVar('view'),$this->questiontitle);
+
+		if (JVersion::MAJOR_VERSION == 3) MPOLLHelper::addQuestionSubmenu($jinput->getVar('view'),$this->questiontitle);
 	
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
@@ -65,6 +67,7 @@ class MPollViewOptions extends JViewLegacy
 			JToolBarHelper::trash('options.trash');
 			JToolBarHelper::divider();
 		}
+		if (JVersion::MAJOR_VERSION == 4) JToolbarHelper::link('index.php?option=com_mpoll&view=questions','Return to Questions','chevron-left');
 	}
 	
 	protected function getSortFields()

@@ -15,6 +15,8 @@ class MPollViewQuestions extends JViewLegacy
 	
 	function display($tpl = null) 
 	{
+		$jinput = JFactory::getApplication()->input;
+
 		// Get data from the model
 		$this->state = $this->get('State');
 		$this->items = $this->get('Items');
@@ -22,8 +24,8 @@ class MPollViewQuestions extends JViewLegacy
 		$this->polltitle = $this->get('PollTitle');
 		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');
-		
-		MPOLLHelper::addPollSubmenu(JRequest::getVar('view'),$this->polltitle);
+
+		if (JVersion::MAJOR_VERSION == 3) MPOLLHelper::addPollSubmenu($jinput->getVar('view'),$this->polltitle);
 		
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) 
@@ -65,6 +67,7 @@ class MPollViewQuestions extends JViewLegacy
 			JToolBarHelper::trash('questions.trash');
 			JToolBarHelper::divider();
 		}
+		if (JVersion::MAJOR_VERSION == 4) JToolbarHelper::link('index.php?option=com_mpoll&view=mpolls','Return to Polls','chevron-left');
 		
 		
 	}

@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@dtdpro.com</authorEmail>
 	<authorUrl>www.dtdpro.com</authorUrl>
-	<version>1.12.3</version>
+	<version>1.14.0</version>
 	<description>MOD_MPOLL_DESC</description>
 	<files>
 		<filename module="mod_mpoll">mod_mpoll.php</filename>
@@ -23,7 +23,7 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic" addfieldpath="/administrator/components/com_mpoll/models/fields">
-				<field name="poll" type="modal_mpoll" label="MOD_MPOLL_FIELD_POLL_LABEL" description="MOD_MPOLL_FIELD_POLL_DESC" required="true" />
+				<field name="poll" type="polls" label="MOD_MPOLL_FIELD_POLL_LABEL" description="MOD_MPOLL_FIELD_POLL_DESC" required="true" class="inputbox form-select" />
 				<field name="showtitle" type="radio" default="1" label="MOD_MPOLL_FIELD_SHOWTITLE_LABEL" description="MOD_MPOLL_FIELD_SHOWTITLE_DESC" class="btn-group">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
@@ -32,6 +32,11 @@
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                 </field>
+				<field name="submitbuttonalign" type="radio" default="center" label="MOD_MPOLL_FIELD_SUBMITALIGN_LABEL" description="MOD_MPOLL_FIELD_SUBMITALIGN_DESC" class="btn-group">
+					<option value="center">Center</option>
+					<option value="left">Left</option>
+					<option value="right">Right</option>
+				</field>
 				<field name="showresults" type="radio" default="1" label="MOD_MPOLL_FIELD_SHOWRESULTS_LABEL" description="MOD_MPOLL_FIELD_SHOWRESULTS_DESC" class="btn-group">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
@@ -43,6 +48,20 @@
 				<field name="resultsas" type="radio" default="count" label="MOD_MPOLL_FIELD_RESULTSAS_LABEL" description="MOD_MPOLL_FIELD_RESULTSAS_DESC" class="btn-group">
 					<option value="count">Count</option>
 					<option value="percent">Percentages</option>
+				</field>
+				<field name="submitvia" type="radio" default="count" label="MOD_MPOLL_FIELD_SUBMITVIA_LABEL" description="MOD_MPOLL_FIELD_SUBMITVIA_DESC" class="btn-group">
+					<option value="ajax">AJAX</option>
+					<option value="component">Component</option>
+				</field>
+				<field
+						name="menuitem"
+						type="menuitem"
+						label="MOD_MPOLL_FIELD_MENUITEM_LABEL"
+						description="MOD_MPOLL_FIELD_MENUITEM_DESC"
+						default="0"
+						filter="integer"
+				>
+					<option value="0">-- Select Menu Item --</option>
 				</field>
 			</fieldset>
 			<fieldset

@@ -7,15 +7,17 @@ class MPollController extends JControllerLegacy
 {
 	function display($cachable = false, $urlparams = false)
 	{
+		$jinput = JFactory::getApplication()->input;
+
 		// set default view if not set
-		JRequest::setVar('view', JRequest::getCmd('view', 'mpolls'));
+		$jinput->set('view', $jinput->getCmd('view', 'mpolls'));
 
 		// call parent behavior
 		parent::display($cachable,$urlparams);
 
 		// Set the submenu
 		MPollHelper::addSubmenu('Polls');
-	}
+}
 
 }
 ?>

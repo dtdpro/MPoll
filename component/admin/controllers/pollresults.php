@@ -3,6 +3,8 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
 
+use Joomla\Utilities\ArrayHelper;
+
 class MPollControllerPollResults extends JControllerAdmin
 {
 	function __construct()
@@ -13,10 +15,12 @@ class MPollControllerPollResults extends JControllerAdmin
 	public function delete()
 	{
 		// Check for request forgeries
-		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+		$this->checkToken();
+
+		$jinput = JFactory::getApplication()->input;
 
 		// Get items to remove from the request.
-		$cid = JFactory::getApplication()->input->get('cid', array(), 'array');
+		$cid = $jinput->get('cid', array(), 'array');
 		
 		if (!is_array($cid) || count($cid) < 1)
 		{
@@ -28,8 +32,7 @@ class MPollControllerPollResults extends JControllerAdmin
 			$model = $this->getModel('pollresults');
 
 			// Make sure the item ids are integers
-			jimport('joomla.utilities.arrayhelper');
-			JArrayHelper::toInteger($cid);
+			ArrayHelper::toInteger($cid);
 
 			// Remove the items.
 			if ($model->delete($cid))

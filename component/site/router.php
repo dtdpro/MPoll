@@ -1,9 +1,21 @@
 <?php
-
-
 defined('_JEXEC') or die;
 
-jimport('joomla.application.categories');
+class MPollRouter extends JComponentRouterView
+{
+	public function __construct($app = null, $menu = null)
+	{
+		$params = JComponentHelper::getParams('com_mpoll');
+
+		parent::__construct($app, $menu);
+
+		$this->attachRule(new JComponentRouterRulesMenu($this));
+
+		JLoader::register('MPollRouterRulesLegacy', __DIR__ . '/helpers/legacyrouter.php');
+		$this->attachRule(new MPollRouterRulesLegacy($this));
+	}
+
+}
 
 /**
  * Build the route for the com_mpoll component
@@ -14,47 +26,10 @@ jimport('joomla.application.categories');
  */
 function MPollBuildRoute(&$query)
 {
-	$items = Array();
-	$default = 0;
-	$founditem = 0;
-	$segments = array();
 	$app = JFactory::getApplication();
-	$menu	= $app->getMenu();
-	$items	= $menu->getItems('component', 'com_mpoll');
+	$router = new MPollRouter($app, $app->getMenu());
 
-	if (isset($query['poll'])) $poll = $query['poll']; else $poll =0;
-
-	foreach ($items as $mi) {
-		if (!$founditem) {
-			if (isset($mi->query['poll'])) {
-				if ( ! empty( $mi->query['poll'] ) && ( (int) $mi->query['poll'] == (int) $poll ) ) {
-					if ( ! empty( $mi->query['task'] ) && ( $mi->query['task'] == 'results' ) && $query['task'] == 'results' ) {
-						$founditem = $mi->id;
-					} else if ( ! empty( $mi->query['task'] ) && ( $mi->query['task'] == 'ballot' ) && $query['task'] == 'ballot' ) {
-						$founditem = $mi->id;
-					}
-				}
-			}
-		}
-	}
-
-	
-	
-	if (!$founditem && isset($query['Itemid'])) {
-		$default = $query['Itemid'];
-	}
-		
-
-	if ($founditem) {
-		$query['Itemid'] = $founditem;
-		unset ($query['view']);
-		unset ($query['task']);
-		unset ($query['poll']);
-	} else {
-		$query['Itemid'] = $default;
-	}
-
-	return $segments;
+	return $router->build($query);
 }
 /**
  * Parse the segments of a URL.
@@ -65,6 +40,8 @@ function MPollBuildRoute(&$query)
  */
 function MPollParseRoute($segments)
 {
-	$vars = array();
-	return $vars;
+	$app = JFactory::getApplication();
+	$router = new MPollRouter($app, $app->getMenu());
+
+	return $router->parse($segments);
 }

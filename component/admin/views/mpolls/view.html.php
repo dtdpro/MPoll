@@ -14,6 +14,8 @@ class MPollViewMPolls extends JViewLegacy
 	
 	function display($tpl = null)
 	{
+		$jinput = JFactory::getApplication()->input;
+
 		$this->state		= $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
@@ -21,7 +23,7 @@ class MPollViewMPolls extends JViewLegacy
 		$this->activeFilters = $this->get('ActiveFilters');
 	
 		// Set the submenu
-		MPollHelper::addSubmenu(JRequest::getVar('view'));
+		if (JVersion::MAJOR_VERSION == 3) MPollHelper::addSubmenu($jinput->getVar('view'));
 	
 		if (count($errors = $this->get('Errors')))
 		{

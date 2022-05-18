@@ -100,7 +100,7 @@
                         label="Option"
                         description=""
                         size="40"
-                        class="inputbox"
+                        class="inputbox form-select"
                         required="false"
                         default=""
                 />
@@ -162,7 +162,7 @@
                 size="40"
                 class="inputbox"
                 required="false"
-                default=""
+                default="0"
         />
     </fieldset>
     <fieldset name="confirmation">

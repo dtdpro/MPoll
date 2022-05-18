@@ -1,8 +1,8 @@
 <?php
 // No direct access
 defined('_JEXEC') or die('Restricted access');
-JHtml::_('behavior.tooltip');
-JHtml::_('behavior.formvalidation');
+JHtml::_('bootstrap.tooltip');
+JHtml::_('behavior.formvalidator');
 JHtml::_('behavior.keepalive');
 JHtml::_('formbehavior.chosen', 'select');
 $params = $this->form->getFieldsets('params');
@@ -10,7 +10,7 @@ $params = $this->form->getFieldsets('params');
 <script type="text/javascript">
 	Joomla.submitbutton = function(task)
 	{
-		if (task == 'option.cancel' || document.formvalidator.isValid(document.id('mpoll-form'))) {
+		if (task == 'option.cancel' || document.formvalidator.isValid(document.getElementById('mpoll-form'))) {
 			Joomla.submitform(task, document.getElementById('mpoll-form'));
 		}
 	}

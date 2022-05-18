@@ -3,9 +3,9 @@
 defined('_JEXEC') or die('Restricted Access');
 // load tooltip behavior
 JHtml::_('bootstrap.tooltip');
-JHtml::_('behavior.multiselect');
+//JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
-JHtml::_('formbehavior.chosen', 'select');
+//JHtml::_('formbehavior.chosen', 'select');
 
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 $listOrder	= $this->escape($this->state->get('list.ordering'));
@@ -87,7 +87,7 @@ if ($saveOrder) {
 		<tbody>
 		<?php foreach($this->items as $i => $item):	?>
 				<tr class="row<?php echo $i % 2; ?>" sortable-group-id="questionoptions">
-					<td class="order nowrap center hidden-phone">
+					<td class="order nowrap center text-center hidden-phone">
 						<?php 
 						$disableClassName = '';
 						$disabledLabel	  = '';
@@ -104,28 +104,30 @@ if ($saveOrder) {
 					<td>
 						<?php echo JHtml::_('grid.id', $i, $item->opt_id); ?>
 					</td>
-					<td class="center">
+					<td class="center text-center">
 						<div class="btn-group">
 							<?php echo JHtml::_('jgrid.published', $item->published, $i, 'options.', true);?>
 							<?php
-								// Create dropdown items
-								
-								if ($item->published) :
-									JHtml::_('actionsdropdown.unpublish', 'cb' . $i, 'options');
-								else :
-									JHtml::_('actionsdropdown.publish', 'cb' . $i, 'options');
-								endif;
-								
-								JHtml::_('actionsdropdown.divider');
-								
-								if ($trashed) :
-									JHtml::_('actionsdropdown.untrash', 'cb' . $i, 'options');
-								else :
-									JHtml::_('actionsdropdown.trash', 'cb' . $i, 'options');
-								endif;
-								
-								// Render dropdown list
-								echo JHtml::_('actionsdropdown.render');
+							    if ( JVersion::MAJOR_VERSION == 3 ) {
+								    // Create dropdown items
+
+								    if ( $item->published ) :
+									    JHtml::_( 'actionsdropdown.unpublish', 'cb' . $i, 'options' );
+								    else :
+									    JHtml::_( 'actionsdropdown.publish', 'cb' . $i, 'options' );
+								    endif;
+
+								    JHtml::_( 'actionsdropdown.divider' );
+
+								    if ( $trashed ) :
+									    JHtml::_( 'actionsdropdown.untrash', 'cb' . $i, 'options' );
+								    else :
+									    JHtml::_( 'actionsdropdown.trash', 'cb' . $i, 'options' );
+								    endif;
+
+								    // Render dropdown list
+								    echo JHtml::_( 'actionsdropdown.render' );
+							    }
 							?>
 						</div>
 					</td>
@@ -133,16 +135,16 @@ if ($saveOrder) {
 							<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=option.edit&opt_id='.(int) $item->opt_id); ?>">
 							<?php echo $this->escape($item->opt_txt); ?></a>
 					</td>
-					<td align="center small">
+					<td class="center text-center small">
 						<?php echo ($item->opt_selectable) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
-					<td align="center small">
+					<td class="center text-center small">
 						<?php echo ($item->opt_disabled) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
-			       <td align="center small">
+			       <td class="center  text-centersmall">
 						<?php echo ($item->opt_correct) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
-					<td align="center">
+					<td class="center">
 						<?php echo $item->opt_id; ?>
 					</td>
 				

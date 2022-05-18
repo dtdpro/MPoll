@@ -1,11 +1,12 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
 $db = JFactory::getDBO();
+if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 ?>
 <script type="text/javascript">
 
 	jQuery(document).ready(function() {
-		jQuery("#mpollf<?php echo $pdata->poll_id; ?>").validate({
+		var validator<?php echo $pdata->poll_id; ?> = jQuery("#mpollf<?php echo $pdata->poll_id; ?>").validate({
 			errorClass:"uk-form-danger",
 			validClass:"uk-form-success",
 			errorElement: "div",
@@ -13,13 +14,40 @@ $db = JFactory::getDBO();
 				error.appendTo( element.parent("div") );
 				error.addClass("uk-alert uk-alert-danger uk-form-controls-text")
 			},
-			submitHandler: function(form) {
+            onsubmit: false
+		});
+
+        jQuery("#mpollf<?php echo $pdata->poll_id; ?>").submit(function( event ) {
+            event.preventDefault();
+            if (validator<?php echo $pdata->poll_id; ?>.form()) {
                 if (typeof ga === 'function') {
                     ga('send', 'event', 'MPoll', 'submit', '<?php echo $pdata->poll_name; ?>');
                 }
                 if (typeof gtag === 'function') {
                     gtag('event', 'submit', { 'event_category' : 'MPoll', 'event_label' : '<?php echo $pdata->poll_name; ?>' });
                 }
+				<?php if ( $pdata->poll_recaptcha && $cfg->rc_theme == "v3") { ?>
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('<?php echo $cfg->rc_api_key; ?>', {action: 'submit'}).then(function(token) {
+                        jQuery('#reCapResponse<?php echo $pdata->poll_id; ?>').val(token);
+                        var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
+                        var formData = new FormData(jQuery("#mpollf<?php echo $pdata->poll_id; ?>")[0]);
+                        jQuery.ajax({
+                            type: "POST",
+                            url: url,
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function( data ) {
+                                jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).empty().append( data );
+                            },
+                            error: function(errResponse) {
+                                jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).append( errResponse );
+                            }
+                        });
+                    });
+                });
+				<?php } else { ?>
                 var url = '<?php echo JURI::base( true ); ?>/modules/mod_mpoll/mod_mpoll_ajax.php';
                 var formData = new FormData(jQuery("#mpollf<?php echo $pdata->poll_id; ?>")[0]);
                 jQuery.ajax({
@@ -35,8 +63,9 @@ $db = JFactory::getDBO();
                         jQuery( "#mpollmod<?php echo $pdata->poll_id; ?>" ).append( errResponse );
                     }
                 });
-			}
-		});
+				<?php } ?>
+            }
+        });
 
 	});
 
@@ -45,6 +74,51 @@ $db = JFactory::getDBO();
     }
 </script>
 <form name="mpollf<?php echo $pdata->poll_id; ?>" id="mpollf<?php echo $pdata->poll_id; ?>" enctype="multipart/form-data" action="" class="uk-form">
+<?php } else { ?>
+    <script type="text/javascript">
+
+        jQuery(document).ready(function() {
+            var validator<?php echo $pdata->poll_id; ?> = jQuery("#mpollf<?php echo $pdata->poll_id; ?>").validate({
+                errorClass:"uk-form-danger",
+                validClass:"uk-form-success",
+                errorElement: "div",
+                errorPlacement: function(error, element) {
+                    error.appendTo( element.parent("div") );
+                    error.addClass("uk-alert uk-alert-danger uk-form-controls-text")
+                },
+                onsubmit: false
+            });
+
+            jQuery("#mpollf<?php echo $pdata->poll_id; ?>").submit(function( event ) {
+                event.preventDefault();
+                if (validator<?php echo $pdata->poll_id; ?>.form()) {
+                    if (typeof ga === 'function') {
+                        ga('send', 'event', 'MPoll', 'submit', '<?php echo $pdata->poll_name; ?>');
+                    }
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'submit', { 'event_category' : 'MPoll', 'event_label' : '<?php echo $pdata->poll_name; ?>' });
+                    }
+			        <?php if ( $pdata->poll_recaptcha && $cfg->rc_theme == "v3") { ?>
+                    grecaptcha.ready(function() {
+                        grecaptcha.execute('<?php echo $cfg->rc_api_key; ?>', {action: 'submit'}).then(function(token) {
+                            jQuery('#reCapResponse<?php echo $pdata->poll_id; ?>').val(token);
+                            jQuery("#mpollf<?php echo $pdata->poll_id; ?>")[0].submit();
+                        });
+                    });
+			        <?php } else { ?>
+                    jQuery("#mpollf<?php echo $pdata->poll_id; ?>")[0].submit();
+			        <?php } ?>
+                }
+            });
+
+        });
+
+        function reCapChecked<?php echo $pdata->poll_id; ?>() {
+            jQuery('#reCapChecked<?php echo $pdata->poll_id; ?>').val("checked");
+        }
+    </script>
+    <form name="mpollf<?php echo $pdata->poll_id; ?>" id="mpollf<?php echo $pdata->poll_id; ?>" enctype="multipart/form-data" method="post" action="<?php echo JRoute::_('index.php?option=com_mpoll&view=mpoll&poll='.$pdata->poll_id.'&task=castvote&Itemid='.$params->get( 'menuitem', 101),false); ?>" class="uk-form">
+<?php } ?>
 
 	<?php
 	if ($showtitle) {
@@ -160,7 +234,9 @@ $db = JFactory::getDBO();
 							echo '<label for="jform_'.$sname.$o->value.'">';
 							echo ' '.$o->text;
 							if ($o->opt_other) {
-								echo ' <input type="text" value="'.$f->other.'" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="">';
+								echo ' <input type="text" value="';
+                                if (property_exists($f,'other')) echo $f->other;
+                                echo '" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="">';
 							}
 							echo '</label>';
 							echo '<br />'."\n";
@@ -212,7 +288,9 @@ $db = JFactory::getDBO();
 
 				//text field, phone #, email, username
 				if ($f->q_type=="textbox" || $f->q_type=="email") {
-					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="'.$f->value.'" class="mf_field uk-width-1-1 uk-input" type="text"';
+					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="';
+                    if( $f->value) echo $f->value;
+                    echo '" class="mf_field uk-width-1-1 uk-input" type="text"';
 					if ($f->q_req) {
 						echo ' data-rule-required="true"';
 						if ($f->q_min) echo ' data-rule-minlength="'.$f->q_min.'"';
@@ -235,21 +313,6 @@ $db = JFactory::getDBO();
 					echo '>'.$f->value.'</textarea>';
 				}
 
-				//captcha
-				if ($f->q_type=="captcha") {
-					echo '<img id="captcha_img" src="'.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php" alt="CAPTCHA Image" />';
-					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="" class="mf_field uk-input" type="text"';
-					if ($f->q_req) {
-						echo ' data-rule-required="true"';
-						echo ' data-msg-required="This Field is required"';
-					}
-					echo '>';
-					echo '<div class="uk-text-small">';
-					echo '<a href="#" onclick="document.getElementById(\'captcha_img\').src = \''.JURI::base(true).'/components/com_mpoll/lib/securimage/securimage_show.php?\' + Math.random(); return false">Reload Image</a>';
-					echo '</div>';
-				}
-
-
 				//File Attachment
 				if ($f->q_type == 'attach') {
 					echo '<input name="q_'.$f->q_id.'[]" id="jform_'.$sname.'" type="file" size="40" multiple="multiple" class="mf_file"';
@@ -258,6 +321,49 @@ $db = JFactory::getDBO();
 						echo ' data-msg-required="This Field is required"';
 					}
 					echo ' />';
+				}
+
+                // Date Dropdown
+				if ( $f->q_type == 'datedropdown' ) {
+                    $value = $f->value;
+					$selected = ' selected="selected"';
+					$html = "";
+					$html .= '<select id="jform_' . $sname . '_month" name="jform[' . $sname . '_month]" class="form-control mf_field input-sm uk-select uk-width-1-3">';
+					$html .= '<option value="01"'; $html .= (substr($value,0,2) == "01") ? $selected : ''; $html .= '>01 - January</option>';
+					$html .= '<option value="02"'; $html .= (substr($value,0,2) == "02") ? $selected : ''; $html .= '>02 - February</option>';
+					$html .= '<option value="03"'; $html .= (substr($value,0,2) == "03") ? $selected : ''; $html .= '>03 - March</option>';
+					$html .= '<option value="04"'; $html .= (substr($value,0,2) == "04") ? $selected : ''; $html .= '>04 - April</option>';
+					$html .= '<option value="05"'; $html .= (substr($value,0,2) == "05") ? $selected : ''; $html .= '>05 - May</option>';
+					$html .= '<option value="06"'; $html .= (substr($value,0,2) == "06") ? $selected : ''; $html .= '>06 - June</option>';
+					$html .= '<option value="07"'; $html .= (substr($value,0,2) == "07") ? $selected : ''; $html .= '>07 - July</option>';
+					$html .= '<option value="08"'; $html .= (substr($value,0,2) == "08") ? $selected : ''; $html .= '>08 - August</option>';
+					$html .= '<option value="09"'; $html .= (substr($value,0,2) == "09") ? $selected : ''; $html .= '>09 - September</option>';
+					$html .= '<option value="10"'; $html .= (substr($value,0,2) == "10") ? $selected : ''; $html .= '>10 - October</option>';
+					$html .= '<option value="11"'; $html .= (substr($value,0,2) == "11") ? $selected : ''; $html .= '>11 - November</option>';
+					$html .= '<option value="12"'; $html .= (substr($value,0,2) == "12") ? $selected : ''; $html .= '>12 - December</option>';
+					$html .= '</select>';
+
+					$html .= '<select id="jform_'.$sname.'_day" name="jform[' . $sname . '_day]" class="form-control mf_field input-sm uk-select uk-width-1-3">';
+					for ($i=1;$i<=31;$i++) {
+						if ($i<10) $val = "0".$i;
+						else $val=$i;
+						$html .= '<option value="'.$val.'"';
+						$html .= (substr($value,3,2) == $val) ? $selected : '';
+						$html .= '>'.$val.'</option>';
+					}
+					$html .=  '</select>';
+
+					$html .= '<select id="jform_'.$sname.'_year" name="jform[' . $sname . '_year]" class="form-control mf_field input-sm uk-select uk-width-1-3">';
+					for ($i=$f->q_min;$i<=$f->q_max;$i++) {
+						if ($i<10) $val = "0".$i;
+						else $val=$i;
+						$html .= '<option value="'.$val.'"';
+						$html .= (substr($value,6,4) == $val) ? $selected : '';
+						$html .= '>'.$val.'</option>';
+					}
+					$html .=  '</select>';
+
+					echo $html;
 				}
 
 				if ($f->q_hint && $f->q_type!="captcha") echo '<div class="uk-text-small">'.$f->q_hint.'</div>';
@@ -270,7 +376,7 @@ $db = JFactory::getDBO();
 			}
 
 			//reCAPTCHA
-			if ($pdata->poll_recaptcha) {
+			if ( $pdata->poll_recaptcha && $cfg->rc_theme != "v3" ) {
 				echo '<div class="uk-form-row uk-margin-top mpoll-form-poll-row'.($ri % 2).'">';
 				echo '<div class="uk-form-label">';
 				echo '</div>';
@@ -278,13 +384,24 @@ $db = JFactory::getDBO();
 				echo '<input type="hidden" id="reCapChecked" name="reCapChecked'.$pdata->poll_id.'" value="" data-rule-required="true" data-msg-required="reCaptcha Required">';
 				echo '<div class="g-recaptcha" data-callback="reCapChecked'.$pdata->poll_id.'" data-theme="'.$cfg->rc_theme.'" data-sitekey="'.$cfg->rc_api_key.'"></div>';
 				echo '</div></div>';
+			} else if ($pdata->poll_recaptcha && $cfg->rc_theme == "v3") {
+				echo '<input type="hidden" id="reCapResponse'.$pdata->poll_id.'" name="g-recaptcha-response" value="" class="ignore">';
 			}
 
-			echo '<p align="center">';
+            //submitbuttonalign
+            $buttonAlign = $params->get( 'submitbuttonalign', 'center' );
+		    if ($buttonAlign == "center") {
+			    echo '<p class="uk-text-center text-center">';
+		    } else if ($buttonAlign == "left"){
+				echo '<p class="uk-text-left text-left">';
+            } else if ($buttonAlign == "right"){
+			    echo '<p class="uk-text-right text-right">';
+		    }
+
 			if ($status == 'open') {
 				$buttontext = "Submit";
 				if ($pdata->poll_payment_enabled) $buttontext .= " & Pay";
-				echo '<button type="submit" class="button uk-button uk-button-default">'.$buttontext.'</button>';
+				echo '<button type="submit" class="btn btn-'.$cfg->btncolor.' uk-button uk-button-'.$cfg->btncolor.'">'.$buttontext.'</button>';
 			}
 
 			if ($status == 'regreq') {
@@ -296,7 +413,7 @@ $db = JFactory::getDBO();
 			}
 
 			if ($params->get( 'showresultslink', 0 )) {
-				echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="button uk-button uk-button-default">Results</a>';
+				echo ' <a href="'.JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pdata->poll_id).'" class="btn '.$cfg->btncolor.' uk-button '.$cfg->btncolor.'">Results</a>';
 			}
 			echo '</p>';
 

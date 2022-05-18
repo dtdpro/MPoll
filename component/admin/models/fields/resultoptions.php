@@ -9,7 +9,8 @@ class JFormFieldResultOptions extends JFormField
 
 	protected function getInput()
 	{
-		$id	= (int) JRequest::getVar( 'poll_id' );
+		$jinput = JFactory::getApplication()->input;
+		$id	= $jinput->getInt( 'poll_id' );
 		if (!$id) return '<input type="hidden" name="' . $name . '" value="0" />' . '<span class="readonly">Available Once Poll is Saved</span>';
 
 		$result_options = array();
@@ -48,7 +49,7 @@ class JFormFieldResultOptions extends JFormField
 
 		//$html[] = '<select name="'.$this->name.'" class="inputbox" '.$attr.'>';
 		$html[] = JHtml::_('select.groupedlist',$result_options,$this->name, array(
-			'list.attr' => $attr, 'id' => $this->id, 'list.select' => $this->value, 'group.items' => null, 'option.key.toHtml' => false,
+			'id' => $this->id, 'list.select' => $this->value, 'group.items' => null, 'option.key.toHtml' => false,
 			'option.text.toHtml' => false,
 		));
 		//$html[] = '</select>';

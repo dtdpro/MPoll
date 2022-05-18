@@ -3,9 +3,9 @@
 defined('_JEXEC') or die('Restricted Access');
 // load tooltip behavior
 JHtml::_('bootstrap.tooltip');
-JHtml::_('behavior.multiselect');
-JHtml::_('dropdown.init');
-JHtml::_('formbehavior.chosen', 'select');
+//JHtml::_('behavior.multiselect');
+//JHtml::_('dropdown.init');
+//JHtml::_('formbehavior.chosen', 'select');
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 $app	= JFactory::getApplication();
@@ -90,29 +90,31 @@ $sortFields = $this->getSortFields();
 		<?php foreach($this->items as $i => $item): ?>
 			<tr class="row<?php echo $i % 2; ?>">
 				<td><?php echo JHtml::_('grid.id', $i, $item->poll_id); ?></td>
-				<td class="center">
+				<td class="center text-center">
 					<div class="btn-group">
-						<?php echo JHtml::_('jgrid.published', $item->published, $i, 'mpolls.', true); ?>
-						<?php echo JHtml::_('mpolladministrator.questions',$i, true); ?>
 						<?php
+						echo JHtml::_('jgrid.published', $item->published, $i, 'mpolls.', true);
+						if ( JVersion::MAJOR_VERSION == 3 ) {
+							echo JHtml::_('mpolladministrator.questions',$i, true);
+
 							// Create dropdown items
-							
-							if ($item->published) :
-								JHtml::_('actionsdropdown.unpublish', 'cb' . $i, 'mpolls');
+							if ( $item->published ) :
+								JHtml::_( 'actionsdropdown.unpublish', 'cb' . $i, 'mpolls' );
 							else :
-								JHtml::_('actionsdropdown.publish', 'cb' . $i, 'mpolls');
+								JHtml::_( 'actionsdropdown.publish', 'cb' . $i, 'mpolls' );
 							endif;
-							
-							JHtml::_('actionsdropdown.divider');
-							
-							if ($trashed) :
-								JHtml::_('actionsdropdown.untrash', 'cb' . $i, 'mpolls');
+
+							JHtml::_( 'actionsdropdown.divider' );
+
+							if ( $trashed ) :
+								JHtml::_( 'actionsdropdown.untrash', 'cb' . $i, 'mpolls' );
 							else :
-								JHtml::_('actionsdropdown.trash', 'cb' . $i, 'mpolls');
+								JHtml::_( 'actionsdropdown.trash', 'cb' . $i, 'mpolls' );
 							endif;
-							
+
 							// Render dropdown list
-							echo JHtml::_('actionsdropdown.render');
+							echo JHtml::_( 'actionsdropdown.render' );
+						}
 						?>
 					</div>
 				</td>
@@ -137,10 +139,13 @@ $sortFields = $this->getSortFields();
 						 	<?php if ($item->poll_regreq) echo ' | <span style="color:#800000">Reg Required</span>'; ?>
 						 	| <strong>Submissions:</strong> 
 						 	<?php 
-						 		echo $item->results; 
+						 		echo $item->results;
+                                if ( JVersion::MAJOR_VERSION == 4 ) {
+                                    echo ' | '. JHtml::_('mpolladministrator.questions',$i, true);
+                                }
 						 		if ($item->results) {//<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.questions\')" class="btn btn-micro hasTooltip' . '" title="Questions"><i class="icon-question"></i></a>
-							 		echo ' | <a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.pollresults\')">Results</a>';
-									echo ' | <a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.tally\')">Tally</a>';
+								    echo ' | '. JHtml::_('mpolladministrator.results',$i, true);
+								    echo ' | '. JHtml::_('mpolladministrator.tally',$i, true);
 								}
 							?>
 						</div>

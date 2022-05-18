@@ -13,6 +13,11 @@
 			<option value="almost-flat">Almost Flat</option>
 			<option value="gradient">Gradient</option>
 		</field>
+		<field name="btncolor" type="radio" label="COM_MPOLL_CONFIG_FIELD_BTNCOLOR_LABEL" description="COM_MPOLL_CONFIG_FIELD_BTNCOLOR_DESC" default="" class="btn-group">
+			<option value="default">Default</option>
+			<option value="primary">Primary</option>
+			<option value="secondary">Secondary</option>
+		</field>
 		<field name="two_col_threshold" type="text" label="COM_MPOLL_CONFIG_FIELD_TWO_COL_THRESHOLD_LABEL" description="COM_MPOLL_CONFIG_FIELD_TWO_COL_THRESHOLD_DESC" size="40" class="inputbox" required="false" default="10" />
 	</fieldset>
 	<fieldset name="integrations" label="COM_MPOLL_CONFIG_INTEGRATIONS_LABEL" description="COM_MPOLL_CONFIG_INTEGRATIONS_DESC">
@@ -20,8 +25,9 @@
 		<field name="rc_api_key" type="text" label="COM_MPOLL_CONFIG_FIELD_RC_APIKEY_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_APIKEY_DESC" size="70" class="inputbox" required="false" default="" />
 		<field name="rc_api_secret" type="text" label="COM_MPOLL_CONFIG_FIELD_RC_APISECRET_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_APISECRET_DESC" size="70" class="inputbox" required="false" default="" />
 		<field name="rc_theme" type="radio" label="COM_MPOLL_CONFIG_FIELD_RC_THEME_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_THEME_DESC" default="light" class="btn-group">
-			<option value="dark">Dark</option>
-			<option value="light">Light</option>
+			<option value="dark">v2 Dark</option>
+			<option value="light">v2 Light</option>
+			<option value="v3">v3</option>
 		</field>
 	</fieldset>
 	<fieldset name="paypal" label="PayPal Settings">

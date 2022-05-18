@@ -12,7 +12,7 @@ class JFormFieldFieldDefault extends JFormField
 		$type = $this->form->getValue('q_type');
 		
 		$id	= (int) $this->form->getValue('q_id');
-		if (!$id) return '<input type="hidden" name="' . $name . '" value="0" />' . '<span class="readonly">Available Once Field Saved</span>';
+		if (!$id) return '<input type="hidden" name="' . $this->name . '" value="0" />' . '<span class="readonly">Available Once Field Saved</span>';
 		
 		switch ($type) {
 			case "multi":

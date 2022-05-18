@@ -5,7 +5,8 @@ defined('_JEXEC') or die;
 
 JHtml::_('behavior.tooltip');
 
-$function	= JRequest::getCmd('function', 'jSelectMPoll');
+$jinput = JFactory::getApplication()->input;
+$function	= $jinput->getCmd('function', 'jSelectMPoll');
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 

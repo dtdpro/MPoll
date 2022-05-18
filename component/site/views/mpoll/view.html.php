@@ -12,11 +12,14 @@ class MPollViewMPoll extends JViewLegacy
 		$model = $this->getModel();
 		$doc = JFactory::getDocument();
 		$output = null;
+		$jinput = JFactory::getApplication()->input;
 
 		$this->params = $app->getParams();
-		$this->pollid = JRequest::getVar( 'poll' );
-		$this->task = JRequest::getVar('task');
+		$this->pollid = $jinput->getVar( 'poll' );
+		$this->task = $jinput->getVar('task');
 
+		// Load Config
+		$this->cfg = MPollHelper::getConfig();
 
 		if ($this->task != "paypal_webhook") {
 			$this->pdata = $model->getPoll( $this->pollid );
@@ -25,7 +28,8 @@ class MPollViewMPoll extends JViewLegacy
 
 			//check if poll exists
 			if ( empty( $this->pdata ) ) {
-				JError::raiseError( 404, JText::_( 'COM_MPOLL_POLL_NOT_FOUND' ) );
+				$app->enqueueMessage(JText::_('COM_MPOLL_POLL_NOT_FOUND'), 'error');
+				$app->setHeader('status', 404, true);
 
 				return false;
 			}
@@ -34,7 +38,8 @@ class MPollViewMPoll extends JViewLegacy
 			if ( ( strtotime( $this->pdata->poll_start ) > strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				$this->started=false;
 				if ( ! $this->pdata->poll_shownotstarted ) {
-					JError::raiseError( 404, JText::_( 'COM_MPOLL_POLL_NOT_AVAILABLE' ) );
+					$app->enqueueMessage(JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'), 'error');
+					$app->setHeader('status', 404, true);
 					return false;
 				}
 			}
@@ -44,7 +49,8 @@ class MPollViewMPoll extends JViewLegacy
 			if ( ( strtotime( $this->pdata->poll_end ) < strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				$this->ended = true;
 				if ( ! $this->pdata->poll_showended ) {
-					JError::raiseError( 404, JText::_( 'COM_MPOLL_POLL_NOT_AVAILABLE' ) );
+					$app->enqueueMessage(JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'), 'error');
+					$app->setHeader('status', 404, true);
 					return false;
 				}
 			}
@@ -54,11 +60,6 @@ class MPollViewMPoll extends JViewLegacy
 				if ( $model->getCasted( $this->pollid ) ) {
 					$this->task = 'results';
 				}
-			}
-
-			// Load reCAPTCHA Library if enabled
-			if ( $this->pdata->poll_recaptcha ) {
-				$doc->addScript( 'https://www.google.com/recaptcha/api.js' );
 			}
 
 			$this->_prepareTitle();
@@ -72,17 +73,17 @@ class MPollViewMPoll extends JViewLegacy
 			case "paypal_cancel": // cancel paypal payment
 			case "paypal_cancel_link": //cancel payppal paymnet url
 			case "pay": // Pay screen
-				$this->payment = JRequest::getVar('payment');
-				$this->payurl = JRoute::_('index.php?option=com_mpoll&task=pay&poll='.$this->pollid. '&payment=' . $this->payment);
+				$this->payment = $jinput->getVar('payment');
+				$this->payurl = JRoute::_('index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid. '&payment=' . $this->payment);
 				$paydetails = array();
 				parse_str(base64_decode($this->payment),$paydetails);
 				$this->completition = $model->getCompletition($paydetails['cmplid'],$paydetails['id']);
 				if (!$this->completition) {
-					$url = 'index.php?option=com_mpoll&task=results&poll=' . $this->pollid .'&cmpl=' . $this->payment;
+					$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid .'&cmpl=' . $this->payment;
 					$app->redirect(JRoute::_($url,false));
 				} else {
 					if (in_array($this->completition->cm_status,array('complete','paid','refunded','approved'))) {
-						$url = 'index.php?option=com_mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . $this->payment;
+						$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . $this->payment;
 						$app->redirect(JRoute::_($url,false));
 					}
 					else {
@@ -97,7 +98,7 @@ class MPollViewMPoll extends JViewLegacy
 						}
 						if ($this->task == 'paypal_cancel_link') {
 							$model->PayPalCancel($this->pdata,$this->completition);
-							$url = 'index.php?option=com_mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . $this->payment;
+							$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . $this->payment;
 							$app->redirect(JRoute::_($url,false));
 						}
 						if ($this->task == 'pay') {
@@ -109,24 +110,25 @@ class MPollViewMPoll extends JViewLegacy
 			case "castvote": //save vote results
 				if ($this->cmplid=$model->save($this->pollid)) { //no payment
 					if (!$this->pdata->poll_payment_enabled) {
-						$url = 'index.php?option=com_mpoll&task=results&poll=' . $this->pollid .'&cmpl=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
+						$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid .'&cmpl=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
 						if ( $this->params->get( 'rtmpl', '' ) ) {
 							$url .= '&tmpl=' . $rtmpl;
 						}
 					} else { //payment
 						$completition = $model->getCompletition($this->cmplid);
-						$url = 'index.php?option=com_mpoll&task=pay&poll='.$this->pollid.'&payment=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
+						$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid.'&payment=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
 					}
 					$app->redirect(JRoute::_($url,false));
 				} else {
-					$url = 'index.php?option=com_mpoll&task=ballot&poll='.$this->pollid.'&cmplid='.$this->cmplid;
-					$app->redirect(JRoute::_($url,false),$model->getError(),"error");
+					$url = 'index.php?option=com_mpoll&view=mpoll&task=ballot&poll='.$this->pollid.'&cmplid='.$this->cmplid;
+					$app->enqueueMessage($model->getError(), 'error');
+					$app->redirect(JRoute::_($url,false));
 				}
 				break;
 			case 'results': //Show Results
-				$this->cmpl = JRequest::getVar('cmpl');
-				$this->cmplurl = JRoute::_('index.php?option=com_mpoll&task=results&poll='.$this->pollid. '&cmpl=' . $this->cmpl);
-				$this->payurl = JRoute::_('index.php?option=com_mpoll&task=pay&poll='.$this->pollid. '&payment=' . $this->cmpl);
+				$this->cmpl = $jinput->getVar('cmpl');
+				$this->cmplurl = JRoute::_('index.php?option=com_mpoll&view=mpoll&task=results&poll='.$this->pollid. '&cmpl=' . $this->cmpl);
+				$this->payurl = JRoute::_('index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid. '&payment=' . $this->cmpl);
 				$cmpldetails = array();
 				parse_str(base64_decode($this->cmpl),$cmpldetails);
 				$this->completition = $model->getCompletition($cmpldetails['cmplid'],$cmpldetails['id']);
@@ -138,11 +140,22 @@ class MPollViewMPoll extends JViewLegacy
 				$this->fcast = $model->getFirstCast($this->pollid);
 				$this->lcast = $model->getLastCast($this->pollid);
 				$this->ncast = $model->getNumCast($this->pollid);
-				$this->print = JRequest::getInt( 'print',0 );
+				$this->print = $jinput->getInt( 'print',0 );
 				break;
 			case 'ballot': //Show Questions
 			default:
+				// Load reCAPTCHA JS if enabled
+				if ( $this->pdata->poll_recaptcha ) {
+					if ($this->cfg->rc_theme == "v3") { // v3
+						$doc->addScript( 'https://www.google.com/recaptcha/api.js?render=' . $this->cfg->rc_api_key );
+					} else { // v2
+						$doc->addScript( 'https://www.google.com/recaptcha/api.js' );
+					}
+				}
+
+				// get questins
 				$this->qdata=$model->getQuestions($this->pollid,true);
+
 				break;
 		}
 

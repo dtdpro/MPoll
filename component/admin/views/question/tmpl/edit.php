@@ -1,8 +1,7 @@
 <?php
 // No direct access
 defined('_JEXEC') or die('Restricted access');
-JHtml::_('behavior.tooltip');
-JHtml::_('behavior.formvalidation');
+JHtml::_('behavior.formvalidator');
 JHtml::_('behavior.keepalive');
 JHtml::_('formbehavior.chosen', 'select');
 $params = $this->form->getFieldsets('params');
@@ -10,7 +9,7 @@ $params = $this->form->getFieldsets('params');
 <script type="text/javascript">
 	Joomla.submitbutton = function(task)
 	{
-		if (task == 'question.cancel' || document.formvalidator.isValid(document.id('mpoll-form'))) {
+		if (task == 'question.cancel' || document.formvalidator.isValid(document.getElementById('mpoll-form'))) {
 			Joomla.submitform(task, document.getElementById('mpoll-form'));
 		}
 	}
@@ -28,8 +27,8 @@ $params = $this->form->getFieldsets('params');
 			<div class="controls"><?php echo $this->form->getInput('q_type'); ?></div>
 		</div>
 	</div>
-	<div class="row-fluid">
-		<div class="span8">
+	<div class="row-fluid <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+		<div class="span8 col-md-8">
 			<?php foreach($this->form->getFieldset('content') as $field): ?>
 				<div class="control-group">
 					<div class="control-label"><?php echo $field->label;?></div>
@@ -37,7 +36,7 @@ $params = $this->form->getFieldsets('params');
 				</div>
 			<?php endforeach; ?>
 		</div>
-		<div class="span4 form-horizontal">
+		<div class="span4 col-md-4 form-horizontal">
 			<?php foreach($this->form->getFieldset('details') as $field): ?>
 				<div class="control-group">
 					<div class="control-label"><?php echo $field->label;?></div>

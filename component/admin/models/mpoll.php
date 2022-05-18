@@ -51,6 +51,8 @@ class MPollModelMPoll extends JModelAdmin
 
 	protected function loadFormData() 
 	{
+		$jinput = JFactory::getApplication()->input;
+
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_mpoll.edit.mpoll.data', array());
 		if (empty($data)) 
@@ -59,7 +61,7 @@ class MPollModelMPoll extends JModelAdmin
 			// Prime some default values.
 			if ($this->getState('mpoll.id') == 0) {
 				$app = JFactory::getApplication();
-				$data->set('poll_cat', JRequest::getInt('poll_cat', $app->getUserState('com_mpoll.mpolls.filter.category_id')));
+				$data->set('poll_cat', $jinput->getInt('poll_cat', $app->getUserState('com_mpoll.mpolls.filter.category_id')));
 			}
 		}
 		return $data;

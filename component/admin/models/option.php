@@ -32,6 +32,7 @@ class MPollModelOption extends JModelAdmin
 	
 	protected function loadFormData() 
 	{
+		$jinput = JFactory::getApplication()->input;
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_mpoll.edit.option.data', array());
 		if (empty($data)) 
@@ -39,7 +40,7 @@ class MPollModelOption extends JModelAdmin
 			$data = $this->getItem();
 			if ($this->getState('option.opt_id') == 0) {
 				$app = JFactory::getApplication();
-				$data->set('opt_qid', JRequest::getInt('opt_qid', $app->getUserState('com_mpoll.options.question')));
+				$data->set('opt_qid', $jinput->getInt('opt_qid', $app->getUserState('com_mpoll.options.question')));
 			}
 		}
 		return $data;		

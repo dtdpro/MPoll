@@ -7,8 +7,8 @@
 	<authorUrl>http://www.dtdpro.com</authorUrl>
 	<copyright>(c)2008-2019</copyright>
 	<license>GPL v2</license>
-	<version>1.27.3</version>
-    <releaseDate>2020.05.05</releaseDate>
+	<version>1.29.0</version>
+    <releaseDate>2022.05.06</releaseDate>
     <releaseType>Update</releaseType>
 	<description>COM_MPOLL_DESC</description>
 	<scriptfile>script.php</scriptfile>
@@ -21,6 +21,7 @@
 		<folder>helpers</folder>
 		<folder>models</folder>
 		<folder>lib</folder>
+		<folder>vendor</folder>
 	</files>
 	<install>
 		<sql>
@@ -50,8 +51,6 @@
 			<menu view="mpolls">COM_MPOLL_SUBMENU_MPOLLS</menu>
 			<menu link="option=com_categories&amp;extension=com_mpoll" view="categories" alt="MPoll/Categories">COM_MPOLL_SUBMENU_CATEGORIES</menu>
 		</submenu>
-		
-		
 		<files folder="admin">
 			<filename>index.html</filename>
 			<filename>mpoll.php</filename>
@@ -65,6 +64,7 @@
 			<folder>tables</folder>
 			<folder>helpers</folder>
 			<folder>sql</folder>
+			<folder>vendor</folder>
 		</files>
 		<languages folder="admin">
 			<language tag="en-GB">language/en-GB.com_mpoll.ini</language>

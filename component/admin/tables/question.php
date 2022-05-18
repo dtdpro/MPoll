@@ -21,6 +21,8 @@ class MPollTableQuestion extends JTable
 			$registry = new JRegistry;
 			$registry->loadArray($array['params']);
 			$array['params'] = (string) $registry;
+		} else {
+			$array['params'] = "{}";
 		}
 	
 		return parent::bind($array, $ignore);

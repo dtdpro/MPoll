@@ -145,7 +145,7 @@ class MPollModelPollResults extends JModelList
 			$query->from("#__mpoll_completed");
 			$query->where('cm_id='.(int)$pk);
 			$db->setQuery($query);
-			if (!$db->query()) {
+			if (!$db->execute()) {
 				$this->setError($db->getErrorMsg());
 				return false;
 			}
@@ -155,7 +155,7 @@ class MPollModelPollResults extends JModelList
 			$query2->from("#__mpoll_results");
 			$query2->where('res_cm='.(int)$pk);
 			$db->setQuery($query2);
-			if (!$db->query()) {
+			if (!$db->execute()) {
 				$this->setError($db->getErrorMsg());
 				return false;
 			}
