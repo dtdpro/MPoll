@@ -29,6 +29,7 @@
 			<option value="light">v2 Light</option>
 			<option value="v3">v3</option>
 		</field>
+		<field name="rc_threshold" type="text" label="COM_MPOLL_CONFIG_FIELD_RC_THRESHOLD_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_THRESHOLD_DESC" size="40" class="inputbox" required="false" default="0.5" />
 	</fieldset>
 	<fieldset name="paypal" label="PayPal Settings">
 		<field name="paypal_mode" type="radio" class="btn-group" label="PayPal Mode">

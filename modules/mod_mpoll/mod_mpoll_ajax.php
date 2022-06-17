@@ -82,7 +82,7 @@ if ($pdata->poll_recaptcha) {
 	$recaptcha = new \MReCaptcha\MReCaptcha($cfg->rc_api_secret);
 
 	if ($cfg->rc_theme == "v3") {
-		$resp = $recaptcha->setScoreThreshold(0.75)
+		$resp = $recaptcha->setScoreThreshold($cfg->rc_threshold)
 		                  ->setExpectedAction('submit')
 		                  ->verify($_POST["g-recaptcha-response"]);
 	} else {
@@ -104,7 +104,7 @@ $cmrec->cm_pubid=$pubid;
 if ($pdata->poll_payment_enabled) $cmrec->cm_status="unpaid";
 else $cmrec->cm_status="completed";
 $cmrec->cm_useragent=$_SERVER['HTTP_USER_AGENT'];
-$cmrec->cm_ipaddr=$_SERVER['REMOTE_ADDR'];
+$cmrec->cm_ipaddr=getIPAddress();
 $db->insertObject('#__mpoll_completed',$cmrec);
 $subid = $db->insertid();
 
@@ -277,7 +277,7 @@ try {
 			}
 		}
 		$resultsemail .= "<br /><br /><b>User Agent:</b> ".$_SERVER['HTTP_USER_AGENT'];
-		$resultsemail .= "<br /><b>IP:</b> ".$_SERVER['REMOTE_ADDR'];
+		$resultsemail .= "<br /><b>IP:</b> ".getIPAddress();
 		$emllist = Array();
 		$emllist = explode(",",$pdata->poll_emailto);
 
@@ -486,4 +486,20 @@ function checkToken($method = 'post', $redirect = true)
 	$valid = Session::checkToken($method);
 
 	return $valid;
+}
+
+function getIPAddress() {
+	//whether ip is from the share internet
+	if(!empty($_SERVER['HTTP_CLIENT_IP'])) {
+		$ip = $_SERVER['HTTP_CLIENT_IP'];
+	}
+	//whether ip is from the proxy
+	elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	}
+	//whether ip is from the remote address
+	else{
+		$ip = $_SERVER['REMOTE_ADDR'];
+	}
+	return $ip;
 }
