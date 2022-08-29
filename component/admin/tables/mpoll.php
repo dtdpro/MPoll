@@ -49,6 +49,19 @@ class MPollTableMPoll extends JTable
 			}
 		}
 
+		// Set publish_up to null date if not set
+		if (!$this->poll_start)
+		{
+			$this->poll_start = $this->_db->getNullDate();
+		}
+
+		// Set publish_down to null date if not set
+		if (!$this->poll_end)
+		{
+			$this->poll_end = $this->_db->getNullDate();
+		}
+
+
 		// Verify that the alias is unique
 		$table = JTable::getInstance('MPoll', 'MPollTable');
 		if ($table->load(array('poll_alias'=>$this->poll_alias,'poll_cat'=>$this->poll_cat)) && ($table->poll_id != $this->poll_id || $this->poll_id==0)) {
