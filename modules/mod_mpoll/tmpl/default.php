@@ -150,7 +150,7 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 				//field title/label
 				if ($f->q_type != "message" && $f->q_type != "header") {
 					echo '<div class="uk-form-label uk-text-bold">';
-					if ($f->q_req) echo "*";
+					if ($f->q_req && $params->get( 'showreq', 1 )) echo "*";
 					if ($f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header") echo $f->q_text;
 					echo '</div>';
 				}
@@ -374,6 +374,18 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 				//End Row
 				echo '</div>';
 			}
+
+			// Start Honeypot Row & Field
+			echo '<div class="row-'.$sname.' mpoll-form-poll-row-info uk-form-row uk-margin-top"><div class="uk-form-controls">';
+
+			// Honepot Label
+			echo '<div class="uk-form-label uk-text-bold">SPAM Check, leave blank</div>';
+
+            // Honepot Input
+			echo '<input autocomplete="off"  name="name" id="jform_name" value="" class="mf_field uk-width-1-1 uk-input" type="text">';
+
+			// End Honeypot Row & Field
+			echo '</div></div>';
 
 			//reCAPTCHA
 			if ( $pdata->poll_recaptcha && $cfg->rc_theme != "v3" ) {

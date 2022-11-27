@@ -14,7 +14,7 @@ class MPollControllerQuestions extends JControllerAdmin
 
 	protected $text_prefix = "COM_MPOLL_QUESTION";
 	
-	public function getModel($name = 'Question', $prefix = 'MPollModel') 
+	public function getModel($name = 'Question', $prefix = 'MPollModel', $config = [])
 	{
 		$model = parent::getModel($name, $prefix, array('ignore_request' => true));
 		return $model;

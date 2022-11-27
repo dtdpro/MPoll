@@ -13,7 +13,7 @@ class MPollControllerMPolls extends JControllerAdmin
 {
 
 	
-	public function getModel($name = 'MPoll', $prefix = 'MPollModel') 
+	public function getModel($name = 'MPoll', $prefix = 'MPollModel', $config = [])
 	{
 		$model = parent::getModel($name, $prefix, array('ignore_request' => true));
 		return $model;

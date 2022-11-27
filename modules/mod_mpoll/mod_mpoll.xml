@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@dtdpro.com</authorEmail>
 	<authorUrl>www.dtdpro.com</authorUrl>
-	<version>1.14.2</version>
+	<version>1.14.3</version>
 	<description>MOD_MPOLL_DESC</description>
 	<files>
 		<filename module="mod_mpoll">mod_mpoll.php</filename>
@@ -32,6 +32,10 @@
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                 </field>
+				<field name="showreq" type="radio" default="1" label="Indicate Required" description="Show the * to indicate required questions" class="btn-group">
+					<option value="1">Yes</option>
+					<option value="0">No</option>
+				</field>
 				<field name="submitbuttonalign" type="radio" default="center" label="MOD_MPOLL_FIELD_SUBMITALIGN_LABEL" description="MOD_MPOLL_FIELD_SUBMITALIGN_DESC" class="btn-group">
 					<option value="center">Center</option>
 					<option value="left">Left</option>

@@ -116,9 +116,14 @@ class MPollModelMPoll extends JModelLegacy
 
 	public function save($pollid)
 	{
-		$this->checkToken();
+		$this->checkToken() or die(Text::_('JINVALID_TOKEN'));
+
 		// Initialise variables;
 		$jinput = JFactory::getApplication()->input;
+
+		// Honeypot
+		$honeyPot = $jinput->getVar('name',"");
+		if ($honeyPot) die(Text::_('JINVALID_TOKEN'));
 		$data		= $jinput->getVar('jform', array(), 'post', 'array');
 		$isNew = true;
 		$db		= $this->getDbo();
@@ -150,6 +155,8 @@ class MPollModelMPoll extends JModelLegacy
 			$optfs = array();
 			$moptfs = array();
 			$upfile=array();
+			$item = new stdClass();
+			$other = new stdClass();
 			$flist = $this->getQuestions($pollid,false);
 			foreach ($flist as $d) {
 				$fieldname = 'q_'.$d->q_id;
@@ -981,19 +988,6 @@ class MPollModelMPoll extends JModelLegacy
 	public function checkToken($method = 'post', $redirect = true)
 	{
 		$valid = Session::checkToken($method);
-
-		if (!$valid && $redirect)
-		{
-			$referrer = $this->input->server->getString('HTTP_REFERER');
-
-			if (!Uri::isInternal($referrer))
-			{
-				$referrer = 'index.php';
-			}
-
-			$this->app->enqueueMessage(Text::_('JINVALID_TOKEN_NOTICE'), 'warning');
-			$this->app->redirect($referrer);
-		}
 
 		return $valid;
 	}

@@ -14,7 +14,7 @@ class MPollControllerOptions extends JControllerAdmin
 
 	protected $text_prefix = "COM_MPOLL_OPTION";
 	
-	public function getModel($name = 'Option', $prefix = 'MPollModel') 
+	public function getModel($name = 'Option', $prefix = 'MPollModel', $config = [])
 	{
 		$model = parent::getModel($name, $prefix, array('ignore_request' => true));
 		return $model;

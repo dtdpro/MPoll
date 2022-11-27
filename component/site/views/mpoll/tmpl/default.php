@@ -452,6 +452,19 @@ if ( $this->task == 'ballot' ) {
 			echo '</div>';
 		}
 
+
+		// Start Honeypot Row & Field
+		echo '<div class="row-' . $sname . ' mpoll-form-' . $this->pdata->poll_pagetype . '-row mpoll-form-poll-row-info uk-form-row uk-margin-top"><div class="uk-form-controls">';
+
+		// Honepot Label
+		echo '<div class="uk-form-label uk-text-bold">SPAM Check, leave blank</div>';
+
+		// Honepot Input
+		echo '<input autocomplete="off"  name="name" id="jform_name" value="" class="mf_field uk-width-1-1 uk-input" type="text">';
+
+		// End Honeypot Row & Field
+		echo '</div></div>';
+
 		//reCAPTCHA
 		if ( $this->pdata->poll_recaptcha && $cfg->rc_theme != "v3" ) {
             echo '<div class="uk-form-row uk-margin-top mpoll-form-' . $this->pdata->poll_pagetype . '-row' . ( $ri % 2 ) . '">';
