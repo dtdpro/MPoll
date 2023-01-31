@@ -126,21 +126,27 @@ class MPollViewMPoll extends JViewLegacy
 				}
 				break;
 			case 'results': //Show Results
-				$this->cmpl = $jinput->getVar('cmpl');
-				$this->cmplurl = JRoute::_('index.php?option=com_mpoll&view=mpoll&task=results&poll='.$this->pollid. '&cmpl=' . $this->cmpl);
-				$this->payurl = JRoute::_('index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid. '&payment=' . $this->cmpl);
-				$cmpldetails = array();
-				parse_str(base64_decode($this->cmpl),$cmpldetails);
-				$this->completition = $model->getCompletition($cmpldetails['cmplid'],$cmpldetails['id']);
+				$this->cmpl = $jinput->getVar('cmpl',null);
+				if ($this->cmpl) {
+					$this->cmplurl = JRoute::_( 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . $this->cmpl );
+					$this->payurl  = JRoute::_( 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid . '&payment=' . $this->cmpl );
+					$cmpldetails   = array();
+					parse_str( base64_decode( $this->cmpl ), $cmpldetails );
+					$this->completition = $model->getCompletition( $cmpldetails['cmplid'], $cmpldetails['id'] );
 
-				$this->qdata=$model->getQuestions($this->pollid,true,true);
-				$this->task='results';
-					
-				if ($this->completition) $this->qdata = $model->applyAnswers($this->qdata,$this->completition->cm_id);
-				$this->fcast = $model->getFirstCast($this->pollid);
-				$this->lcast = $model->getLastCast($this->pollid);
-				$this->ncast = $model->getNumCast($this->pollid);
-				$this->print = $jinput->getInt( 'print',0 );
+					$this->qdata = $model->getQuestions( $this->pollid, true, true );
+					$this->task  = 'results';
+
+					if ( $this->completition ) {
+						$this->qdata = $model->applyAnswers( $this->qdata, $this->completition->cm_id );
+					}
+					$this->fcast = $model->getFirstCast( $this->pollid );
+					$this->lcast = $model->getLastCast( $this->pollid );
+					$this->ncast = $model->getNumCast( $this->pollid );
+					$this->print = $jinput->getInt( 'print', 0 );
+				} else {
+					$this->task = "completed";
+				}
 				break;
 			case 'ballot': //Show Questions
 			default:

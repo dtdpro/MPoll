@@ -348,32 +348,24 @@ if ( $this->task == 'ballot' ) {
                 echo '" class="mf_field uk-width-1-1 uk-input" type="text"';
 				if ( $f->q_req ) {
 					echo ' data-rule-required="true"';
-					if ( $f->q_min ) {
-						echo ' data-rule-minlength="' . $f->q_min . '"';
-					}
-					if ( $f->q_max ) {
-						echo ' data-rule-maxlength="' . $f->q_max . '"';
-					}
-					if ( $f->q_type == "email" ) {
-						echo ' data-rule-email="true"';
-					}
-					if ( $f->q_match ) {
-						echo ' data-rule-equalTo="#jform_' . $f->q_match . '"';
-					}
 					echo ' data-msg-required="This Field is required"';
-					if ( $f->q_min ) {
-						echo ' data-msg-minlength="Min length ' . $f->q_min . ' characters"';
-					}
-					if ( $f->q_max ) {
-						echo ' data-msg-maxlength="Max length ' . $f->q_max . ' characters"';
-					}
-					if ( $f->q_type == "email" ) {
-						echo ' data-msg-email="Email address must be valid"';
-					}
-					if ( $f->q_match ) {
-						echo ' data-msg-equalTo="Fields must match"';
-					}
 				}
+                if ( $f->q_min ) {
+                    echo ' data-rule-minlength="' . $f->q_min . '"';
+	                echo ' data-msg-minlength="Min length ' . $f->q_min . ' characters"';
+                }
+                if ( $f->q_max ) {
+                    echo ' data-rule-maxlength="' . $f->q_max . '" maxlength="' . $f->q_max . '"';
+	                echo ' data-msg-maxlength="Max length ' . $f->q_max . ' characters"';
+                }
+                if ( $f->q_type == "email" ) {
+                    echo ' data-rule-email="true"';
+	                echo ' data-msg-email="Email address must be valid"';
+                }
+                if ( $f->q_match ) {
+                    echo ' data-rule-equalTo="#jform_' . $f->q_match . '"';
+	                echo ' data-msg-equalTo="Fields must match"';
+                }
 				echo '>';
 			}
 
@@ -381,7 +373,16 @@ if ( $this->task == 'ballot' ) {
 			if ( $f->q_type == "textar" ) {
 				echo '<textarea name="jform[' . $sname . ']" id="jform_' . $sname . '" cols="70" rows="4" class="mf_field uk-width-1-1 uk-textarea"';
 				if ( $f->q_req ) {
-					echo ' data-rule-required="true" data-msg-required="This Field is required"';
+					echo ' data-rule-required="true"';
+                    echo ' data-msg-required="This Field is required"';
+				}
+				if ( $f->q_min ) {
+					echo ' data-rule-minlength="' . $f->q_min . '"';
+					echo ' data-msg-minlength="Min length ' . $f->q_min . ' characters"';
+				}
+				if ( $f->q_max ) {
+					echo ' data-rule-maxlength="' . $f->q_max . '" maxlength="' . $f->q_max . '"';
+					echo ' data-msg-maxlength="Max length ' . $f->q_max . ' characters"';
 				}
 				echo '>';
                 if ($f->value) echo $f->value;
@@ -641,6 +642,24 @@ if ( $this->task == 'results' ) {
 			echo 'No Votes Yet<br />';
 		}
 		echo '</p>';
+	}
+
+}
+
+/*** DISPLAY POLL RESULTS ***/
+if ( $this->task == 'completed' ) {
+
+	//Display before results message
+	if ( $this->pdata->poll_results_msg_before ) {
+		$this->pdata->poll_results_msg_before = str_replace( "{resid}",
+			$this->cmplid,
+			$this->pdata->poll_results_msg_before );
+		echo $this->pdata->poll_results_msg_before;
+	}
+
+	//Display After results message
+	if ( $this->pdata->poll_results_msg_after ) {
+		echo $this->pdata->poll_results_msg_after;
 	}
 
 }
