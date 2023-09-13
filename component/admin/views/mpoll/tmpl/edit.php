@@ -84,7 +84,7 @@ use Joomla\CMS\Language\Text;
                     <p>Specify an email to go to a specific address based on an option selection. To set the reply to address use the field to the right. The all results email is separate and can be activated/deactivated by using the selector above.</p>
                     <?php echo $this->form->getInput('poll_results_emails'); ?>
                 </div>
-                <div class="span2 col-md-2">
+                <div class="form-vertical span2 col-md-2">
                     <?php foreach($this->form->getFieldset('results_all') as $field): ?>
                         <div class="control-group">
                             <div class="control-label"><?php echo $field->label;?></div>
@@ -121,7 +121,7 @@ use Joomla\CMS\Language\Text;
                     </div>
                 </div>
 
-                <div class="span2 col-md-2">
+                <div class="form-vertical span2 col-md-2">
                     <?php foreach($this->form->getFieldset('confirmation') as $field): ?>
                         <div class="control-group">
                             <div class="control-label"><?php echo $field->label;?></div>
@@ -152,7 +152,7 @@ use Joomla\CMS\Language\Text;
                     <?php endforeach; ?>
                     <?php echo $this->form->renderField('poll_payment_body'); ?>
                 </div>
-                <div class="span2 col-md-2">
+                <div class="form-vertical span2 col-md-2">
                     <?php foreach($this->form->getFieldset('paymentdetails') as $field): ?>
                         <div class="control-group">
                             <div class="control-label"><?php echo $field->label;?></div>

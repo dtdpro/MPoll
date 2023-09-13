@@ -118,12 +118,18 @@ class MPollModelMPoll extends JModelLegacy
 	{
 		$this->checkToken() or die(Text::_('JINVALID_TOKEN'));
 
-		// Initialise variables;
+		// Initialise variables
+		$cfg = MPollHelper::getConfig();
 		$jinput = JFactory::getApplication()->input;
 
 		// Honeypot
-		$honeyPot = $jinput->getVar('name',"");
-		if ($honeyPot) die(Text::_('JINVALID_TOKEN'));
+		if ($cfg->usehoneypot) {
+			$honeyPot = $jinput->getVar( 'name', "" );
+			if ( $honeyPot ) {
+				die( Text::_( 'JINVALID_TOKEN' ) );
+			}
+		}
+
 		$data		= $jinput->getVar('jform', array(), 'post', 'array');
 		$isNew = true;
 		$db		= $this->getDbo();
@@ -133,7 +139,6 @@ class MPollModelMPoll extends JModelLegacy
 		$date = new JDate('now');
 		$pollinfo = $this->getPoll($pollid);
 		$jconfig = JFactory::getConfig();
-		$cfg = MPollHelper::getConfig();
 		// Include the content plugins for the on save events.
 		JPluginHelper::importPlugin('content');
 

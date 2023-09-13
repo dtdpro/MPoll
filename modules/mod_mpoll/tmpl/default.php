@@ -375,17 +375,20 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 				echo '</div>';
 			}
 
-			// Start Honeypot Row & Field
-			echo '<div class="row-'.$sname.' mpoll-form-poll-row-info uk-form-row uk-margin-top"><div class="uk-form-controls">';
 
-			// Honepot Label
-			echo '<div class="uk-form-label uk-text-bold">SPAM Check, leave blank</div>';
+            if ($cfg->usehoneypot) {
+                // Start Honeypot Row & Field
+                echo '<div class="row-' . $sname . ' mpoll-form-poll-row-info uk-form-row uk-margin-top"><div class="uk-form-controls">';
 
-            // Honepot Input
-			echo '<input autocomplete="off"  name="name" id="jform_name" value="" class="mf_field uk-width-1-1 uk-input" type="text">';
+                // Honepot Label
+                echo '<div class="uk-form-label uk-text-bold">SPAM Check, leave blank</div>';
 
-			// End Honeypot Row & Field
-			echo '</div></div>';
+                // Honepot Input
+                echo '<input autocomplete="off"  name="name" id="jform_name" value="" class="mf_field uk-width-1-1 uk-input" type="text">';
+
+                // End Honeypot Row & Field
+                echo '</div></div>';
+            }
 
 			//reCAPTCHA
 			if ( $pdata->poll_recaptcha && $cfg->rc_theme != "v3" ) {

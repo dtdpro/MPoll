@@ -54,8 +54,12 @@ $cfg = MPollHelper::getConfig();
 checkToken() or die(Text::_('JINVALID_TOKEN'));
 
 // Honeypot
-$honeyPot = $jinput->getVar('name',"");
-if ($honeyPot) die(Text::_('JINVALID_TOKEN'));
+if ($cfg->usehoneypot) {
+	$honeyPot = $jinput->getVar( 'name', "" );
+	if ( $honeyPot ) {
+		die( Text::_( 'JINVALID_TOKEN' ) );
+	}
+}
 
 $data = $jinput->getVar('jform', array(), 'post', 'array');
 $pollid  = $jinput->getVar('poll');
