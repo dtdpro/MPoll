@@ -317,6 +317,8 @@ class MPollModelMPoll extends JModelLegacy
 							foreach ($ans as $i) {
 								$resultsemail .= $optionsdata[$i].'<br />';
 							}
+                            if ($other->$fieldname) $resultsemail .= 'Other: '.$other->$fieldname;
+                            $resultsemail .= '<br />';
 							$resultsemail .= '<br />';
 						} else {
 							$resultsemail .= $item->$fieldname.'<br />';

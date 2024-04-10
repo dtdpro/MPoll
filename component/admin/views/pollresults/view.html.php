@@ -39,6 +39,6 @@ class MPollViewPollResults extends JViewLegacy
 			JToolBarHelper::divider();
 			JToolBarHelper::deleteList('', 'pollresults.delete', 'COM_MPOLL_MANAGER_POLLRESULTS_DELETERECORDS');
 		}
-		if (JVersion::MAJOR_VERSION == 4) JToolbarHelper::link('index.php?option=com_mpoll&view=mpolls','Return to Polls','chevron-left');
+		if (JVersion::MAJOR_VERSION >= 4) JToolbarHelper::link('index.php?option=com_mpoll&view=mpolls','Return to Polls','chevron-left');
 	}
 }

@@ -67,7 +67,7 @@ class MPollViewOptions extends JViewLegacy
 			JToolBarHelper::trash('options.trash');
 			JToolBarHelper::divider();
 		}
-		if (JVersion::MAJOR_VERSION == 4) JToolbarHelper::link('index.php?option=com_mpoll&view=questions','Return to Questions','chevron-left');
+		if (JVersion::MAJOR_VERSION >= 4) JToolbarHelper::link('index.php?option=com_mpoll&view=questions','Return to Questions','chevron-left');
 	}
 	
 	protected function getSortFields()

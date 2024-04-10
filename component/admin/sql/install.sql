@@ -7,7 +7,7 @@ CREATE TABLE `#__mpoll_completed` (
   `cm_useragent` text NOT NULL,
   `cm_ipaddr` varchar(50) NOT NULL,
   `cm_status` varchar(64) NOT NULL DEFAULT 'complete'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `#__mpoll_polls` (
   `poll_id` int(11) NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE `#__mpoll_polls` (
   `poll_created_by` int(11) NOT NULL,
   `poll_modified` datetime NOT NULL,
   `poll_modified_by` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `#__mpoll_questions` (
   `q_id` bigint(20) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE `#__mpoll_questions` (
   `q_match` int(11) NOT NULL,
   `params` text NOT NULL,
   `published` int(11) NOT NULL DEFAULT '1'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `#__mpoll_questions_opts` (
   `opt_id` bigint(20) NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE `#__mpoll_questions_opts` (
   `opt_disabled` tinyint(1) NOT NULL DEFAULT '0',
   `opt_color` varchar(10) NOT NULL DEFAULT '#000000',
   `published` int(11) NOT NULL DEFAULT '1'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `#__mpoll_results` (
   `res_id` bigint(20) NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE `#__mpoll_results` (
   `res_cm` int(11) NOT NULL,
   `res_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `res_ans_other` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `#__mpoll_payment` (
   `pay_id` int(11) NOT NULL,

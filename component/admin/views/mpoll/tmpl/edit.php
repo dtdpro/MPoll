@@ -36,7 +36,7 @@ use Joomla\CMS\Language\Text;
     <div class="form-horizontal main-card">
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
 	        echo HTMLHelper::_( 'uitab.startTabSet', 'myTab', array( 'active' => 'details', 'recall' => true, 'breakpoint' => 768 ) );
 	        echo HTMLHelper::_('uitab.addTab', 'myTab', 'setup', Text::_('COM_MPOLL_MPOLL_SETUP'));
         } else {
@@ -45,7 +45,7 @@ use Joomla\CMS\Language\Text;
         }
         ?>
 
-            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
                 <div class="span6 form-horizontal col-md-6">
                     <?php foreach($this->form->getFieldset('setup') as $field): ?>
                         <div class="control-group">
@@ -65,7 +65,7 @@ use Joomla\CMS\Language\Text;
             </div>
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.addTab', 'myTab', 'results', Text::_('COM_MPOLL_MPOLL_RESULTS'));
         } else {
@@ -74,7 +74,7 @@ use Joomla\CMS\Language\Text;
         }
         ?>
 
-            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
                 <div class="span10 form-horizontal col-md-10">
                     <div class="control-group">
                         <div class="control-label"><?php echo $this->form->getLabel('poll_resultsemail');?></div>
@@ -95,7 +95,7 @@ use Joomla\CMS\Language\Text;
             </div>
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.addTab', 'myTab', 'confirmation', Text::_('Confirmation'));
         } else {
@@ -105,7 +105,7 @@ use Joomla\CMS\Language\Text;
         ?>
 
 
-            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
 
                 <div class="span10 form-vertical col-md-10">
                     <?php echo $this->form->renderField('poll_confmsg'); ?>
@@ -133,7 +133,7 @@ use Joomla\CMS\Language\Text;
             </div>
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.addTab', 'myTab', 'payment', Text::_('Payment'));
         } else {
@@ -142,7 +142,7 @@ use Joomla\CMS\Language\Text;
         }
         ?>
 
-            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
                 <div class="span10 form-horizontal col-md-10">
                     <?php foreach($this->form->getFieldset('paymentemail') as $field): ?>
                         <div class="control-group">
@@ -163,7 +163,7 @@ use Joomla\CMS\Language\Text;
             </div>
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.addTab', 'myTab', 'desc1', Text::_('COM_MPOLL_MPOLL_FIELD_DESC_LABEL'));
         } else {
@@ -173,14 +173,14 @@ use Joomla\CMS\Language\Text;
         ?>
 
             <p><?php echo jText::_('COM_MPOLL_MPOLL_FIELD_DESC_DESC'); ?></p>
-            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
                 <div class="form-vertical col-md-12">
                     <?php echo $this->form->renderField('poll_desc'); ?>
                 </div>
             </div>
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.addTab', 'myTab', 'desc2', Text::_('COM_MPOLL_MPOLL_FIELD_RMSGB_LABEL'));
         } else {
@@ -190,14 +190,14 @@ use Joomla\CMS\Language\Text;
         ?>
 
             <p><?php echo jText::_('COM_MPOLL_MPOLL_FIELD_RMSGB_DESC'); ?></p>
-            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
                 <div class="form-vertical col-md-12">
                     <?php echo $this->form->renderField('poll_results_msg_before'); ?>
                 </div>
             </div>
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.addTab', 'myTab', 'desc3', Text::_('COM_MPOLL_MPOLL_FIELD_RMSGA_LABEL'));
         } else {
@@ -207,14 +207,14 @@ use Joomla\CMS\Language\Text;
         ?>
 
             <p><?php echo jText::_('COM_MPOLL_MPOLL_FIELD_RMSGA_DESC'); ?></p>
-            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
                 <div class="form-vertical col-md-12">
                     <?php echo $this->form->renderField('poll_results_msg_after'); ?>
                 </div>
             </div>
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.addTab', 'myTab', 'desc4', Text::_('COM_MPOLL_MPOLL_FIELD_RMSGM_LABEL'));
         } else {
@@ -224,7 +224,7 @@ use Joomla\CMS\Language\Text;
         ?>
 
             <p><?php echo jText::_('COM_MPOLL_MPOLL_FIELD_RMSGM_DESC'); ?></p>
-            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+            <div class="row-fluid form-horizontal-desktop <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
                 <div class="form-vertical col-md-12">
                     <?php echo $this->form->renderField('poll_results_msg_mod'); ?>
                 </div>
@@ -232,7 +232,7 @@ use Joomla\CMS\Language\Text;
 
 
         <?php
-        if (JVersion::MAJOR_VERSION == 4) {
+        if (JVersion::MAJOR_VERSION >= 4) {
             echo HTMLHelper::_('uitab.endTab');
             echo HTMLHelper::_('uitab.endTabSet');
         } else {

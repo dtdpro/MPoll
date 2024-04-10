@@ -140,7 +140,7 @@ $sortFields = $this->getSortFields();
 						 	| <strong>Submissions:</strong> 
 						 	<?php 
 						 		echo $item->results;
-                                if ( JVersion::MAJOR_VERSION == 4 ) {
+                                if ( JVersion::MAJOR_VERSION >= 4 ) {
                                     echo ' | '. JHtml::_('mpolladministrator.questions',$i, true);
                                 }
 						 		if ($item->results) {//<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.questions\')" class="btn btn-micro hasTooltip' . '" title="Questions"><i class="icon-question"></i></a>

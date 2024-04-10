@@ -37,45 +37,44 @@ foreach ($this->items as $i)
     	$fn='q_'.$qu->q_id;
         $fno='q_'.$qu->q_id.'_other';
 		$qnum = 'q'.$qu->q_id.'ans';
+        $answer = "";
 	    if (property_exists($i,$fn)) {
 		    if ( $qu->q_type == 'multi' || $qu->q_type == 'dropdown' ) {
-				$answer = "";
 			    if ( isset( $this->options[ $i->$fn ] ) ) {
 				    $answer .= $this->options[ $i->$fn ];
 			    }
 			    if ( property_exists( $i, $fno ) ) {
 				    $answer .= ': ' . $i->$fno;
 			    }
-			    $dataRow[] = $answer;
 		    }
 		    if ( $qu->q_type == 'textbox' || $qu->q_type == 'mailchimp' || $qu->q_type == 'textar' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown') {
-			    $dataRow[] = $i->$fn;
+			    $answer = $i->$fn;
 		    }
 			if ( $qu->q_type == 'attach' ) {
-				$answer = "";
 			    if ( strpos( $i->$fn, "ERROR:" ) === false && $i->$fn != "" ) {
 				    $answer .= $i->$fn;
 			    } else {
 				    $answer .= $i->$fn;
 			    }
-			    $dataRow[] = $answer;
 		    }
 		    if ( $qu->q_type == 'cbox' ) {
 			    if ( $i->$fn ) {
-				    $dataRow[] = 'Yes';
+                    $answer = 'Yes';
 			    } else {
-				    $dataRow[] = 'No';
+                    $answer = 'No';
 			    }
 		    }
 		    if ( $qu->q_type == 'mcbox' || $qu->q_type == "mlist" ) {
-			    $answer = "";
 			    $i->$fn = explode( " ", $i->$fn );
 			    foreach ( $i->$fn as $o ) {
 				    $answer .= $this->options[ $o ] . ' ';
 			    }
-			    $dataRow[] = $answer;
+                if ( property_exists($i,$fno)) {
+                    $answer .= 'Other: ' . $i->$fno;
+                }
 		    }
 	    }
+        $dataRow[] = $answer;
 	}
 	$dataRows[] = $dataRow;
 }

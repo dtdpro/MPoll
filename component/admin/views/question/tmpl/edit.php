@@ -27,7 +27,7 @@ $params = $this->form->getFieldsets('params');
 			<div class="controls"><?php echo $this->form->getInput('q_type'); ?></div>
 		</div>
 	</div>
-	<div class="row-fluid <?php if (JVersion::MAJOR_VERSION == 4) { ?>row<?php } ?>">
+	<div class="row-fluid <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
 		<div class="span8 col-md-8">
 			<?php foreach($this->form->getFieldset('content') as $field): ?>
 				<div class="control-group">

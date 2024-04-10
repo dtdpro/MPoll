@@ -124,6 +124,9 @@ JHtml::_('formbehavior.chosen', 'select');
 							foreach ( $item->$fn as $o ) {
 								echo $this->options[ $o ] . '<br />';
 							}
+                            if ( property_exists($item,$fno)) {
+                                echo 'Other: ' . $item->$fno;
+                            }
 						}
 					}
 					echo '</td>';
