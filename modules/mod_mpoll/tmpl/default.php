@@ -211,7 +211,13 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 							if ($o->opt_disabled) $checked .= ' disabled';
 							echo $checked.'/>'."\n";
 							echo '<label for="jform_'.$sname.$o->value.'">';
-							echo ' '.$o->text.'</label><br />'."\n";
+							echo ' '.$o->text;
+                            if ($o->opt_other) {
+                                echo ' <input type="text" value="';
+                                if (property_exists($f,'other')) echo $f->other;
+                                echo '" name="jform['.$sname.'_other]" id="jform_'.$sname.$o->value.'_other" class="">';
+                            }
+                            echo '</label><br />'."\n";
 						} else {
 							echo '<span class="uk-text-bold">'.$o->text.'</span><br />';
 						}
