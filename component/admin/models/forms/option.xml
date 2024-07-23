@@ -10,7 +10,7 @@
 			name="published"
 			type="list"
 			id="published"
-			class="inputbox"
+			class="inputbox form-select"
 			label="JSTATUS"
 			description="JFIELD_PUBLISHED_DESC"
 			size="1"
@@ -26,7 +26,7 @@
 		<field 
 			name="ordering" 
 			type="OrderOption" 
-			class="inputbox"
+			class="inputbox form-select"
 			label="JFIELD_ORDERING_LABEL"
 			description="JFIELD_ORDERING_DESC" 
 		/>

@@ -26,7 +26,7 @@ class MPollModelMPoll extends JModelLegacy
 		$query = $db->getQuery(true);
 		$query->select('*');
 		$query->from('#__mpoll_polls');
-		$query->where('poll_id = '.$pollid);
+		$query->where('poll_id = '.$db->escape($pollid));
 		$query->where('published > 0');
 		$db->setQuery( $query );
 		$pdata = $db->loadObject();
@@ -51,7 +51,7 @@ class MPollModelMPoll extends JModelLegacy
 		$query->select('*');
 		$query->from('#__mpoll_questions');
 		$query->where('published > 0');
-		$query->where('q_poll = '.$pollid);
+		$query->where('q_poll = '.$db->escape($pollid));
 		$query->order('ordering ASC');
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
@@ -422,7 +422,7 @@ class MPollModelMPoll extends JModelLegacy
 		$query->select('cm_id');
 		$query->from('#__mpoll_completed');
 		$query->where('cm_user='.$user->id);
-		$query->where('cm_poll='.$pollid);
+		$query->where('cm_poll='.$db->escape($pollid));
 		$db->setQuery($query);
 		$data = $db->loadColumn();
 
@@ -435,7 +435,7 @@ class MPollModelMPoll extends JModelLegacy
 		$q = $db->getQuery(true);
 		$q->select('*');
 		$q->from('#__mpoll_completed');
-		$q->where('cm_id = '.$cmid);
+		$q->where('cm_id = '.$db->escape($cmid));
 		if ($pubid) $q->where('cm_pubid = "'.$pubid.'"');
 		$q->setLimit('1');
 		$db->setQuery($q);
@@ -447,7 +447,7 @@ class MPollModelMPoll extends JModelLegacy
 		$q = $db->getQuery(true);
 		$q->select('cm_time');
 		$q->from('#__mpoll_completed');
-		$q->where('cm_poll = '.$pollid);
+		$q->where('cm_poll = '.$db->escape($pollid));
 		$q->order('cm_time ASC');
 		$q->setLimit('1');
 		$db->setQuery($q);
@@ -459,7 +459,7 @@ class MPollModelMPoll extends JModelLegacy
 		$q = $db->getQuery(true);
 		$q->select('cm_time');
 		$q->from('#__mpoll_completed');
-		$q->where('cm_poll = '.$pollid);
+		$q->where('cm_poll = '.$db->escape($pollid));
 		$q->order('cm_time DESC');
 		$q->setLimit('1');
 		$db->setQuery($q);
@@ -471,7 +471,7 @@ class MPollModelMPoll extends JModelLegacy
 		$q = $db->getQuery(true);
 		$q->select('count(*)');
 		$q->from('#__mpoll_completed');
-		$q->where('cm_poll = '.$pollid);
+		$q->where('cm_poll = '.$db->escape($pollid));
 		$q->group('cm_poll');
 		$db->setQuery($q);
 		$count = $db->loadResult();

@@ -57,8 +57,8 @@ $sortFields = $this->getSortFields();
 			<tr>
 				<th width="1%">
 					<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-				</th>	
-				<th width="1%" style="min-width:55px" class="nowrap center">
+				</th>
+                <th width="1%" style="min-width:55px" class="nowrap center">
 					<?php echo JHtml::_('searchtools.sort','JSTATUS','p.published', $listDirn, $listOrder); ?>
 				</th>		
 				<th>
@@ -90,7 +90,7 @@ $sortFields = $this->getSortFields();
 		<?php foreach($this->items as $i => $item): ?>
 			<tr class="row<?php echo $i % 2; ?>">
 				<td><?php echo JHtml::_('grid.id', $i, $item->poll_id); ?></td>
-				<td class="center text-center">
+                <td class="center text-center">
 					<div class="btn-group">
 						<?php
 						echo JHtml::_('jgrid.published', $item->published, $i, 'mpolls.', true);
@@ -137,15 +137,15 @@ $sortFields = $this->getSortFields();
 						 	 | <strong>Questions:</strong>
 						 	<?php echo $item->questions; ?>  
 						 	<?php if ($item->poll_regreq) echo ' | <span style="color:#800000">Reg Required</span>'; ?>
-						 	| <strong>Submissions:</strong> 
+						 	| <strong>Submissions:</strong>
 						 	<?php 
-						 		echo $item->results;
+						 		echo $item->results.'<br>';
                                 if ( JVersion::MAJOR_VERSION >= 4 ) {
-                                    echo ' | '. JHtml::_('mpolladministrator.questions',$i, true);
+                                    echo JHtml::_('mpolladministrator.questions',$i, true);
                                 }
 						 		if ($item->results) {//<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.questions\')" class="btn btn-micro hasTooltip' . '" title="Questions"><i class="icon-question"></i></a>
-								    echo ' | '. JHtml::_('mpolladministrator.results',$i, true);
-								    echo ' | '. JHtml::_('mpolladministrator.tally',$i, true);
+								    echo '&nbsp;' . JHtml::_('mpolladministrator.results',$i, true);
+								    echo '&nbsp;' . JHtml::_('mpolladministrator.tally',$i, true);
 								}
 							?>
 						</div>

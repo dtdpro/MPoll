@@ -14,7 +14,7 @@
 			name="published"
 			type="list"
 			id="published"
-			class="inputbox"
+			class="inputbox form-select"
 			label="JSTATUS"
 			description="JFIELD_PUBLISHED_DESC"
 			size="1"
@@ -26,14 +26,14 @@
 		<field 
 			name="q_poll" 
 			type="Polls" 
-			class="inputbox"
+			class="inputbox form-select"
 			label="COM_MPOLL_QUESTION_FIELD_POLL_LABEL"
 			description="COM_MPOLL_QUESTION_FIELD_POLL_DESC" 
 		/>
 		<field 
 			name="ordering" 
 			type="OrderQuestion" 
-			class="inputbox"
+			class="inputbox form-select"
 			label="JFIELD_ORDERING_LABEL"
 			description="JFIELD_ORDERING_DESC" 
 		/>
@@ -43,7 +43,7 @@
 			label="COM_MPOLL_OPTION_FIELD_DEFAULT_LABEL"
 			description="COM_MPOLL_OPTION_FIELD_DEFAULT_DESC"
 			size="40"
-			class="inputbox"
+			class="inputbox form-control"
 			required="false"
 			default=""
 		/>
@@ -126,7 +126,7 @@
 			name="q_type"
 			type="list"
 			extension="com_mpoll"
-			class="inputbox"
+			class="inputbox form-select"
 			default="multi"
 			label="COM_MPOLL_QUESTION_FIELD_TYPE_LABEL"
 			description="COM_MPOLL_QUESTION_FIELD_TYPE_DESC"

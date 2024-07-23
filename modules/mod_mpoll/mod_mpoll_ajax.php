@@ -49,7 +49,7 @@ if ($cfg->usehoneypot) {
 }
 
 $data = $jinput->getVar('jform', array(), 'post', 'array');
-$pollid  = $jinput->getVar('poll');
+$pollid  = $jinput->getInt('poll');
 $showresults  = $jinput->getVar('showresults');
 $showresultslink  = $jinput->getVar('showresultslink');
 $resultsas  = $jinput->getVar('resultsas');
@@ -60,7 +60,7 @@ $paylink  = urldecode($jinput->getVar('paylink'));
 $pquery = $db->getQuery(true);
 $pquery->select('*');
 $pquery->from('#__mpoll_polls');
-$pquery->where('poll_id = '.$pollid);
+$pquery->where('poll_id = '.$db->escape($pollid));
 $pquery->where('published > 0');
 $db->setQuery( $pquery );
 $pdata = $db->loadObject();
@@ -94,7 +94,7 @@ if ($pdata->poll_recaptcha) {
 $pubid = bin2hex(random_bytes(16));
 $cmrec=new stdClass();
 $cmrec->cm_user=$user->id;
-$cmrec->cm_poll=$pollid;
+$cmrec->cm_poll=$db->escape($pollid);
 $cmrec->cm_pubid=$pubid;
 if ($pdata->poll_payment_enabled) $cmrec->cm_status="unpaid";
 else $cmrec->cm_status="completed";
@@ -109,7 +109,7 @@ $qquery=$db->getQuery(true);
 $qquery->select('*');
 $qquery->from('#__mpoll_questions');
 $qquery->where('published > 0');
-$qquery->where('q_poll = '.$pollid);
+$qquery->where('q_poll = '.$db->escape($pollid));
 $qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach","datedropdown")');
 $qquery->order('ordering ASC');
 $db->setQuery( $qquery );
@@ -219,7 +219,7 @@ try {
         if ($fl->q_type != "captcha") {
             $cmres=new stdClass();
             $cmres->res_user=$user->id;
-            $cmres->res_poll=$pollid;
+            $cmres->res_poll=$db->escape($pollid);
             $cmres->res_qid=$fl->q_id;
             $cmres->res_ans=$db->escape($item->$fieldname);
             $cmres->res_cm=$subid;
@@ -239,7 +239,7 @@ try {
         $requery->select('*');
         $requery->from('#__mpoll_questions');
         $requery->where('published > 0');
-        $requery->where('q_poll = '.$pollid);
+        $requery->where('q_poll = '.$db->escape($pollid));
         $requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach")');
         $requery->order('ordering ASC');
         $db->setQuery( $requery );
@@ -312,7 +312,7 @@ try {
         $requery->select('*');
         $requery->from('#__mpoll_questions');
         $requery->where('published > 0');
-        $requery->where('q_poll = '.$pollid);
+        $requery->where('q_poll = '.$db->escape($pollid));
         $requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar")');
         $requery->order('ordering ASC');
         $db->setQuery( $requery );

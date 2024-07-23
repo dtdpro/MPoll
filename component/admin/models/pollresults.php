@@ -166,4 +166,30 @@ class MPollModelPollResults extends JModelList
 	
 		return true;
 	}
+
+    public function publish(&$pks, $newState=0)
+    {
+        $pks = (array) $pks;
+        $db = JFactory::getDBO();
+        $user = JFactory::getUser();
+
+        // Iterate the items to delete each one.
+        foreach ($pks as $i => $pk)
+        {
+            $query = $db->getQuery(true);
+            $query->update("#__mpoll_completed");
+            $query->set("published = ".$db->escape((int)$newState));
+            $query->where('cm_id='.(int)$pk);
+            $db->setQuery($query);
+            if (!$db->execute()) {
+                $this->setError($db->getErrorMsg());
+                return false;
+            }
+        }
+
+        // Clear the component's cache
+        $this->cleanCache();
+
+        return true;
+    }
 }

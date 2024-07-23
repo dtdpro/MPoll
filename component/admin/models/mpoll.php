@@ -158,8 +158,6 @@ class MPollModelMPoll extends JModelAdmin
 	
 	public function delete(&$pks)
 	{
-		// Initialise variables.
-		$dispatcher = JDispatcher::getInstance();
 		$pks = (array) $pks;
 		$table = $this->getTable();
 		$qtable=$this->getTable("Question","MPollTable");
@@ -216,7 +214,7 @@ class MPollModelMPoll extends JModelAdmin
 					//Completions
 					$q='DELETE FROM #__mpoll_completed WHERE cm_poll = '.$table->poll_id;
 					$this->_db->setQuery($q);
-					if (!$this->_db->query()) {
+					if (!$this->_db->execute()) {
 						$this->setError($this->_db->getError());
 						return false;
 					}
@@ -224,7 +222,7 @@ class MPollModelMPoll extends JModelAdmin
 					//Answers
 					$q='DELETE FROM #__mpoll_results WHERE res_poll = '.$table->poll_id;
 					$this->_db->setQuery($q);
-					if (!$this->_db->query()) {
+					if (!$this->_db->execute()) {
 						$this->setError($this->_db->getError());
 						return false;
 					}

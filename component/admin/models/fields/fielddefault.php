@@ -99,7 +99,7 @@ class JFormFieldFieldDefault extends JFormField
 		if (!$id) return $this->getTextField();
 	
 		// Build the query for the ordering list.
-		$html[] = '<select name="'.$this->name.'" class="inputbox" '.$attr.'>';
+		$html[] = '<select name="'.$this->name.'" class="inputbox form-select" '.$attr.'>';
 		$html[] = '<option value="">None</option>';
 		$query = 'SELECT opt_id AS value, opt_txt AS text' .
 				' FROM #__mpoll_questions_opts' .

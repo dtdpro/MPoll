@@ -35,7 +35,11 @@ class MPollViewPollResults extends JViewLegacy
 		//$tbar->appendButton('Link','archive','Export CSV','index.php?option=com_mpoll&view=pollresults&format=csv');
 		JToolbarHelper::link('index.php?option=com_mpoll&view=pollresults&format=csv','Export CSV','archive');
 		$canDo = MPollHelper::getActions();
-		if ($canDo->get('core.deleterecords')) {
+        if ($canDo->get('core.edit.state')) {
+            JToolBarHelper::custom('pollresults.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
+            JToolBarHelper::custom('pollresults.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
+        }
+        if ($canDo->get('core.deleterecords')) {
 			JToolBarHelper::divider();
 			JToolBarHelper::deleteList('', 'pollresults.delete', 'COM_MPOLL_MANAGER_POLLRESULTS_DELETERECORDS');
 		}

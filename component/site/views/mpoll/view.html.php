@@ -15,11 +15,15 @@ class MPollViewMPoll extends JViewLegacy
 		$jinput = JFactory::getApplication()->input;
 
 		$this->params = $app->getParams();
-		$this->pollid = $jinput->getVar( 'poll' );
+		$this->pollid = $jinput->getInt( 'poll' );
 		$this->task = $jinput->getVar('task');
 
 		// Load Config
 		$this->cfg = MPollHelper::getConfig();
+
+		if (!$this->pollid){
+			throw new \Exception("Not Found", 404);
+		}
 
 		if ($this->task != "paypal_webhook") {
 			$this->pdata = $model->getPoll( $this->pollid );
@@ -28,8 +32,7 @@ class MPollViewMPoll extends JViewLegacy
 
 			//check if poll exists
 			if ( empty( $this->pdata ) ) {
-				$app->enqueueMessage(JText::_('COM_MPOLL_POLL_NOT_FOUND'), 'error');
-				$app->setHeader('status', 404, true);
+				throw new \Exception("Not Found", 404);
 
 				return false;
 			}
@@ -38,8 +41,7 @@ class MPollViewMPoll extends JViewLegacy
 			if ( ( strtotime( $this->pdata->poll_start ) > strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				$this->started=false;
 				if ( ! $this->pdata->poll_shownotstarted ) {
-					$app->enqueueMessage(JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'), 'error');
-					$app->setHeader('status', 404, true);
+					throw new \Exception(JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'), 404);
 					return false;
 				}
 			}
@@ -49,8 +51,7 @@ class MPollViewMPoll extends JViewLegacy
 			if ( ( strtotime( $this->pdata->poll_end ) < strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				$this->ended = true;
 				if ( ! $this->pdata->poll_showended ) {
-					$app->enqueueMessage(JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'), 'error');
-					$app->setHeader('status', 404, true);
+					throw new \Exception(JText::_('COM_MPOLL_POLL_NOT_AVAILABLE'), 404);
 					return false;
 				}
 			}
@@ -77,7 +78,7 @@ class MPollViewMPoll extends JViewLegacy
 				$this->payurl = JRoute::_('index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid. '&payment=' . $this->payment);
 				$paydetails = array();
 				parse_str(base64_decode($this->payment),$paydetails);
-				$this->completition = $model->getCompletition($paydetails['cmplid'],$paydetails['id']);
+				$this->completition = $model->getCompletition((int)$paydetails['cmplid'],$paydetails['id']);
 				if (!$this->completition) {
 					$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid .'&cmpl=' . $this->payment;
 					$app->redirect(JRoute::_($url,false));
@@ -132,7 +133,7 @@ class MPollViewMPoll extends JViewLegacy
 					$this->payurl  = JRoute::_( 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid . '&payment=' . $this->cmpl );
 					$cmpldetails   = array();
 					parse_str( base64_decode( $this->cmpl ), $cmpldetails );
-					$this->completition = $model->getCompletition( $cmpldetails['cmplid'], $cmpldetails['id'] );
+					$this->completition = $model->getCompletition( (int)$cmpldetails['cmplid'], $cmpldetails['id'] );
 
 					$this->qdata = $model->getQuestions( $this->pollid, true, true );
 					$this->task  = 'results';

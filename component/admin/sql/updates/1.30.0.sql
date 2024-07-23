@@ -1,0 +1,1 @@
+ALTER TABLE `#__mpoll_completed` ADD `published` tinyint NOT NULL DEFAULT '0' AFTER `cm_status`;

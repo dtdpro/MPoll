@@ -1,7 +1,8 @@
-<?php 
-defined('_JEXEC') or die('Restricted access'); 
-JHtml::_('behavior.multiselect');
-JHtml::_('formbehavior.chosen', 'select');
+<?php
+defined('_JEXEC') or die('Restricted access');
+
+use Joomla\CMS\Button\PublishedButton;
+
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=mpolls'); ?>" method="post" name="adminForm" id="adminForm">
 <?php if (!empty( $this->sidebar)) : ?>
@@ -21,7 +22,10 @@ JHtml::_('formbehavior.chosen', 'select');
 		<tr>
 			<th width="1%">
 					<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-			</th>	
+			</th>
+            <th width="1%" style="min-width:55px" class="nowrap center">
+                <?php echo JText::_('JSTATUS'); ?>
+            </th>
 			<th>
 				<?php echo JText::_( 'ID#' ); ?>
 			</th>
@@ -53,6 +57,12 @@ JHtml::_('formbehavior.chosen', 'select');
 		?>
 		<tr class="row<?php echo $i % 2; ?>">
 			<td><?php echo JHtml::_('grid.id', $i, $item->cm_id); ?></td>
+            <td class="center text-center">
+                <?php
+                $options = [ 'task_prefix' => 'pollresults.', 'id' => 'state-' . $item->cm_id ];
+                echo ( new PublishedButton() )->render( (int) $item->published, $i, $options );
+                ?>
+            </td>
 			<td>
 				<?php echo $item->cm_id; ?>
 			</td>

@@ -6,7 +6,8 @@ CREATE TABLE `#__mpoll_completed` (
   `cm_poll` int(11) NOT NULL,
   `cm_useragent` text NOT NULL,
   `cm_ipaddr` varchar(50) NOT NULL,
-  `cm_status` varchar(64) NOT NULL DEFAULT 'complete'
+  `cm_status` varchar(64) NOT NULL DEFAULT 'complete',
+  `published` tinyint NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `#__mpoll_polls` (

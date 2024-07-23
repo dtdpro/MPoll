@@ -161,7 +161,7 @@ if ($saveOrder) {
 									if ($item->q_type=='mlist' ||$item->q_type=='multi' || $item->q_type=='mcbox' || $item->q_type=='dropdown') {
 										echo ' | <strong>Options:</strong> '.$item->options;
 								        if ( JVersion::MAJOR_VERSION >= 4 ) {
-                                            echo ' | ';
+                                            echo '<br>';
 									        echo JHtml::_( 'mpolladministrator.options', $i, $item->q_type, true );
 								        }
 									}
