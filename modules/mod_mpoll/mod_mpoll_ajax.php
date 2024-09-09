@@ -104,13 +104,13 @@ $db->insertObject('#__mpoll_completed',$cmrec);
 $subid = $db->insertid();
 
 // Get questions
-
 $qquery=$db->getQuery(true);
 $qquery->select('*');
 $qquery->from('#__mpoll_questions');
 $qquery->where('published > 0');
 $qquery->where('q_poll = '.$db->escape($pollid));
-$qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach","datedropdown")');
+$qquery->where('q_hidden = 0');
+$qquery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach","datedropdown","gmap")');
 $qquery->order('ordering ASC');
 $db->setQuery( $qquery );
 $qdata = $db->loadObjectList();
@@ -119,7 +119,7 @@ $qdata = $db->loadObjectList();
 foreach ($qdata as &$q) {
     if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
         $qo=$db->getQuery(true);
-        $qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable');
+        $qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable, opt_blank');
         $qo->from('#__mpoll_questions_opts');
         $qo->where('opt_qid = '.$q->q_id);
         $qo->where('published > 0');
@@ -138,6 +138,7 @@ try {
     $jinput = Factory::getApplication()->input;
     $item = new stdClass();
     $other = new stdClass();
+    $otherAlt = new stdClass();
     $optfs = array();
     $moptfs = array();
     $upfile=array();
@@ -157,6 +158,16 @@ try {
             if ($fmonth < 10) $fmonth = "0".$fmonth;
             if ($fday < 10) $fday = "0".$fday;
             $item->$fieldname = $fmonth.'-'.$fday.'-'.$fyear;
+        } else if ($d->q_type=='gmap') {
+            $address = $data[$fieldname];
+            $item->$fieldname = $address;
+            if ($cfg->gmaps_geocode_key) {
+                $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($address) . '&key=' . $cfg->gmaps_geocode_key;
+                $gdata_json = curl_file_get_contents($url);
+                $gdata = json_decode($gdata_json);
+                $other->$fieldname = $gdata->results[0]->geometry->location->lat; //latitude
+                $otherAlt->$fieldname = $gdata->results[0]->geometry->location->lng; //longitude
+            }
         } else {
             $item->$fieldname = $data[$fieldname];
         }
@@ -228,7 +239,13 @@ try {
             } else {
                 $cmres->res_ans_other = "";
             }
-            $db->insertObject('#__mpoll_results',$cmres);
+            if (isset($otherAlt->$fieldname)) {
+                $cmres->res_ans_other_alt = $db->escape( $otherAlt->$fieldname );
+            } else {
+                $cmres->res_ans_other_alt = "";
+            }
+
+                $db->insertObject('#__mpoll_results',$cmres);
         }
     }
 
@@ -239,6 +256,7 @@ try {
         $requery->select('*');
         $requery->from('#__mpoll_questions');
         $requery->where('published > 0');
+        $requery->where('q_hidden = 0');
         $requery->where('q_poll = '.$db->escape($pollid));
         $requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach")');
         $requery->order('ordering ASC');
@@ -254,6 +272,16 @@ try {
                         foreach ($uploaded_files as $uf) {
                             $resultsemail .= 'Download: <a href="' . str_replace("/modules/mod_mpoll","",JURI::base()) . $uf . '">'.basename($uf).'</a><br>';
                         }
+                    }
+                } else if ($d->q_type=="cbox") {
+                    if($item->$fieldname) {
+                        if ($item->$fieldname == 1) {
+                            $resultsemail .= "Yes";
+                        } else {
+                            $resultsemail .= "No";
+                        }
+                    } else {
+                        $resultsemail .= "No";
                     }
                 } else if (in_array($fieldname,$optfs)) {
                     $resultsemail .= $optionsdata[$item->$fieldname];
@@ -313,6 +341,7 @@ try {
         $requery->from('#__mpoll_questions');
         $requery->where('published > 0');
         $requery->where('q_poll = '.$db->escape($pollid));
+        $requery->where('q_hidden = 0');
         $requery->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar")');
         $requery->order('ordering ASC');
         $db->setQuery( $requery );
@@ -398,7 +427,7 @@ if ($pdata->poll_showresults && $showresults) {
                         $numr = $numr + $o->anscount;
                     }
                     foreach ($qr->options as $opts) {
-                        if ($opts->opt_selectable) {
+                        if ($opts->opt_selectable && !$opts->opt_blank) {
                             if ($numr != 0) $per = ($opts->anscount)/($numr); else $per=1;
                             echo '<div class="mpollmod-opt">';
 
@@ -502,4 +531,15 @@ function getIPAddress() {
         $ip = $_SERVER['REMOTE_ADDR'];
     }
     return $ip;
+}
+
+function curl_file_get_contents($URL){
+    $c = curl_init();
+    curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($c, CURLOPT_URL, $URL);
+    $contents = curl_exec($c);
+    curl_close($c);
+
+    if ($contents) return $contents;
+    else return FALSE;
 }

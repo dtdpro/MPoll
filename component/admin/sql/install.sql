@@ -7,7 +7,8 @@ CREATE TABLE `#__mpoll_completed` (
   `cm_useragent` text NOT NULL,
   `cm_ipaddr` varchar(50) NOT NULL,
   `cm_status` varchar(64) NOT NULL DEFAULT 'complete',
-  `published` tinyint NOT NULL DEFAULT '0'
+  `published` tinyint NOT NULL DEFAULT '0',
+  `featured` tinyint NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `#__mpoll_polls` (
@@ -33,6 +34,14 @@ CREATE TABLE `#__mpoll_polls` (
   `poll_results_msg_after` text NOT NULL,
   `poll_results_msg_mod` text NOT NULL,
   `poll_showresults` tinyint(1) NOT NULL DEFAULT '1',
+  `poll_results_searchable` tinyint(1) NOT NULL DEFAULT '0',
+  `poll_results_showall` tinyint(1) NOT NULL DEFAULT '0',
+  `poll_results_sortby` int(11) NOT NULL DEFAULT '0',
+  `poll_results_sortdirr` VARCHAR(5) NOT NULL DEFAULT 'ASC',
+  `poll_results_sortby2` int(11) NOT NULL DEFAULT '0',
+  `poll_results_sortdirr2` VARCHAR(5) NOT NULL DEFAULT 'ASC',
+  `poll_results_msg_noresults` TEXT NOT NULL,
+  `poll_results_msg_filterfirst` TEXT NOT NULL,
   `access` int(11) NOT NULL DEFAULT '1',
   `poll_cat` int(11) NOT NULL,
   `poll_resultsemail` tinyint(1) NOT NULL DEFAULT '0',
@@ -74,9 +83,13 @@ CREATE TABLE `#__mpoll_questions` (
   `q_default` varchar(255) NOT NULL,
   `q_type` varchar(20) NOT NULL,
   `q_req` tinyint(1) NOT NULL DEFAULT '1',
+  `q_hidden` tinyint(1) NOT NULL DEFAULT '0',
   `q_min` int(11) NOT NULL,
   `q_max` int(11) NOT NULL,
   `q_match` int(11) NOT NULL,
+  `q_filter` tinyint(1) NOT NULL DEFAULT '0',
+  `q_filter_name` VARCHAR(255) NULL,
+  `q_filter_width` VARCHAR(4) NOT NULL DEFAULT '1-1',
   `params` text NOT NULL,
   `published` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -91,6 +104,7 @@ CREATE TABLE `#__mpoll_questions_opts` (
   `opt_selectable` tinyint(1) NOT NULL DEFAULT '1',
   `opt_disabled` tinyint(1) NOT NULL DEFAULT '0',
   `opt_color` varchar(10) NOT NULL DEFAULT '#000000',
+  `opt_blank` tinyint(1) NOT NULL DEFAULT '0',
   `published` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -102,7 +116,8 @@ CREATE TABLE `#__mpoll_results` (
   `res_ans` text NOT NULL,
   `res_cm` int(11) NOT NULL,
   `res_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `res_ans_other` text NOT NULL
+  `res_ans_other` text NOT NULL,
+  `res_ans_other_alt` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `#__mpoll_payment` (

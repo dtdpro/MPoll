@@ -1,0 +1,1 @@
+ALTER TABLE `#__mpoll_questions_opts` ADD `opt_blank` tinyint NOT NULL DEFAULT '0' AFTER `opt_color`;

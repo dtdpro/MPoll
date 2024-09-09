@@ -99,6 +99,18 @@
 			required="true"
 			default="#000000"
 		/>
+		<field
+				name="opt_blank"
+				type="radio"
+				label="COM_MPOLL_OPTION_FIELD_BLANK_LABEL"
+				description="COM_MPOLL_OPTION_FIELD_BLANK_DESC"
+				size="1"
+				class="btn-group"
+				required="true"
+				default="0">
+			<option	value="1">Yes</option>
+			<option	value="0">No</option>
+		</field>
 	</fieldset>
 	
 

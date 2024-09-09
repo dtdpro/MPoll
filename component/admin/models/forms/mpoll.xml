@@ -85,7 +85,7 @@
                 type="hidden"
         />
     </fieldset>
-    <fieldset name="results_opts">
+    <fieldset name="results_opts">poll_results_searchable
         <field
                 name="poll_results_emails"
                 type="subform"
@@ -428,6 +428,18 @@
             <option value="0">No</option>
         </field>
         <field
+                name="poll_showresults"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_DESC"
+                size="1"
+                class="btn-group"
+                required="true"
+                default="1">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </field>
+        <field
                 name="poll_end_msg"
                 type="text"
                 label="COM_MPOLL_MPOLL_FIELD_ENDMSG_LABEL"
@@ -506,18 +518,6 @@
                 buttons="false"
         />
         <field
-                name="poll_showresults"
-                type="radio"
-                label="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_LABEL"
-                description="COM_MPOLL_MPOLL_FIELD_SHOWRESULTS_DESC"
-                size="1"
-                class="btn-group"
-                required="true"
-                default="1">
-            <option value="1">Yes</option>
-            <option value="0">No</option>
-        </field>
-        <field
                 name="poll_printresults"
                 type="radio"
                 label="COM_MPOLL_MPOLL_FIELD_PRINTRESULTS_LABEL"
@@ -563,6 +563,110 @@
                 class="readonly"
                 readonly="true"
                 filter="unset"
+        />
+    </fieldset>
+    <fieldset name="searchableresultsdetails">
+        <field
+                name="poll_results_searchable"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTS_SEARCHABLE_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTS_SEARCHABLE_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="0">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </field>
+        <field
+                name="poll_results_showall"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTS_SHOWALL_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTS_SHOWALL_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="0">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </field>
+        <field
+                name="poll_results_showfeat"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTS_SHOWFEAT_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTS_SHOWFEAT_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="0">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </field>
+        <field
+                name="poll_results_sortby"
+                type="QuestionSort"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTSBY_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTSBY_DESC"
+                class="inputbox"
+                required="false"
+                default="0"
+        />
+        <field
+                name="poll_results_sortdirr"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTSDIRR_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTSDIRR_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="ASC">
+            <option value="ASC">Ascending</option>
+            <option value="DESC">Descending</option>
+        </field>
+        <field
+                name="poll_results_sortby2"
+                type="QuestionSort"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTSBY2_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTSBY2_DESC"
+                class="inputbox"
+                required="false"
+                default="0"
+        />
+        <field
+                name="poll_results_sortdirr2"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTSDIRR2_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTSDIRR2_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="ASC">
+            <option value="ASC">Ascending</option>
+            <option value="DESC">Descending</option>
+        </field>
+    </fieldset>
+    <fieldset name="searchableresults">
+        <field
+                name="poll_results_msg_noresults"
+                type="textarea"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTS_MSG_NORESULTS_LABEL"
+                description="COM_MPOLL_MPOLL_RESULTS_MSG_NORESULTS_DESC"
+                rows="3"
+                cols="30"
+                class="inputbox"
+                filter="safehtml"
+                buttons="false"
+        />
+        <field
+                name="poll_results_msg_filterfirst"
+                type="textarea"
+                label="COM_MPOLL_MPOLL_FIELD_RESULTS_MSG_FILTERFIRST_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTS_MSG_FILTERFIRST_DESC"
+                rows="3"
+                cols="30"
+                class="inputbox"
+                filter="safehtml"
+                buttons="false"
         />
     </fieldset>
 

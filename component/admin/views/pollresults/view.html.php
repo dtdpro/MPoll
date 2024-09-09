@@ -12,18 +12,17 @@ class MPollViewPollResults extends JViewLegacy
 		$jinput = JFactory::getApplication()->input;
 		$this->questions = $this->get('Questions');
 		$this->polltitle = $this->get('PollTitle');
+        $this->filterForm    = $this->get('FilterForm');
+        $this->activeFilters = $this->get('ActiveFilters');
 		
 		$model = $this->getModel('pollresults');
 		$this->items = $model->getResponses($this->questions);
 		$this->options = $model->getOptions($this->questions);
 		$this->poll = $model->getPoll();
 		$this->users = $model->getUsers();
-
-		if (JVersion::MAJOR_VERSION == 3) MPOLLHelper::addPollSubmenu($jinput->getVar('view'),$this->polltitle);
 	
 		// Set the toolbar
 		$this->addToolBar();
-		$this->sidebar = JHtmlSidebar::render();
 	
 		parent::display($tpl);
 	}
@@ -38,6 +37,9 @@ class MPollViewPollResults extends JViewLegacy
         if ($canDo->get('core.edit.state')) {
             JToolBarHelper::custom('pollresults.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
             JToolBarHelper::custom('pollresults.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
+            JToolBarHelper::custom('pollresults.featured', 'featured.png', 'featured_f2.png', 'JFEATURE', true);
+            JToolBarHelper::custom('pollresults.unfeatured', 'remove.png', 'remove_f2.png', 'JUNFEATURE', true);
+
         }
         if ($canDo->get('core.deleterecords')) {
 			JToolBarHelper::divider();

@@ -9,6 +9,7 @@
 			<field name="task" type="radio" default="ballot" label="View" description="View" class="btn-group">
 				<option value="ballot">Ballot</option>
 				<option value="results">Results</option>
+				<option value="search">Searchable Results</option>
 			</field>
 		</fieldset>
 	</fields>

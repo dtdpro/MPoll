@@ -29,8 +29,10 @@ class MPollProvider
             foreach ($cmd as $c) {
                 $fn='q_'.$c->res_qid;
                 $fno='q_'.$c->res_qid.'_other';
+                $fna='q_'.$c->res_qid.'_other_alt';
                 $d->$fn=$c->res_ans;
                 $d->$fno=$c->res_ans_other;
+                $d->$fna=$c->res_ans_other_alt;
             }
         }
 
@@ -49,6 +51,25 @@ class MPollProvider
         $query->order('q.q_poll ASC, q.ordering ASC');
         $db->setQuery($query);
         $items = $db->loadObjectList();
+        foreach ($items as &$q) {
+            //Load options
+            if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
+                $qo=$db->getQuery(true);
+                $qo->select('opt_txt, opt_id, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable, opt_blank');
+                $qo->from('#__mpoll_questions_opts');
+                $qo->where('opt_qid = '.$q->q_id);
+                $qo->where('published > 0');
+                $qo->order('ordering ASC');
+                $db->setQuery($qo);
+                $queriedOptions = $db->loadAssocList();
+                $options = [];
+                foreach ($queriedOptions as $option) {
+                    $id = $option['opt_id'];
+                    $options[$id] = $option;
+                }
+                $q->options = $options;
+            }
+        }
 
         return $items;
     }

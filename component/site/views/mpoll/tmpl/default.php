@@ -304,7 +304,10 @@ if ( $this->task == 'ballot' ) {
 					if ( $o->opt_disabled ) {
 						$selected .= ' disabled';
 					}
-					echo '<option value="' . $o->value . '"' . $selected . '>';
+					echo '<option ';
+                    if ( !$o->opt_blank ) echo 'value="' . $o->value . '"';
+                    else echo 'value=""';
+                    echo $selected . '>';
 					echo ' ' . $o->text . '</option>';
 				}
 				echo '</select>';
@@ -348,7 +351,7 @@ if ( $this->task == 'ballot' ) {
 
 
 			//text field, phone #, email, username
-			if ( $f->q_type == "textbox" || $f->q_type == "email" ) {
+			if ( $f->q_type == "textbox" || $f->q_type == "email" || $f->q_type == "gmap" ) {
 				echo '<input name="jform[' . $sname . ']" id="jform_' . $sname . '" value="';
                 if ($f->value) echo $f->value;
                 echo '" class="mf_field uk-width-1-1 uk-input" type="text"';
@@ -593,7 +596,7 @@ if ( $this->task == 'results' ) {
 					case 'dropdown':
 						$numr = 0;
 						foreach ( $q->options as $opts ) {
-							if ( $opts->opt_selectable ) {
+							if ( $opts->opt_selectable && !$opts->opt_blank ) {
 								if ( $q->anscount != 0 ) {
 									$per = ( $opts->anscount ) / ( $q->anscount );
 								} else {
@@ -732,6 +735,24 @@ if ( $this->task == 'pay' ) {
 	echo '</div>';
 
 }
+
+if ( $this->task == 'search' ) {
+    echo 'This featuire requires a YooTheme Pro Template';
+    /*echo '<form name="mpollform" id="mpollform" method="post" action="" enctype="multipart/form-data" class="uk-form">';
+    foreach($this->filterForm->getGroup('filter') as $field) {
+        echo '<div class="control-group">';
+        echo '<div class="control-label">'.$field->label.'</div>';
+        echo '<div class="controls">'.$field->input.'</div>';
+        echo '</div>';
+    }
+    echo JHtml::_( 'form.token' );
+    echo '<input name="submit" id="submit" value="Search" type="submit" class="btn btn-primary uk-button uk-button-primary">';
+    echo '</form>';
+    echo '<pre>';
+    print_r($this->items);
+    echo '</pre>';*/
+}
+
 
 if ( $this->params->get( 'divwrapper', 1 ) ) {
 	echo '</div>';

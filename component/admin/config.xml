@@ -34,6 +34,9 @@
 			<option value="v3">v3</option>
 		</field>
 		<field name="rc_threshold" type="text" label="COM_MPOLL_CONFIG_FIELD_RC_THRESHOLD_LABEL" description="COM_MPOLL_CONFIG_FIELD_RC_THRESHOLD_DESC" size="40" class="inputbox" required="false" default="0.5" />
+		<field name="spacer_apis2" type="spacer" label="COM_MPOLL_CONFIG_GMAPS_LABEL" />
+		<field name="gmaps_geocode_key" type="text" label="COM_MPOLL_CONFIG_FIELD_GMAPS_GEOCODE_APIKEY_LABEL" description="COM_MPOLL_CONFIG_FIELD_GMAPS_GEOCODE_APIKEY_DESC" size="70" class="inputbox" required="false" default="" />
+		<field name="gmaps_map_key" type="text" label="COM_MPOLL_CONFIG_FIELD_GMAPS_MAP_APIKEY_LABEL" description="COM_MPOLL_CONFIG_FIELD_GMAPS_MAP_APIKEY_DESC" size="70" class="inputbox" required="false" default="" />
 	</fieldset>
 	<fieldset name="paypal" label="PayPal Settings">
 		<field name="paypal_mode" type="radio" class="btn-group" label="PayPal Mode">

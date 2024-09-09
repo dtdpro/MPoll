@@ -21,6 +21,7 @@ class MPollViewOptions extends JViewLegacy
 		$this->state = $this->get('State');
 		$this->items = $this->get('Items');
 		$this->pagination = $this->get('Pagination');
+        $this->polltitle = $this->get('PollTitle');
 		$this->questiontitle = $this->get('QuestionTitle');
 		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');

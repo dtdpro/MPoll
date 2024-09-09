@@ -50,6 +50,9 @@ if ($saveOrder) {
 <?php else : ?>
 	<div id="j-main-container">
 <?php endif;?>
+        <div class="alert alert-info" role="alert">
+            <?php echo '<strong>Poll:</strong> '.$this->polltitle; ?>
+        </div>
 	<?php
 		// Search tools bar
 		echo JLayoutHelper::render('joomla.searchtools.default', array('view' => $this));
@@ -73,6 +76,12 @@ if ($saveOrder) {
 				<th width="5%">
 					<?php echo JText::_( 'COM_MPOLL_QUESTION_HEADING_REQ' ); ?>
 				</th>
+                <th width="5%">
+                    <?php echo JText::_( 'COM_MPOLL_QUESTION_HEADING_HIDDEN' ); ?>
+                </th>
+                <th width="5%">
+                    <?php echo JText::_( 'COM_MPOLL_QUESTION_HEADING_FILTER' ); ?>
+                </th>
 				<th width="1%">
 					<?php echo JText::_('COM_MPOLL_QUESTION_HEADING_ID'); ?>
 				</th>
@@ -83,7 +92,7 @@ if ($saveOrder) {
 		</thead>
 		<tfoot>
 			<tr>
-				<td colspan="6"><?php echo $this->pagination->getListFooter(); ?></td>
+				<td colspan="8"><?php echo $this->pagination->getListFooter(); ?></td>
 			</tr>
 		</tfoot>
 		<tbody><?php 
@@ -156,6 +165,7 @@ if ($saveOrder) {
 									case "mlist": echo 'Multi Select'; break;
 									case "mailchimp": echo 'Mailchimp List'; break;
                                     case "datedropdown": echo 'Date Dropdown'; break;
+                                    case "gmap": echo "Google Maps Address"; break;
 								} ?>
 								<?php 
 									if ($item->q_type=='mlist' ||$item->q_type=='multi' || $item->q_type=='mcbox' || $item->q_type=='dropdown') {
@@ -171,6 +181,12 @@ if ($saveOrder) {
 					<td class="small center text-center">
 						<?php echo ($item->q_req) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
 					</td>
+                    <td class="small center text-center">
+                        <?php echo ($item->q_hidden) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
+                    </td>
+                    <td class="small center text-center">
+                        <?php echo ($item->q_filter) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>
+                    </td>
 					<td>
 						<?php echo $item->q_id; ?>
 					</td>

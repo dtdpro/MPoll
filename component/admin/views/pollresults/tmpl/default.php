@@ -2,20 +2,20 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\CMS\Button\PublishedButton;
+use Joomla\CMS\Button\FeaturedButton;
+
 
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=mpolls'); ?>" method="post" name="adminForm" id="adminForm">
-<?php if (!empty( $this->sidebar)) : ?>
-	<div id="j-sidebar-container" class="span2">
-	<?php echo $this->sidebar; ?>
-	</div>
-	<div id="j-main-container" class="span10">
-<?php else : ?>
-	<div id="j-main-container">
-<?php endif;
-?>
-		
-<div id="editcell">
+<form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=pollresults'); ?>" method="post" name="adminForm" id="adminForm">
+    <div id="j-main-container">
+    <div class="alert alert-info" role="alert">
+        <?php echo '<strong>Poll:</strong> '.$this->polltitle; ?>
+    </div>
+
+    <?php
+    // Search tools bar
+    echo JLayoutHelper::render('joomla.searchtools.default', array('view' => $this));
+    ?>
 
 	<table class="adminlist table table-striped">
 	<thead>
@@ -25,6 +25,9 @@ use Joomla\CMS\Button\PublishedButton;
 			</th>
             <th width="1%" style="min-width:55px" class="nowrap center">
                 <?php echo JText::_('JSTATUS'); ?>
+            </th>
+            <th width="1%" style="min-width:55px" class="nowrap center">
+                <?php echo JText::_('JFEATURED'); ?>
             </th>
 			<th>
 				<?php echo JText::_( 'ID#' ); ?>
@@ -63,8 +66,14 @@ use Joomla\CMS\Button\PublishedButton;
                 echo ( new PublishedButton() )->render( (int) $item->published, $i, $options );
                 ?>
             </td>
+            <td class="center text-center">
+                <?php
+                $options = [ 'task_prefix' => 'pollresults.', 'id' => 'featured-' . $item->cm_id ];
+                echo ( new FeaturedButton() )->render( (int) $item->featured, $i, $options );
+                ?>
+            </td>
 			<td>
-				<?php echo $item->cm_id; ?>
+                <a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=pollresult.edit&cm_id='.(int) $item->cm_id); ?>"><?php echo $item->cm_id; ?></a>
 			</td>
             <td>
 				<?php echo $item->cm_pubid; ?>
@@ -97,7 +106,7 @@ use Joomla\CMS\Button\PublishedButton;
 							}
 						}
 					}
-					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown') {
+					if ($qu->q_type == 'textbox' || $qu->q_type == 'mailchimp' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown' || $qu->q_type == 'gmap') {
 						if (property_exists($item,$fn)) {
                             echo $item->$fn;
                         }
@@ -135,7 +144,7 @@ use Joomla\CMS\Button\PublishedButton;
 								echo $this->options[ $o ] . '<br />';
 							}
                             if ( property_exists($item,$fno)) {
-                                echo 'Other: ' . $item->$fno;
+                                if ($item->$fno) echo 'Other: ' . $item->$fno;
                             }
 						}
 					}
@@ -153,5 +162,5 @@ use Joomla\CMS\Button\PublishedButton;
 	<input type="hidden" name="boxchecked" value="0" />
 	<?php echo JHtml::_('form.token'); ?>
 </div>
-</div>
+
 </form>

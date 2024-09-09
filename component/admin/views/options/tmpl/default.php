@@ -49,6 +49,10 @@ if ($saveOrder) {
 <?php else : ?>
 	<div id="j-main-container">
 <?php endif;?>
+        <div class="alert alert-info" role="alert">
+            <?php echo '<strong>Poll:</strong> '.$this->polltitle; ?>
+            <?php echo '<br><strong>Question:</strong> '.$this->questiontitle; ?>
+        </div>
 	<?php
 		// Search tools bar
 		echo JLayoutHelper::render('joomla.searchtools.default', array('view' => $this));

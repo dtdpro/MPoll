@@ -10,6 +10,7 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Form\Form;
 
 // Load Extra Pakcages
 require JPATH_COMPONENT."/vendor/autoload.php";
@@ -19,6 +20,8 @@ use MReCaptcha\MReCaptcha;
 class MPollModelMPoll extends JModelLegacy
 {
 	var $errmsg = "";
+
+    var $hasFilters = false;
 
 	function getPoll($pollid)
 	{
@@ -39,10 +42,13 @@ class MPollModelMPoll extends JModelLegacy
 			}
 		}
 
+        // Set searchable results message default
+        $pdata->resultsMsg = "";
+
 		return $pdata;
 	}
 
-	function getQuestions($pollid,$options=false,$count=false)
+	function getQuestions($pollid,$options=false,$count=false,$filterQuestions=false)
 	{
 		$db = JFactory::getDBO();
 		$app=Jfactory::getApplication();
@@ -52,6 +58,8 @@ class MPollModelMPoll extends JModelLegacy
 		$query->from('#__mpoll_questions');
 		$query->where('published > 0');
 		$query->where('q_poll = '.$db->escape($pollid));
+        if ($filterQuestions) $query->where('q_filter = 1 ');
+        if (!$filterQuestions) $query->where('q_hidden = 0 ');
 		$query->order('ordering ASC');
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
@@ -62,7 +70,7 @@ class MPollModelMPoll extends JModelLegacy
 				//Load options
 				if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
 					$qo=$db->getQuery(true);
-					$qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable');
+					$qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable, opt_blank');
 					$qo->from('#__mpoll_questions_opts');
 					$qo->where('opt_qid = '.$q->q_id);
 					$qo->where('published > 0');
@@ -130,11 +138,11 @@ class MPollModelMPoll extends JModelLegacy
 			}
 		}
 
-		$data		= $jinput->getVar('jform', array(), 'post', 'array');
+		$data = $jinput->getVar('jform', array(), 'post', 'array');
 		$isNew = true;
-		$db		= $this->getDbo();
-		$app=Jfactory::getApplication();
-		$session=JFactory::getSession();
+		$db = $this->getDbo();
+		$app = Jfactory::getApplication();
+		$session = JFactory::getSession();
 		$user = JFactory::getUser();
 		$date = new JDate('now');
 		$pollinfo = $this->getPoll($pollid);
@@ -162,6 +170,7 @@ class MPollModelMPoll extends JModelLegacy
 			$upfile=array();
 			$item = new stdClass();
 			$other = new stdClass();
+            $otherAlt = new stdClass();
 			$flist = $this->getQuestions($pollid,false);
 			foreach ($flist as $d) {
 				$fieldname = 'q_'.$d->q_id;
@@ -178,7 +187,17 @@ class MPollModelMPoll extends JModelLegacy
 					if ($fmonth < 10) $fmonth = "0".$fmonth;
 					if ($fday < 10) $fday = "0".$fday;
 					$item->$fieldname = $fmonth.'-'.$fday.'-'.$fyear;
-				} else {
+				} else if ($d->q_type=='gmap') {
+                    $address = $data[$fieldname];
+                    $item->$fieldname = $address;
+                    if ($cfg->gmaps_geocode_key) {
+                        $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($address) . '&key=' . $cfg->gmaps_geocode_key;
+                        $gdata_json = $this->curl_file_get_contents($url);
+                        $gdata = json_decode($gdata_json);
+                        $other->$fieldname = $gdata->results[0]->geometry->location->lat; //latitude
+                        $otherAlt->$fieldname = $gdata->results[0]->geometry->location->lng; //longitude
+                    }
+                } else {
 					$item->$fieldname = $data[$fieldname];
 				}
 
@@ -285,7 +304,16 @@ class MPollModelMPoll extends JModelLegacy
 				$cmres->res_qid=$fl->q_id;
 				$cmres->res_ans=$db->escape($item->$fieldname);
 				$cmres->res_cm=$subid;
-				$cmres->res_ans_other=$db->escape($other->$fieldname);
+                if (isset($other->$fieldname)) {
+                    $cmres->res_ans_other = $db->escape( $other->$fieldname );
+                } else {
+                    $cmres->res_ans_other = "";
+                }
+                if (isset($otherAlt->$fieldname)) {
+                    $cmres->res_ans_other_alt = $db->escape( $otherAlt->$fieldname );
+                } else {
+                    $cmres->res_ans_other_alt = "";
+                }
 				if (!$db->insertObject('#__mpoll_results',$cmres)) {
 					$this->setError("Error saving additional information.  Please resubmit.");
 					return false;
@@ -307,7 +335,17 @@ class MPollModelMPoll extends JModelLegacy
 									$resultsemail .= 'Download: <a href="' . JURI::base() . $uf . '">'.basename($uf).'</a><br>';
 								}
 							}
-						} else if (in_array($fieldname,$optfs)) {
+						} else if ($d->q_type=="cbox") {
+                            if($item->$fieldname) {
+                                if ($item->$fieldname == 1) {
+                                    $resultsemail .= "Yes";
+                                } else {
+                                    $resultsemail .= "No";
+                                }
+                            } else {
+                                $resultsemail .= "No";
+                            }
+                        } else if (in_array($fieldname,$optfs)) {
 							$resultsemail .= $optionsdata[$item->$fieldname];
 							if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
 							$resultsemail .= '<br />';
@@ -493,6 +531,260 @@ class MPollModelMPoll extends JModelLegacy
 		}
 		return $qdata;
 	}
+
+    public function getAllResults($pdata,$filterQuestions) {
+        $db = JFactory::getDBO();
+        $app=Jfactory::getApplication();
+        $cfg = MPollHelper::getConfig();
+        $pollid = $pdata->poll_id;
+
+        $filterResults = [];
+        $data = [];
+        $filterNada = false;
+
+        foreach ($filterQuestions as $qu) {
+            $ans = $app->getUserState('filter.qf_'.$qu->q_id, '');
+            if ($ans != '' && !$filterNada) {
+                if ($qu->q_type == 'textbox' || $qu->q_type == 'textar' || $qu->q_type == 'mailchimp' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown' ) {
+                    $qo=$db->getQuery(true);
+                    $qo->select('res_cm');
+                    $qo->from('#__mpoll_results');
+                    $qo->where('LOWER(res_ans) LIKE "%'.strtolower($ans).'%"');
+                    $qo->where('res_qid = "'.$qu->q_id.'"');
+                    $db->setQuery($qo);
+                    $results = $db->loadColumn();
+                    $filterResults[] = $results;
+                    if (count($results) == 0) $filterNada = true;
+                }
+                if ($qu->q_type == 'gmap') {
+                    if ($cfg->gmaps_geocode_key) {
+                        $searchDistance = $app->getUserState('filter.qf_'.$qu->q_id.'_distance', 50);
+                        $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($ans) . '&key=' . $cfg->gmaps_geocode_key;
+                        $gdata_json = $this->curl_file_get_contents($url);
+                        $gdata = json_decode($gdata_json);
+                        $lat = $gdata->results[0]->geometry->location->lat; //latitude
+                        $lon = $gdata->results[0]->geometry->location->lng; //longitude
+                        if (!$lat || !$lon) {
+                            $filterResults[] = [];
+                            $filterNada = true;
+                        } else {
+                            $query = "SELECT res_cm, ( 3959 * acos( cos( radians('" . $lat . "') ) * cos( radians( res_ans_other ) ) * cos( radians( res_ans_other_alt ) - radians('" . $lon . "') ) + sin( radians('" . $lat . "') ) * sin( radians( res_ans_other ) ) ) ) AS distance FROM #__mpoll_results ";
+                            $query .= "HAVING distance < '" . $searchDistance . "' ";
+                            $query .= "ORDER BY distance ";
+                            $db->setQuery($query);
+                            $results = $db->loadColumn();
+                            $filterResults[] = $results;
+                            if (count($results) == 0) $filterNada = true;
+                        }
+                    }
+                }
+                if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown' || $qu->q_type == 'cbox') {
+                    $qo=$db->getQuery(true);
+                    $qo->select('res_cm');
+                    $qo->from('#__mpoll_results');
+                    $qo->where('res_ans = "'.$ans.'"');
+                    $qo->where('res_qid = "'.$qu->q_id.'"');
+                    $db->setQuery($qo);
+                    $results = $db->loadColumn();
+                    $filterResults[] = $results;
+                    if (count($results) == 0) $filterNada = true;
+                }
+                if ($qu->q_type == 'mcbox' || $qu->q_type=="mlist") {
+                    $qo=$db->getQuery(true);
+                    $qo->select('res_cm,res_ans');
+                    $qo->from('#__mpoll_results');
+                    $qo->where('res_qid = "'.$qu->q_id.'"');
+                    $db->setQuery($qo);
+                    $multiResults = $db->loadObjectList();
+                    $filterResult = [];
+                    foreach ($multiResults as $multiResult) {
+                        $resArray = explode(' ', $multiResult->res_ans);
+                        if (in_array($ans, $resArray)) {
+                            $filterResult[] = $multiResult->res_cm;
+                        }
+                    }
+                    $filterResults[] = $filterResult;
+                    if (count($filterResult) == 0) $filterNada = true;
+                }
+            }
+        }
+
+        $filteredIds = [];
+        $genResults = true;
+        $genFeatured = false;
+        if (count($filterResults)) {
+            $this->hasFilters = true;
+            $filteredIds = call_user_func_array('array_intersect',$filterResults);
+        }
+
+        if (!$this->hasFilters && !$pdata->poll_results_showall) {
+            $genResults = false;
+        }
+
+        //poll_results_showfeat
+        if (!$genResults && $pdata->poll_results_showfeat) {
+            $genResults = true;
+            $genFeatured = true;
+        }
+
+        if (!$filterNada && $genResults) {
+            $query = $db->getQuery(true);
+            $query->select('*');
+            $query->from('#__mpoll_completed AS r');
+            $query->where('r.published = 1');
+            $query->where('r.cm_poll = ' . $db->escape($pollid));
+            if ($genFeatured) $query->where('r.featured = 1');
+            if (count($filteredIds)) $query->where('r.cm_id IN (' . implode(',', $filteredIds) . ')');
+            $query->order('r.cm_time DESC');
+            $db->setQuery($query);
+            $data = $db->loadObjectList();
+
+            //Get Results
+            foreach ($data as &$d) {
+                $resQuery = $db->getQuery(true);
+
+                $resQuery->select('*');
+                $resQuery->from('#__mpoll_results AS r');
+                $resQuery->where('res_cm = ' . $db->escape($d->cm_id));
+                $db->setQuery($resQuery);
+                $cmd = $db->loadObjectList();
+
+                foreach ($cmd as $c) {
+                    $fn = 'q_' . $c->res_qid;
+                    $fno = 'q_' . $c->res_qid . '_other';
+                    $fna = 'q_' . $c->res_qid . '_other_alt';
+                    $d->$fn = $c->res_ans;
+                    $d->$fno = $c->res_ans_other;
+                    $d->$fna = $c->res_ans_other_alt;
+                }
+            }
+        }
+
+        // Sort 2
+        if ($pdata->poll_results_sortby2 != $pdata->poll_results_sortby) {
+            $sortField2 = null;
+            if ($pdata->poll_results_sortby2 == 0) {
+                $sortField2 = 'cm_id';
+            } else {
+                $sortField2 = 'q_' . $pdata->poll_results_sortby2;
+            }
+            if ($pdata->poll_results_sortdirr2 == 'ASC') {
+                usort($data, fn($a, $b) => strcmp($a->$sortField2, $b->$sortField2));
+            } else {
+                usort($data, fn($a, $b) => strcmp($b->$sortField2, $a->$sortField2));
+            }
+        }
+
+        // Sort 1
+        $sortField = null;
+        if ($pdata->poll_results_sortby == -1) {
+            $sortField = 'featured';
+        } else if ($pdata->poll_results_sortby == 0) {
+            $sortField = 'cm_id';
+        } else {
+            $sortField = 'q_'.$pdata->poll_results_sortby;
+        }
+        if ($pdata->poll_results_sortdirr == 'ASC') {
+            usort($data, fn($a, $b) => strcmp($a->$sortField, $b->$sortField));
+        } else {
+            usort($data, fn($a, $b) => strcmp($b->$sortField, $a->$sortField));
+        }
+
+        return $data;
+    }
+
+    public function getResultsMessage($pollData, $itemCount)
+    {
+        if ($this->hasFilters == false && $itemCount == 0 && !$pollData->poll_results_showall) {
+            // no filter msg
+            return $pollData->poll_results_msg_filterfirst;
+        } else if ($itemCount == 0) {
+            //no items msg
+            return $pollData->poll_results_msg_noresults;
+        }
+        return "";
+    }
+
+    public function getFilterForm($pollid)
+    {
+        $app=Jfactory::getApplication();
+        $cfg = MPollHelper::getConfig();
+        $jinput = JFactory::getApplication()->input;
+        $filterQuestions = $this->getQuestions($pollid,true,false,true);
+        $form = new Form('filterForm');
+        $baseForm='<?xml version="1.0" encoding="UTF-8"?><form><fields name="filter"></fields></form>';
+        $form->load(new \SimpleXMLElement($baseForm));
+        $filterrData = $jinput->getVar('filter', array(), 'post', 'array');
+
+        foreach ($filterQuestions as $qu) {
+            if (isset($filterrData['qf_' . $qu->q_id])) $requestAns = $filterrData['qf_' . $qu->q_id];
+            else $requestAns = null;
+            $stateAns = $app->getUserState('filter.qf_'.$qu->q_id, '');
+            if ($requestAns == "") $ans='';
+            else if ($requestAns != null) $ans = $requestAns;
+            else $ans = $stateAns;
+            $app->setUserState('filter.qf_'.$qu->q_id, $ans);
+
+            if ($qu->q_type == 'gmap') {
+                if ($cfg->gmaps_geocode_key) {
+                    if (isset($filterrData['qf_' . $qu->q_id.'_distance'])) $requestAnsD = $filterrData['qf_' . $qu->q_id.'_distance'];
+                    else $requestAnsD = null;
+                    $stateAnsD = $app->getUserState('filter.qf_'.$qu->q_id.'_distance', '');
+                    if ($requestAnsD == "") $ansd='';
+                    else if ($requestAnsD != null) $ansd = $requestAnsD;
+                    else $ansd = $stateAnsD;
+                    $app->setUserState('filter.qf_'.$qu->q_id.'_distance', $ansd);
+                }
+            }
+
+            if ($qu->q_type == 'textbox' || $qu->q_type == 'textar' || $qu->q_type == 'mailchimp' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown') {
+                $formxml = '<field name="qf_'.$qu->q_id.'" type="text" default="'.$ans.'" label="'.$qu->q_text.'" hint="'.$qu->q_filter_name.'" description="" />';
+                $newField = new \SimpleXMLElement($formxml);
+                $form->setField($newField,'filter');
+                $this->filter_fields[] = 'qf_'.$qu->q_id.'';
+            }
+            if ($qu->q_type == 'gmap') {
+                $formxml = '<field name="qf_'.$qu->q_id.'" type="text" default="'.$ans.'" label="'.$qu->q_filter_name.'" hint="'.$qu->q_filter_name.'" description="" />';
+                $newField = new \SimpleXMLElement($formxml);
+                $form->setField($newField,'filter');
+                $this->filter_fields[] = 'qf_'.$qu->q_id.'';
+
+                $formxml  = '<field name="qf_'.$qu->q_id.'_distance" type="list" default="'.$ansd.'" label="Distance" description="">';
+                $formxml .= '<option value="50">50 miles</option>';
+                $formxml .= '<option value="100">100 miles</option>';
+                $formxml .= '<option value="200">200 miles</option>';
+                $formxml .= '<option value="300">300 miles</option>';
+                $formxml .= '</field>';
+                $newField = new \SimpleXMLElement($formxml);
+                $form->setField($newField,'filter');
+                $this->filter_fields[] = 'qf_'.$qu->q_id.'';
+
+            }
+            if ($qu->q_type == 'multi' || $qu->q_type == 'dropdown' || $qu->q_type == 'mcbox' || $qu->q_type=="mlist") {
+                $formxml  = '<field name="qf_'.$qu->q_id.'" type="list" default="'.$ans.'" label="'.$qu->q_filter_name.'" description="">';
+                $formxml .= '<option value=""><![CDATA['.$qu->q_filter_name.']]></option>';
+                foreach ($qu->options as $quo) {
+                    $formxml .= '<option value="'.$quo->value.'"><![CDATA['.$quo->text.']]></option>';
+                }
+                $formxml .= '</field>';
+                $newField = new \SimpleXMLElement($formxml);
+                $form->setField($newField,'filter');
+                $this->filter_fields[] = 'qf_'.$qu->q_id.'';
+            }
+            if ($qu->q_type == 'cbox') {
+                $formxml  = '<field name="qf_'.$qu->q_id.'" type="list" default="'.$ans.'" label="'.$qu->q_filter_name.'" description="">';
+                $formxml .= '<option value="">'.$qu->q_filter_name.'</option>';
+                $formxml .= '<option value="1">Yes</option>';
+                $formxml .= '<option value="0">No</option>';
+                $formxml .= '</field>';
+                $newField = new \SimpleXMLElement($formxml);
+                $form->setField($newField,'filter');
+                $this->filter_fields[] = 'qf_'.$qu->q_id.'';
+            }
+        }
+
+        return $form;
+    }
 
 	public static function canUpload($file,&$err)
 	{
@@ -1014,6 +1306,17 @@ class MPollModelMPoll extends JModelLegacy
 		}
 		return $ip;
 	}
+
+    private function curl_file_get_contents($URL){
+        $c = curl_init();
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($c, CURLOPT_URL, $URL);
+        $contents = curl_exec($c);
+        curl_close($c);
+
+        if ($contents) return $contents;
+        else return FALSE;
+    }
 
 
 }

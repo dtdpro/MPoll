@@ -107,20 +107,6 @@ class MPollModelQuestion extends JModelAdmin
 			$registry->loadString($item->params);
 			$item->params = $registry->toArray();
 		}
-		
-		if ($item->q_type == "mailchimp" && $item->q_default) {
-			require_once(JPATH_ROOT.'/components/com_mpoll/lib/mailchimp.php');
-			$cfg=MPollHelper::getConfig();
-			if (!$cfg->mckey) return false;
-			if (strstr($item->q_default,"_")){ list($mc_key, $mc_list) = explode("_",$item->q_default,2);	}
-			else { $mc_key = $cfg->mckey; $mc_list = $item->q_defaultt; }
-			$mc = new MailChimpHelper($mc_key);
-			$mclist=$mc->getLists($mc_list);
-			if ($mclist[0]) {
-				$item->list_mvars = $mc->getListMergeVars($mc_list);
-				$item->questions = $this->getQuestions($item->q_poll);
-			}
-		}
 	
 		return $item;
 	}

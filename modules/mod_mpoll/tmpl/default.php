@@ -1,6 +1,8 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
 $db = JFactory::getDBO();
+$twoColThreshold = $cfg->two_col_threshold;
+if (!$twoColThreshold) $twoColThreshold = 10;
 if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 ?>
 <script type="text/javascript">
@@ -192,7 +194,7 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 				}
 
 				//multi checkbox
-				if ($f->q_type=="mcbox") {
+				/*if ($f->q_type=="mcbox") {
 					$first = true;
 					foreach ($f->options as $o) {
 						if ($o->opt_selectable) {
@@ -223,7 +225,73 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 						}
 
 					}
-				}
+				}*/
+
+                if ( $f->q_type == "mcbox" ) {
+                    $first = true;
+                    $numOptions = count($f->options);
+                    $twoCol = false;
+                    $optCount = 0;
+                    if ($numOptions >= $twoColThreshold) {
+                        if($numOptions % 2 == 0) {
+                            $numPerCol = ( $numOptions / 2 );
+                        } else {
+                            $numPerCol = ( ($numOptions+1) / 2 );
+                        }
+                        $twoCol=true;
+                    }
+                    if ($twoCol) {
+                        echo '<div class="row uk-grid" uk-grid><div class="col-md-6 uk-width-medium-1-2 uk-width-1-2@m">';
+                    }
+                    foreach ( $f->options as $o ) {
+                        if ( $o->opt_selectable ) {
+                            if ( ! empty( $f->value ) ) {
+                                $checked = in_array( $o->value, $f->value ) ? ' checked="checked"' : '';
+                            } else {
+                                $checked = '';
+                            }
+                            echo '<input type="checkbox" name="jform[' . $sname . '][]" value="' . $o->value . '" class="uk-checkbox" id="jform_' . $sname . $o->value . '"';
+                            if ( $f->q_req && $first ) {
+                                echo ' data-rule-required="true"';
+                                if ( $f->q_min ) {
+                                    echo ' data-rule-minlength="' . $f->q_min . '"';
+                                }
+                                if ( $f->q_max ) {
+                                    echo ' data-rule-maxlength="' . $f->q_max . '"';
+                                }
+                                echo ' data-msg-required="This Field is required"';
+                                if ( $f->q_min ) {
+                                    echo ' data-msg-minlength="Select at least ' . $f->q_min . '"';
+                                }
+                                if ( $f->q_max ) {
+                                    echo ' data-msg-maxlength="Select at most ' . $f->q_max . '"';
+                                }
+                                $first = false;
+                            }
+                            if ( $o->opt_disabled ) {
+                                $checked .= ' disabled';
+                            }
+                            echo $checked . '/>' . "\n";
+                            echo '<label for="jform_' . $sname . $o->value . '">';
+                            echo ' ' . $o->text;
+                            if ( $o->opt_other ) {
+                                echo ' <input type="text" value="';
+                                if ($f->other) echo $f->other;
+                                echo '" name="jform[' . $sname . '_other]" id="jform_' . $sname . $o->value . '_other" class="">';
+                            }
+                            echo '</label><br />' . "\n";
+                        } else {
+                            echo '<span class="uk-text-bold">' . $o->text . '</span><br />';
+                        }
+                        $optCount++;
+                        if ($optCount == $numPerCol) {
+                            echo '</div><div class="col-md-6 uk-width-medium-1-2 uk-width-1-2@m">';
+                        }
+                    }
+                    if ($twoCol) {
+                        echo '</div></div>';
+                    }
+                }
 
 				//radio
 				if ($f->q_type=="multi") {
@@ -262,8 +330,11 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 						if (!empty($f->value)) $selected = in_array($o->value,$f->value) ? ' selected="selected"' : '';
 						else $selected = '';
 						if ($o->opt_disabled) $selected .= ' disabled';
-						echo '<option value="'.$o->value.'"'.$selected.'>';
-						echo ' '.$o->text.'</option>';
+                        echo '<option ';
+                        if ( !$o->opt_blank ) echo 'value="' . $o->value . '"';
+                        else echo 'value=""';
+                        echo $selected . '>';
+                        echo ' ' . $o->text . '</option>';
 					}
 					echo '</select>';
 				}
@@ -293,7 +364,7 @@ if ($params->get( 'submitvia', 'ajax' ) == 'ajax') {
 
 
 				//text field, phone #, email, username
-				if ($f->q_type=="textbox" || $f->q_type=="email") {
+				if ($f->q_type=="textbox" || $f->q_type=="email" || $f->q_type=="gmap") {
 					echo '<input name="jform['.$sname.']" id="jform_'.$sname.'" value="';
                     if( $f->value) echo $f->value;
                     echo '" class="mf_field uk-width-1-1 uk-input" type="text"';

@@ -45,6 +45,10 @@ class MPollRouterRulesLegacy implements JComponentRouterRulesInterface
 			unset($query['task'],$segments['task']);
 		}
 
+        if (isset($query['task']) && $query['task'] == 'search') {
+            unset($query['task'],$segments['task']);
+        }
+
 		// Are we dealing with a poll that is attached to a menu item?
 		if (isset($view) && ($mView == $view) && isset($query['poll']) && ($mId == (int) $query['poll']))
 		{

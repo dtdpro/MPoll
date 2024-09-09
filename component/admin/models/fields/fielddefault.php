@@ -59,7 +59,7 @@ class JFormFieldFieldDefault extends JFormField
 		$attr = '';
 		$db = JFactory::getDBO();
 		// Initialize some field attributes.
-		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
+		//$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
 		
 	
@@ -70,7 +70,7 @@ class JFormFieldFieldDefault extends JFormField
 		$options[] = JHtml::_('select.option', "1","Yes");
 		$options[] = JHtml::_('select.option', "0","No");
 		
-		$html[] = '<select name="'.$this->name.'" class="inputbox" '.$attr.'>';
+		$html[] = '<select name="'.$this->name.'" class="inputbox form-select" '.$attr.'>';
 		$html[] = JHtml::_('select.options',$options,"value","text",$this->value);
 		$html[] = '</select>';
 	
@@ -85,7 +85,7 @@ class JFormFieldFieldDefault extends JFormField
 		$attr = '';
 		$db = JFactory::getDBO();
 		// Initialize some field attributes.
-		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
+		//$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
 		if ($multi) {
 			$attr .= ' multiple ';

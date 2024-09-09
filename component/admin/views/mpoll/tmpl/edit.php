@@ -230,6 +230,34 @@ use Joomla\CMS\Language\Text;
                 </div>
             </div>
 
+        <?php
+        if (JVersion::MAJOR_VERSION >= 4) {
+            echo HTMLHelper::_('uitab.endTab');
+            echo HTMLHelper::_('uitab.addTab', 'myTab', 'searchresults', "Searchable Results");
+        } else {
+            echo JHtml::_('bootstrap.endTab');
+            echo JHtml::_('bootstrap.addTab', 'myTab', 'searchresults', "Searchable Results");
+        }
+        ?>
+
+        <div class="row-fluid <?php if (JVersion::MAJOR_VERSION >= 4) { ?>row<?php } ?>">
+            <div class="span10 form-vertical col-md-10">
+                <?php foreach($this->form->getFieldset('searchableresults') as $field): ?>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $field->label;?></div>
+                        <div class="controls"><?php echo $field->input;?></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div class="form-vertical span2 col-md-2">
+                <?php foreach($this->form->getFieldset('searchableresultsdetails') as $field): ?>
+                    <div class="control-group">
+                        <div class="control-label"><?php echo $field->label;?></div>
+                        <div class="controls"><?php echo $field->input;?></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
 
         <?php
         if (JVersion::MAJOR_VERSION >= 4) {

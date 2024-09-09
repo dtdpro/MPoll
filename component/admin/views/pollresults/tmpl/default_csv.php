@@ -47,7 +47,7 @@ foreach ($this->items as $i)
 				    $answer .= ': ' . $i->$fno;
 			    }
 		    }
-		    if ( $qu->q_type == 'textbox' || $qu->q_type == 'mailchimp' || $qu->q_type == 'textar' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown') {
+		    if ( $qu->q_type == 'textbox' || $qu->q_type == 'mailchimp' || $qu->q_type == 'textar' || $qu->q_type == 'email' || $qu->q_type == 'datedropdown' || $qu->q_type == 'gmap') {
 			    $answer = $i->$fn;
 		    }
 			if ( $qu->q_type == 'attach' ) {
@@ -70,7 +70,7 @@ foreach ($this->items as $i)
 				    $answer .= $this->options[ $o ] . ' ';
 			    }
                 if ( property_exists($i,$fno)) {
-                    $answer .= 'Other: ' . $i->$fno;
+                    if ($item->$fno) $answer .= 'Other: ' . $i->$fno;
                 }
 		    }
 	    }

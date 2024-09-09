@@ -33,7 +33,12 @@ class MPollViewMPoll extends JViewLegacy
 			//check if poll exists
 			if ( empty( $this->pdata ) ) {
 				throw new \Exception("Not Found", 404);
+				return false;
+			}
 
+			// if poll is not serachable and search task, kick out
+			if ( !$this->pdata->poll_results_searchable && $this->task == "search") {
+				throw new \Exception("Not Found", 404);
 				return false;
 			}
 
@@ -148,6 +153,12 @@ class MPollViewMPoll extends JViewLegacy
 				} else {
 					$this->task = "completed";
 				}
+				break;
+			case 'search':
+				$this->filterForm = $model->getFilterForm($this->pollid);// needs to be first to get submitted filters
+				$this->filterQuestions = $model->getQuestions($this->pollid,false,false,true);
+				$this->items = $model->getAllResults($this->pdata,$this->filterQuestions);
+				$this->pdata->resultsMsg = $model->getResultsMessage($this->pdata,count($this->items));
 				break;
 			case 'ballot': //Show Questions
 			default:

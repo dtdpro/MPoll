@@ -3,6 +3,8 @@
 // No direct access to this file
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
+
 abstract class MPollHelper
 {
 	public static function addSubmenu($submenu)
@@ -32,6 +34,12 @@ abstract class MPollHelper
 		$mamscfg = $menuConfig->toObject();
 		return $mamscfg;
 	}
+
+    public static function getMPollConfig() {
+        $config = ComponentHelper::getParams('com_mpoll');
+        $cfg = $config->toObject();
+        return $cfg;
+    }
 
 	public static function getActions($vidId = 0)
 	{

@@ -90,5 +90,89 @@ class MPollControllerPollResults extends JControllerAdmin
 
 		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->view_list, false));
 	}
+
+	//featured
+
+	public function featured()
+	{
+		// Check for request forgeries
+		$this->checkToken();
+
+		$jinput = JFactory::getApplication()->input;
+
+		// Get items to remove from the request.
+		$cid = $jinput->get('cid', array(), 'array');
+		$value = 1;
+
+		if (!is_array($cid) || count($cid) < 1)
+		{
+			JLog::add(JText::_('No Records Selected'), JLog::WARNING, 'jerror');
+		}
+		else
+		{
+			// Get the model.
+			$model = $this->getModel('pollresults');
+
+			// Make sure the item ids are integers
+			ArrayHelper::toInteger($cid);
+
+			// Remove the items.
+			if ($model->feature($cid,$value))
+			{
+				$this->setMessage(count($cid).' Record(s) Featured');
+			}
+			else
+			{
+				$this->setMessage($model->getError(), 'error');
+			}
+		}
+		// Invoke the postDelete method to allow for the child class to access the model.
+		$this->postDeleteHook($model, $cid);
+
+		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->view_list, false));
+	}
+
+	//featured
+
+	public function unfeatured()
+	{
+		// Check for request forgeries
+		$this->checkToken();
+
+		$jinput = JFactory::getApplication()->input;
+
+		// Get items to remove from the request.
+		$cid = $jinput->get('cid', array(), 'array');
+		$value = 0;
+
+		if (!is_array($cid) || count($cid) < 1)
+		{
+			JLog::add(JText::_('No Records Selected'), JLog::WARNING, 'jerror');
+		}
+		else
+		{
+			// Get the model.
+			$model = $this->getModel('pollresults');
+
+			// Make sure the item ids are integers
+			ArrayHelper::toInteger($cid);
+
+			// Remove the items.
+			if ($model->feature($cid,$value))
+			{
+				$this->setMessage(count($cid).' Record(s) Featured');
+			}
+			else
+			{
+				$this->setMessage($model->getError(), 'error');
+			}
+		}
+		// Invoke the postDelete method to allow for the child class to access the model.
+		$this->postDeleteHook($model, $cid);
+
+		$this->setRedirect(JRoute::_('index.php?option=' . $this->option . '&view=' . $this->view_list, false));
+	}
+
+
 }
 ?>

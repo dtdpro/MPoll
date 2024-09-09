@@ -32,7 +32,7 @@ if ( ! empty( $this->sidebar ) ) : ?>
 							$numr = $numr + (int) $o->anscount;
 						}
 						foreach ( $qr->options as $opts ) {
-							if ( $opts->opt_selectable ) {
+							if ( $opts->opt_selectable && !$opts->opt_blank ) {
 								if ( $numr != 0 ) {
 									$per = ( $opts->anscount ) / ( $numr );
 								} else {

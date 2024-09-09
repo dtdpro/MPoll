@@ -26,7 +26,8 @@ class modMPollHelper
 		$query->from('#__mpoll_questions');
 		$query->where('published > 0');
 		$query->where('q_poll = '.$pollid);
-		$query->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach","header","message","datedropdown")');
+        $query->where('q_hidden = 0');
+		$query->where('q_type IN ("mcbox","mlist","email","dropdown","multi","cbox","textbox","textar","attach","header","message","datedropdown","gmap")');
 		$query->order('ordering ASC');
 		$db->setQuery( $query );
 		$qdata = $db->loadObjectList();
@@ -34,7 +35,7 @@ class modMPollHelper
 			//Load options
 			if ($q->q_type == "multi" || $q->q_type == "mcbox" || $q->q_type == "dropdown" || $q->q_type == "mlist") {
 				$qo=$db->getQuery(true);
-				$qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable');
+				$qo->select('opt_txt as text, opt_id as value, opt_disabled, opt_correct, opt_color, opt_other, opt_selectable, opt_blank');
 				$qo->from('#__mpoll_questions_opts');
 				$qo->where('opt_qid = '.$q->q_id);
 				$qo->where('published > 0');
