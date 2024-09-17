@@ -70,6 +70,7 @@ class MPollViewMPoll extends JViewLegacy
 
 			$this->_prepareTitle();
 		}
+
 		switch ($this->task) {
 			case "paypal_webhook":
 				$output = $model->PayPalWebhook();
@@ -94,35 +95,53 @@ class MPollViewMPoll extends JViewLegacy
 					}
 					else {
 						if ($this->task == 'paypal_create') {
-							$output = $model->PayPalCreate($this->pdata,$this->completition);
+							if (!$output = $model->PayPalCreate($this->pdata,$this->completition)) {
+								$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid .'&payment=' . $this->payment;
+								if ( $this->params->get( 'rtmpl', '' ) ) {
+									$url .= '&tmpl=' . $rtmpl;
+								}
+								$app->enqueueMessage($model->getError(), 'error');
+								$app->redirect(JRoute::_($url,false));
+							}
 						}
 						if ($this->task == 'paypal_execute') {
-							$output = $model->PayPalExecute($this->pdata,$this->completition);
-						}
-						if ($this->task == 'paypal_cancel') {
-							$output = $model->PayPalCancel($this->pdata,$this->completition);
-						}
-						if ($this->task == 'paypal_cancel_link') {
-							$model->PayPalCancel($this->pdata,$this->completition);
+							if (!$model->PayPalExecute($this->pdata,$this->completition)) {
+								$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid .'&payment=' . $this->payment;
+								if ( $this->params->get( 'rtmpl', '' ) ) {
+									$url .= '&tmpl=' . $rtmpl;
+								}
+								$app->enqueueMessage($model->getError(), 'error');
+								$app->redirect(JRoute::_($url,false));
+							}
 							$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . $this->payment;
 							$app->redirect(JRoute::_($url,false));
 						}
+						if ($this->task == 'paypal_cancel') {
+							$model->PayPalCancel($this->pdata,$this->completition);
+							$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid . '&payment=' . $this->payment;
+							$app->redirect(JRoute::_($url,false));
+						}
+						if ($this->task == 'paypal_cancel_link') {
+							$model->PayPalCancel($this->pdata,$this->completition);
+							$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid . '&payment=' . $this->payment;
+							$app->redirect(JRoute::_($url,false));
+						}
 						if ($this->task == 'pay') {
-							$doc->addScript( 'https://www.paypalobjects.com/api/checkout.js' );
+							$doc->addScript( 'https://www.paypal.com/sdk/js?client-id='.$this->cfg->paypal_api_id );
 						}
 					}
 				}
 				break;
 			case "castvote": //save vote results
-				if ($this->cmplid=$model->save($this->pollid)) { //no payment
-					if (!$this->pdata->poll_payment_enabled) {
+				if ($this->cmplid=$model->save($this->pollid)) {
+					$completition = $model->getCompletition($this->cmplid);
+					if ($completition->cm_status == "unpaid"){ //payment
+						$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid.'&payment=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
+					} else { //no payment
 						$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid .'&cmpl=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
 						if ( $this->params->get( 'rtmpl', '' ) ) {
 							$url .= '&tmpl=' . $rtmpl;
 						}
-					} else { //payment
-						$completition = $model->getCompletition($this->cmplid);
-						$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid.'&payment=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
 					}
 					$app->redirect(JRoute::_($url,false));
 				} else {

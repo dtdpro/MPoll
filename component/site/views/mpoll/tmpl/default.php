@@ -3,7 +3,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 if ( $this->params->get( 'divwrapper', 1 ) ) {
 	echo '<div id="system" class="' . $this->params->get( 'wrapperclass', 'uk-article' ) . '">';
 }
-echo '<h2 class="title uk-article-title">' . $this->pdata->poll_name . '</h2>';
+if ( $this->params->get( 'showtitle', 1 ) ) echo '<h2 class="title uk-article-title">' . $this->pdata->poll_name . '</h2>';
 
 $user = JFactory::getUser();
 $cfg  = $this->cfg;
@@ -497,8 +497,7 @@ if ( $this->task == 'ballot' ) {
 		} else {
 			if ( in_array( $this->pdata->access, $user->getAuthorisedViewLevels() ) ) {
 			    $buttontext = "Submit";
-			    if ($this->pdata->poll_payment_enabled) $buttontext .= " & Pay";
-				echo JHtml::_( 'form.token' );
+			    echo JHtml::_( 'form.token' );
 				echo '<input name="castvote" id="castvote" value="'.$buttontext.'" type="submit" class="btn btn-'.$cfg->btncolor.' uk-button uk-button-'.$cfg->btncolor.'">';
 			} else {
 				echo '<div class="uk-alert uk-alert-danger">' . $this->pdata->poll_accessreqmsg . '</div>';
@@ -521,7 +520,7 @@ if ( $this->task == 'results' ) {
 
     if ($this->completition) {
         if ($this->completition->cm_status == "paid" || $this->completition->cm_status == "approved") {
-            echo '<div class="uk-alert uk-alert-success">Paid, Thank You</div>';
+            echo '<div class="uk-alert uk-alert-success">Paid. Thank you!</div>';
         }
 	    if ($this->completition->cm_status == "unpaid") {
 		    echo '<div class="uk-alert uk-alert-waring">Payment needed, please <a href="'.$this->payurl.'">pay here</a></div>';
@@ -693,37 +692,41 @@ if ( $this->task == 'pay' ) {
 	echo '</div>';
 	echo '<hr>';
 	?>
-    <script>
-        var CREATE_PAYMENT_URL  = '<?php echo JUri::root().'index.php?option=com_mpoll&task=paypal_create&poll=' . $this->pdata->poll_id.'&payment='.$this->payment; ?>';
-        var EXECUTE_PAYMENT_URL = '<?php echo JUri::root().'index.php?option=com_mpoll&task=paypal_execute&poll=' . $this->pdata->poll_id.'&payment='.$this->payment; ?>';
-        var CANCEL_PAYMENT_URL = '<?php echo JUri::root().'index.php?option=com_mpoll&task=paypal_cancel&poll=' . $this->pdata->poll_id.'&payment='.$this->payment; ?>';
 
-        paypal.Button.render({
-            style: { size: 'responsive', tagline:true, fundingicons: false, label: "checkout" },
-            env: '<?php echo $cfg->paypal_mode ?>',
-            commit: true,
-            payment: function() {
-                return paypal.request.post(CREATE_PAYMENT_URL).then(function(data) {
+    <script>
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                return fetch('<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_create&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                }).then(function(res) {
+                    return res.json();
+                }).then(function(data) {
                     return data.id;
                 });
             },
-            onAuthorize: function(data) {
-                return paypal.request.post(EXECUTE_PAYMENT_URL, {
-                    paymentID: data.paymentID,
-                    payerID:   data.payerID
-                }).then(function(data) {
-                    window.location.href = "<?php echo JRoute::_('index.php?option=com_mpoll&task=results&poll=' . $this->pdata->poll_id.'&cmpl='.$this->payment,false); ?>";
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(orderData) {
+                    var transaction = orderData.purchase_units[0].payments.captures[0];
+                    var url = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_execute&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
+                    url += '&capture='+transaction.id;
+                    window.location.href = url;
                 });
             },
             onCancel: function(data) {
-                console.log(data);
-                jQuery.post(CANCEL_PAYMENT_URL, {paymentID: data.paymentID}, function(data) {
-                    window.location.href = "<?php echo JRoute::_('index.php?option=com_mpoll&task=results&poll=' . $this->pdata->poll_id.'&cmpl='.$this->payment,false); ?>";
-                });
-            }
-        }, '#paypal-button');
+                window.location.href = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_cancel&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
+            },
+            onError(err) {
+                alert("An error occurred, please try again")
+            },
+            style:{}
+        }).render('#paypal-button');
     </script>
-	<?php
+
+    <?php
+
 	echo '<div class="uk-grid">';
 	echo '<div class="uk-width-1-3">';
 	echo '</div>';

@@ -78,7 +78,7 @@ use Joomla\CMS\Button\FeaturedButton;
             <td>
 				<?php echo $item->cm_pubid; ?>
                 <?php if ($this->poll->poll_payment_enabled && $item->cm_status != "paid") { ?>
-                    <br><small><a href="<?php echo JRoute::_(JUri::root().'index.php?option=com_mpoll&task=pay&poll='.$this->poll->poll_id. '&payment=' . base64_encode('cmplid='.$item->cm_id.'&id=' . $item->cm_pubid),false); ?>">Payment Link</a></small>
+                    <!--<br><small><a href="<?php /*echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=pay&poll='.$this->poll->poll_id. '&payment=' . base64_encode('cmplid='.$item->cm_id.'&id=' . $item->cm_pubid),false); */?>">Payment Link</a></small>-->
                 <?php } ?>
             </td>
             <td>

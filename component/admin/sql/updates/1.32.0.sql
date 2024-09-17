@@ -9,3 +9,4 @@ ALTER TABLE `#__mpoll_polls` ADD `poll_results_sortby` INT NOT NULL DEFAULT '0' 
 ALTER TABLE `#__mpoll_polls` ADD `poll_results_sortby2` INT NOT NULL DEFAULT '0' AFTER `poll_results_sortdirr`, ADD `poll_results_sortdirr2` VARCHAR(5) NOT NULL DEFAULT 'ASC' AFTER `poll_results_sortby2`;
 ALTER TABLE `#__mpoll_completed` ADD `featured` tinyint NOT NULL DEFAULT '0' AFTER `published`;
 ALTER TABLE `#__mpoll_polls` ADD `poll_results_showfeat` BOOLEAN NOT NULL DEFAULT FALSE AFTER `poll_results_showall`;
+ALTER TABLE `#__mpoll_polls` ADD `poll_payment_trigger` INT NOT NULL DEFAULT '0' AFTER `poll_payment_enabled`;

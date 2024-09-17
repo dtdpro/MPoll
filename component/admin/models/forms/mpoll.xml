@@ -247,6 +247,15 @@
             <option value="0">No</option>
         </field>
         <field
+                name="poll_payment_trigger"
+                type="QuestionTrigger"
+                label="Payment Trigger"
+                description=""
+                class="inputbox"
+                required="false"
+                default="0"
+        />
+        <field
                 name="poll_payment_amount"
                 type="text"
                 label="Amount"

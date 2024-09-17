@@ -15,6 +15,10 @@
 	</fields>
 	<fields name="params">
 		<fieldset name="basic">
+			<field name="showtitle" type="radio" default="1" label="Show Title" description="Show the title" class="btn-group">
+				<option value="1">Yes</option>
+				<option value="0">No</option>
+			</field>
 			<field name="showreq" type="radio" default="1" label="Indicate Required" description="Show the * to indicate required questions" class="btn-group">
 				<option value="1">Yes</option>
 				<option value="0">No</option>

@@ -1,0 +1,12 @@
+{
+    "require": {
+        "league/oauth2-client": "^2.7",
+        "dtdpro/mrecaptcha": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../../recaptcha"
+        }
+    ]
+}
