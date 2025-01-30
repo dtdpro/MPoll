@@ -306,6 +306,24 @@
                 required="false"
                 default=""
         />
+        <field
+                name="poll_payment_subplan"
+                type="PPSubPlans"
+                label="Subscription Plan"
+                description=""
+                class="inputbox"
+                required="false"
+                default=""
+        />
+        <field
+                name="poll_payment_subplan_trigger"
+                type="QuestionTrigger"
+                label="Subscription Trigger"
+                description=""
+                class="inputbox"
+                required="false"
+                default="0"
+        />
     </fieldset>
     <fieldset name="paymentemail">
         <field

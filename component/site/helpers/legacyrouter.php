@@ -1,8 +1,10 @@
 <?php
+use Joomla\CMS\Component\Router\Rules\RulesInterface;
+
 
 defined('_JEXEC') or die;
 
-class MPollRouterRulesLegacy implements JComponentRouterRulesInterface
+class MPollRouterRulesLegacy implements RulesInterface
 {
 	public function __construct($router)
 	{
@@ -11,67 +13,68 @@ class MPollRouterRulesLegacy implements JComponentRouterRulesInterface
 
 	public function preprocess(&$query)
 	{
-	}
+        $items = [];
+        $task = 'ballot';
+        $pollId = 0;
+        $matchedTaskAndPollId = 0;
+        $matchedPollId = 0;
+
+
+        $app = JFactory::getApplication();
+        $menu	= $this->router->menu;
+        $items	= $menu->getItems('component', 'com_mpoll');
+
+        if (isset($query['task'])) $task = $query['task'];
+        if (isset($query['poll'])) $pollId = $query['poll'];
+
+        foreach ($items as $mi) {
+            if ($mi->query['task'] == $task && $mi->query['poll'] == $pollId) {
+                $matchedTaskAndPollId = $mi->id;
+            }
+
+            if ($mi->query['poll'] == $pollId && $matchedTaskAndPollId == 0) {
+                $matchedPollId = $mi->id;
+            }
+        }
+
+        if ($matchedTaskAndPollId != 0) $query['Itemid'] = $matchedTaskAndPollId;
+        else if ($matchedPollId != 0) $query['Itemid'] = $matchedPollId;
+    }
 
 	public function build(&$query, &$segments)
 	{
-		$params = JComponentHelper::getParams('com_mpoll');
+        $items = [];
+        $task = 'ballot';
+        $pollId = 0;
+        $matchedTaskAndPollId = 0;
+        $matchedPollId = 0;
 
-		if (empty($query['Itemid']))
-		{
-			$menuItem = $this->router->menu->getActive();
-		}
-		else
-		{
-			$menuItem = $this->router->menu->getItem($query['Itemid']);
-		}
+        $app = JFactory::getApplication();
+        $menu	= $this->router->menu;
+        $items	= $menu->getItems('component', 'com_mpoll');
 
-		$mView = empty($menuItem->query['view']) ? null : $menuItem->query['view'];
-		$mId = empty($menuItem->query['poll']) ? null : $menuItem->query['poll'];
+        if (isset($query['task'])) $task = $query['task'];
+        if (isset($query['poll'])) $pollId = $query['poll'];
 
-		if (isset($query['view']))
-		{
-			$view = $query['view'];
+        foreach ($items as $mi) {
+            if ($mi->query['task'] == $task && $mi->query['poll'] == $pollId) {
+                $matchedTaskAndPollId = true;
+            }
 
-			if (empty($query['Itemid']) || empty($menuItem) || $menuItem->component != 'com_mpoll')
-			{
-				$segments[] = $query['view'];
-			}
-
-			unset($query['view']);
-		}
-
-		if (isset($query['task']) && $query['task'] == 'ballot') {
-			unset($query['task'],$segments['task']);
-		}
-
-        if (isset($query['task']) && $query['task'] == 'search') {
-            unset($query['task'],$segments['task']);
+            if ($mi->query['poll'] == $pollId  && !$matchedTaskAndPollId) {
+                $matchedPollId = true;
+            }
         }
 
-		// Are we dealing with a poll that is attached to a menu item?
-		if (isset($view) && ($mView == $view) && isset($query['poll']) && ($mId == (int) $query['poll']))
-		{
-			unset($query['view'], $query['poll']);
-
-			return;
-		}
-
-		if (isset($view) && ($view == 'mpoll'))
-		{
-			if ($mId != (int) $query['poll'] || $mView != $view)
-			{
-				if ($view == 'mpoll')
-				{
-
-					$id = $query['poll'];
-
-					$segments[] = $id;
-				}
-			}
-
-			unset($query['poll']);
-		}
+        if ($matchedTaskAndPollId ) {
+            unset($query['task']);
+            unset($query['poll']);
+            unset($query['view']);
+        }
+        else if ($matchedPollId) {
+            unset($query['poll']);
+            unset($query['view']);
+        }
 	}
 
 	public function parse(&$segments, &$vars)

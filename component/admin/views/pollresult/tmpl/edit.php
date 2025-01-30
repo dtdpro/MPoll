@@ -8,6 +8,7 @@ JHtml::_('behavior.formvalidator');
 JHtml::_('behavior.keepalive');
 
 
+
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
@@ -30,6 +31,7 @@ use Joomla\CMS\Language\Text;
 
         <div class="row-fluid row">
             <div class="width-50 fltlft span6 col-md-6">
+                <h3>Data</h3>
                 <fieldset class="adminform form-horizontal">
                     <?php foreach($this->questions as $f) {
                         $sname = 'q_'.$f->q_id;
@@ -83,7 +85,7 @@ use Joomla\CMS\Language\Text;
                             echo '<textarea name="jform['.$sname.']" id="jform_'.$sname.'" cols="70" rows="4" class="form-control inputbox">'.$this->item->$sname.'</textarea>';
                         }
 
-                        //Yes no
+                        // checkbox
                         if ($f->q_type=="cbox") {
                             echo '<select id="jform_'.$sname.'" name="jform['.$sname.']" class="form-select inputbox" size="1">';
                             $selected = ' selected="selected"';
@@ -149,6 +151,91 @@ use Joomla\CMS\Language\Text;
                     } ?>
 
                 </fieldset>
+            </div>
+            <div class="width-50 fltlft span6 col-md-6">
+                <h3>Status</h3>
+                <?php
+
+                // Published
+                echo '<div class="control-group">';
+                echo '<div class="control-label"><label id="jform_published-lbl" for="jform_published" class="hasTip" title="Published">Published</label></div>';
+                echo '<div class="controls">';
+                echo '<select id="jform_published" name="jform[published]" class="form-select inputbox" size="1">';
+                $selected = ' selected="selected"';
+                echo '<option value="0"';
+                echo ($this->item->published == "0") ? $selected : '';
+                echo '>No</option>';
+                echo '<option value="1"';
+                echo ($this->item->published == "1") ? $selected : '';
+                echo '>Yes</option>';
+                echo '</select>';
+                echo '</div>';
+                echo '</div>';
+
+                // Featured
+                echo '<div class="control-group">';
+                echo '<div class="control-label"><label id="jform_featured-lbl" for="jform_featured" class="hasTip" title="featured">Featured</label></div>';
+                echo '<div class="controls">';
+                echo '<select id="jform_featured" name="jform[featured]" class="form-select inputbox" size="1">';
+                $selected = ' selected="selected"';
+                echo '<option value="0"';
+                echo ($this->item->featured == "0") ? $selected : '';
+                echo '>No</option>';
+                echo '<option value="1"';
+                echo ($this->item->featured == "1") ? $selected : '';
+                echo '>Yes</option>';
+                echo '</select>';
+                echo '</div>';
+                echo '</div>';
+
+                // Start
+                echo '<div class="control-group">';
+                echo '<div class="control-label"><label id="jform_cm_start-lbl" for="jform_cm_start">Start</label></div>';
+                echo '<div class="controls">';
+                echo JHtml::_('calendar',$this->item->cm_start,'jform[cm_start]','jform_cm_start','%Y-%m-%d',[]);
+                echo '</div>';
+                echo '</div>';
+
+                // End
+                echo '<div class="control-group">';
+                echo '<div class="control-label"><label id="jform_cm_end-lbl" for="jform_cm_end">End</label></div>';
+                echo '<div class="controls">';
+                echo JHtml::_('calendar',$this->item->cm_end,'jform[cm_end]','jform_cm_end','%Y-%m-%d',[]);
+                echo '</div>';
+                echo '</div>';
+
+
+
+                ?>
+                <h3>Payments</h3>
+                <table class="adminlist table table-striped">
+                    <thead>
+                    <th>Invoice</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Pay ID</th>
+                    </thead>
+                    <tbody>
+                    <?php if (count($this->payments) > 0) { ?>
+                        <?php foreach ($this->payments as $p) { ?>
+                            <tr>
+                                <td><?php echo $p->pay_invoice; ?></td>
+                                <td><?php echo $p->pay_type; ?></td>
+                                <td><?php echo $p->pay_status; ?></td>
+                                <td><?php echo $p->pay_amount; ?></td>
+                                <td><?php echo $p->pay_created; ?></td>
+                                <td><?php echo $p->pay_payid; ?></td>
+                            </tr>
+                        <?php } ?>
+                    <?php } else {?>
+                        <tr>
+                            <td colspan="6"><enm>No payments have been made or no paymnet is required</enm></td>
+                        </tr>
+                    <?php } ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 

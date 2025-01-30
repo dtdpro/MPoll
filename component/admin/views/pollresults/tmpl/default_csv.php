@@ -2,13 +2,13 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Load CSV Exporter
-require JPATH_COMPONENT."/vendor/autoload.php";
+require JPATH_ROOT."/components/com_mpoll/vendor/autoload.php";
 
 // Filename
 $filename  =  'MPoll_Report' . '-' . date("Y-m-d_H:i:s").'.csv';
 
 // Basic Headings
-$headers = ["User","User Email","Completed On","Status"];
+$headers = ["User","User Email","Completed On","Status","Type","Stat","End"];
 
 // Question Headings
 foreach ($this->questions as $qu) {
@@ -32,6 +32,9 @@ foreach ($this->items as $i)
 	}
 	$dataRow[] = $i->cm_time;
 	$dataRow[] = $i->cm_status;
+    $dataRow[] = $i->cm_type;
+    $dataRow[] = $i->cm_start;
+    $dataRow[] = $i->cm_end;
 
     foreach ($this->questions as $qu) {
     	$fn='q_'.$qu->q_id;

@@ -52,7 +52,7 @@ class MPollModelPollResult extends JModelAdmin
 
         foreach ($data as $d) {
             $fieldname = 'q_'.$d->res_qid;
-            $item->$fieldname = $d->res_ans;
+            $item->$fieldname = stripslashes($d->res_ans);
             if ($questions[$d->res_qid]->q_type=="mcbox" || $questions[$d->res_qid]->q_type=="mlist") {
                 $item->$fieldname = explode(" ",$item->$fieldname);
             }
@@ -172,6 +172,24 @@ class MPollModelPollResult extends JModelAdmin
                 }
             }
 
+            // UPdate COmpleittion record
+            $publihsed = $data['published'];
+            $featured = $data['featured'];
+            $start = $data['cm_start'];
+            $end = $data['cm_end'];
+
+            $query = $db->getQuery(true);
+            $query->update("#__mpoll_completed");
+            $query->set("published = ".$db->escape((int)$publihsed));
+            $query->set("featured = ".$db->escape((int)$featured));
+            $query->set('cm_start = "'.$db->escape($start).'"');
+            $query->set('cm_end = "'.$db->escape($end).'"');
+            $query->where("cm_id=".(int)$subid);
+            $db->setQuery($query);
+            if (!$db->execute()) {
+                $this->setError($db->getErrorMsg());
+                return false;
+            }
         }
         catch (Exception $e)
         {
@@ -219,6 +237,20 @@ class MPollModelPollResult extends JModelAdmin
             $q->params = $registry->toObject();
 
         }
+        return $qdata;
+    }
+
+    function getPayments($cmplid)
+    {
+        $db = JFactory::getDBO();
+        $app=Jfactory::getApplication();
+        $query=$db->getQuery(true);
+        $query->select('*');
+        $query->from('#__mpoll_payment');
+        $query->where('pay_cm = '.$db->escape($cmplid));
+        $db->setQuery( $query );
+        $qdata = $db->loadObjectList();
+
         return $qdata;
     }
 

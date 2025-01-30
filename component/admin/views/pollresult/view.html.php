@@ -12,7 +12,8 @@ class MPollViewPollResult extends JViewLegacy
         // get the Data
         $this->item = $this->get('Item');
         $model=$this->getModel();
-        $this->questions		= $model->getQuestions($this->item->cm_poll,true);
+        $this->questions = $model->getQuestions($this->item->cm_poll,true);
+        $this->payments = $model->getPayments($this->item->cm_id);
 
         // Check for errors.
         if (count($errors = $this->get('Errors')))

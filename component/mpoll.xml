@@ -63,7 +63,6 @@
 			<folder>tables</folder>
 			<folder>helpers</folder>
 			<folder>sql</folder>
-			<folder>vendor</folder>
 		</files>
 		<languages folder="admin">
 			<language tag="en-GB">language/en-GB.com_mpoll.ini</language>

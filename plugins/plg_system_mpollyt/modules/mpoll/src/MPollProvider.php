@@ -30,9 +30,9 @@ class MPollProvider
                 $fn='q_'.$c->res_qid;
                 $fno='q_'.$c->res_qid.'_other';
                 $fna='q_'.$c->res_qid.'_other_alt';
-                $d->$fn=$c->res_ans;
-                $d->$fno=$c->res_ans_other;
-                $d->$fna=$c->res_ans_other_alt;
+                $d->$fn=stripslashes($c->res_ans);
+                $d->$fno=stripslashes($c->res_ans_other);
+                $d->$fna=stripslashes($c->res_ans_other_alt);
             }
         }
 

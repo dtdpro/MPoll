@@ -173,7 +173,7 @@ $sortFields = $this->getSortFields();
 
 		<?php
 		echo '<h3>Webhook URL</h3>';
-		echo '<p>'.JUri::root().'index.php?option=com_mpoll&task=paypal_webhook'.'</p>';
+		echo '<p>'.JUri::root().'index.php?option=com_mpoll&task=paypal_webhook&view=mpoll'.'</p>';
 		?>
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />

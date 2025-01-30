@@ -11,6 +11,7 @@ use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Form\Form;
+use Joomla\CMS\Date\Date;
 
 // Load Extra Pakcages
 require JPATH_COMPONENT."/vendor/autoload.php";
@@ -238,15 +239,22 @@ class MPollModelMPoll extends JModelLegacy
 			}
 
             // Determine pay status
-            $patmentNeeded = false;
+            $paymentNeeded = false;
+            $subNeeded = false;
             if ($pollinfo->poll_payment_enabled) {
                 if ($pollinfo->poll_payment_trigger != 0) {
                     $trigger = 'q_'.$pollinfo->poll_payment_trigger;
                     if ($item->$trigger == 1) {
-                        $patmentNeeded = true;
+                        $paymentNeeded = true;
                     }
                 } else {
-                    $patmentNeeded = true;
+                    $paymentNeeded = true;
+                }
+                if ($pollinfo->poll_payment_subplan_trigger != 0) {
+                    $trigger = 'q_'.$pollinfo->poll_payment_subplan_trigger;
+                    if ($item->$trigger == 1) {
+                        $subNeeded = true;
+                    }
                 }
             }
 
@@ -256,8 +264,18 @@ class MPollModelMPoll extends JModelLegacy
 			$cmrec->cm_user=$user->id;
 			$cmrec->cm_poll=$pollid;
 			$cmrec->cm_pubid=$pubid;
-			if ($patmentNeeded) $cmrec->cm_status="unpaid";
-			else $cmrec->cm_status="completed";
+            if ($subNeeded) {
+                $cmrec->cm_type="subscription";
+                $cmrec->cm_status="unpaid";
+            }
+            else if ($paymentNeeded) {
+                $cmrec->cm_type="order";
+                $cmrec->cm_status="unpaid";
+            }
+			else {
+                $cmrec->cm_type="submission";
+                $cmrec->cm_status="completed";
+            }
 			$cmrec->cm_useragent=$_SERVER['HTTP_USER_AGENT'];
 			$cmrec->cm_ipaddr=$this->getIPAddress();
 			if (!$db->insertObject('#__mpoll_completed',$cmrec)) {
@@ -359,6 +377,8 @@ class MPollModelMPoll extends JModelLegacy
                             } else {
                                 $resultsemail .= "No";
                             }
+                            $resultsemail .= '<br />';
+                            $resultsemail .= '<br />';
                         } else if (in_array($fieldname,$optfs)) {
 							$resultsemail .= $optionsdata[$item->$fieldname];
 							if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;
@@ -416,7 +436,7 @@ class MPollModelMPoll extends JModelLegacy
 				$flist = $this->getQuestions($pollid,false);
 				$completedid = base64_encode('cmplid='.$subid.'&id=' . $pubid);
 				$cmplurl = JUri::root().JRoute::_('index.php?option=com_mpoll&task=results&poll='.$pollinfo->poll_id. '&cmpl=' . $completedid,false);
-                if ($patmentNeeded) $payurl = JUri::root().JRoute::_('index.php?option=com_mpoll&task=pay&poll='.$pollinfo->poll_id. '&payment=' . $completedid,false);
+                if ($paymentNeeded || $subNeeded) $payurl = JUri::root().JRoute::_('index.php?option=com_mpoll&task=pay&poll='.$pollinfo->poll_id. '&payment=' . $completedid,false);
                 else $payurl = "";
 
 				$confemail = $pollinfo->poll_confmsg;
@@ -668,9 +688,9 @@ class MPollModelMPoll extends JModelLegacy
                     $fn = 'q_' . $c->res_qid;
                     $fno = 'q_' . $c->res_qid . '_other';
                     $fna = 'q_' . $c->res_qid . '_other_alt';
-                    $d->$fn = $c->res_ans;
-                    $d->$fno = $c->res_ans_other;
-                    $d->$fna = $c->res_ans_other_alt;
+                    $d->$fn = stripslashes($c->res_ans);
+                    $d->$fno = stripslashes($c->res_ans_other);
+                    $d->$fna = stripslashes($c->res_ans_other_alt);
                 }
             }
         }
@@ -864,6 +884,7 @@ class MPollModelMPoll extends JModelLegacy
 		$newpayment=new stdClass();
 		$newpayment->pay_cm=$completition->cm_id;
 		$newpayment->pay_poll=$poll->poll_id;
+        $newpayment->pay_sale_type="order";
 		$newpayment->pay_type='paypal';
 		$newpayment->pay_status='started';
 		$newpayment->pay_amount=floatval($cost);
@@ -948,7 +969,7 @@ class MPollModelMPoll extends JModelLegacy
             $db->setQuery($setstatus);
             $db->execute();
 
-            echo json_encode($ppResult); die;
+            return json_encode($ppResult);
         }
 
         $this->setError(json_encode($payPayService->error));
@@ -1007,7 +1028,7 @@ class MPollModelMPoll extends JModelLegacy
             // Update compleittion Record
             $setcmstatus = $db->getQuery(true);
             $setcmstatus->update('#__mpoll_completed');
-            $setcmstatus->set('cm_status = "approved"');
+            $setcmstatus->set('cm_status = "paid"');
             $setcmstatus->where('cm_id = '.$payment->pay_cm);
             $db->setQuery($setcmstatus);
             $db->execute();
@@ -1094,7 +1115,6 @@ class MPollModelMPoll extends JModelLegacy
 		$jinput = JFactory::getApplication()->input;
 		$jsondata = $jinput->json->getRaw();
 		$headers = array_change_key_case($this->getHeaders(), CASE_UPPER);
-
 		if ($jsondata) {
 			$content = json_decode($jsondata,true);
 			$whid = $content['id'];
@@ -1103,42 +1123,330 @@ class MPollModelMPoll extends JModelLegacy
             $captureId = $content['resource']['id'];
 
             $payPalService = new PayPalService($cfg->paypal_api_id,$cfg->paypal_api_secret,$cfg->paypal_mode);
-            // get order id form capture id and reset them in invoice if matached
-            $ppResult = $payPalService->getCapture($captureId);
 
-            if ( $invoice == $ppResult['invoice_id'] ) {
-                $ppOrderId = $ppResult['supplementary_data']['related_ids']['order_id'];
+            // Subscription Activated
+            if ($content['event_type'] == "BILLING.SUBSCRIPTION.ACTIVATED" || $content['event_type'] == "BILLING.SUBSCRIPTION.UPDATED") {
+                $invoiceId = $content['resource']['custom_id'];
+                $subId = $content['resource']['id'];
 
-                if (!$ppResult = $payPalService->getOrder($ppOrderId)) {
-                    $this->setError(json_encode($payPayService->error));
-                    return "false";
+                $paymentquery = $db->getQuery(true);
+                $paymentquery->select('*');
+                $paymentquery->from('#__mpoll_payment');
+                $paymentquery->where('pay_invoice = "'.$invoiceId.'"');
+                $paymentquery->where('pay_payid = "'.$subId.'"');
+                $db->setQuery( $paymentquery );
+                $payment = $db->loadObject();
+                if (!$payment) {
+                    return true;
+                } else {
+                    if (!$ppResult = $payPalService->getSubscription($subId)) {
+                        return false;
+                    }
+                    if ( $ppResult['status'] == 'ACTIVE' ) {
+                        // do the dates
+                        $currentDate = new Date('now');
+                        $endDate = new Date($ppResult['billing_info']['next_billing_time']);
+                        $end = $endDate->format("Y-m-t");
+
+                        $setcmstatus = $db->getQuery(true);
+                        $setcmstatus->update('#__mpoll_completed');
+                        $setcmstatus->set('cm_status = "subscribed"');
+                        $setcmstatus->set('cm_end = "' . $end . '"');
+                        $setcmstatus->where('cm_id = ' . $payment->pay_cm);
+                        $db->setQuery($setcmstatus);
+                        $db->execute();
+                    }
                 }
+            }
 
-                if ( $ppResult['status'] == 'COMPLETED' ) {
+            if ($content['event_type'] == "BILLING.SUBSCRIPTION.EXPIRED" || $content['event_type'] == "BILLING.SUBSCRIPTION.CANCELLED" || $content['event_type'] == "BILLING.SUBSCRIPTION.SUSPENDED") {
+                $invoiceId = $content['resource']['custom_id'];
+                $subId = $content['resource']['id'];
+
+                $paymentquery = $db->getQuery(true);
+                $paymentquery->select('*');
+                $paymentquery->from('#__mpoll_payment');
+                $paymentquery->where('pay_invoice = "'.$invoiceId.'"');
+                $paymentquery->where('pay_payid = "'.$subId.'"');
+                $db->setQuery( $paymentquery );
+                $payment = $db->loadObject();
+                if (!$payment) {
+                    return true;
+                } else {
+                    if (!$ppResult = $payPalService->getSubscription($subId)) {
+                        return false;
+                    }
+
+                    $subStatus = "";
+                    if ( $ppResult['status'] == 'EXPIRED' ) $subStatus = "subexpired";
+                    if ( $ppResult['status'] == 'CANCELLED' ) $subStatus = "subcancelled";
+                    if ( $ppResult['status'] == 'SUSPENDED' ) $subStatus = "subsuspended";
+
+                    $setcmstatus = $db->getQuery(true);
+                    $setcmstatus->update('#__mpoll_completed');
+                    $setcmstatus->set('cm_status = "'.$subStatus.'"');
+                    $setcmstatus->where('cm_id = ' . $payment->pay_cm);
+                    $db->setQuery($setcmstatus);
+                    $db->execute();
+                }
+            }
+
+            if ($content['event_type'] == "BILLING.SUBSCRIPTION.PAYMENT.FAILED") {
+                $invoiceId = $content['resource']['custom_id'];
+                $subId = $content['resource']['id'];
+
+                $paymentquery = $db->getQuery(true);
+                $paymentquery->select('*');
+                $paymentquery->from('#__mpoll_payment');
+                $paymentquery->where('pay_invoice = "'.$invoiceId.'"');
+                $paymentquery->where('pay_payid = "'.$subId.'"');
+                $db->setQuery( $paymentquery );
+                $payment = $db->loadObject();
+                if (!$payment) {
+                    return true;
+                } else {
+                    if (!$ppResult = $payPalService->getSubscription($subId)) {
+                        return false;
+                    }
+
+                    $setcmstatus = $db->getQuery(true);
+                    $setcmstatus->update('#__mpoll_completed');
+                    $setcmstatus->set('cm_status = "subpayfailed"');
+                    $setcmstatus->where('cm_id = ' . $payment->pay_cm);
+                    $db->setQuery($setcmstatus);
+                    $db->execute();
+                }
+            }
+
+            if ($content['event_type'] == "PAYMENT.SALE.COMPLETED") {
+                if (isset($content['resource']['billing_agreement_id'])) {
+                    $invoiceId = $content['resource']['custom'];
+                    $subId = $content['resource']['billing_agreement_id'];
+
                     $paymentquery = $db->getQuery(true);
                     $paymentquery->select('*');
                     $paymentquery->from('#__mpoll_payment');
-                    $paymentquery->where('pay_invoice = "'.$db->escape($invoice).'"');
+                    $paymentquery->where('pay_invoice = "'.$invoiceId.'"');
+                    $paymentquery->where('pay_payid = "'.$subId.'"');
                     $db->setQuery( $paymentquery );
                     $payment = $db->loadObject();
+                    if (!$payment) {
+                        return true;
+                    } else {
+                        if (!$ppResult = $payPalService->getSubscription($subId)) {
+                            return false;
+                        }
+                        if ( $ppResult['status'] == 'ACTIVE' ) {
+                            // do the dates
+                            $currentDate = new Date('now');
+                            $endDate = new Date($ppResult['billing_info']['next_billing_time']);
+                            $end = $endDate->format("Y-m-t");
 
-                    $setcertstatus = $db->getQuery(true);
-                    $setcertstatus->update('#__mpoll_completed');
-                    $setcertstatus->set('cm_status = "paid"');
-                    $setcertstatus->where('cm_id = '.$payment->pay_cm);
-                    $db->setQuery($setcertstatus);
-                    $db->execute();
+                            $setcmstatus = $db->getQuery(true);
+                            $setcmstatus->update('#__mpoll_completed');
+                            $setcmstatus->set('cm_status = "subscribed"');
+                            $setcmstatus->set('cm_end = "' . $end . '"');
+                            $setcmstatus->where('cm_id = ' . $payment->pay_cm);
+                            $db->setQuery($setcmstatus);
+                            $db->execute();
+                        }
+                    }
+                }
+            }
 
-                    return "true";
-                } else if ( $ppResult['status'] == 'CREATED' ) {
-                    return "false";
+            // Payment Complete
+            if ($content['event_type'] == "PAYMENT.CAPTURE.COMPLETED") {
+                $ppOrderId = $content['resource']['supplementary_data']['related_ids']['order_id'];
+                $invoiceId = $content['resource']['invoice_id'];
+                $paymentquery = $db->getQuery(true);
+                $paymentquery->select('*');
+                $paymentquery->from('#__mpoll_payment');
+                $paymentquery->where('pay_invoice = "'.$invoiceId.'"');
+                $paymentquery->where('pay_payid = "'.$ppOrderId.'"');
+                $db->setQuery( $paymentquery );
+                $payment = $db->loadObject();
+                if (!$payment) {
+                    return true;
                 } else {
-                    return "false";
+                    if (!$ppResult = $payPalService->getOrder($ppOrderId)) {
+                        $this->setError(json_encode($payPayService->error));
+                        return "false";
+                    }
+                    if ( $ppResult['status'] == 'COMPLETED' ) {
+                        $setcertstatus = $db->getQuery(true);
+                        $setcertstatus->update('#__mpoll_completed');
+                        $setcertstatus->set('cm_status = "paid"');
+                        $setcertstatus->where('cm_id = '.$payment->pay_cm);
+                        $db->setQuery($setcertstatus);
+                        $db->execute();
+                    }
                 }
             }
 		}
 		return 'true';
 	}
+
+    public function PayPalCreateSub($poll,$completition) {
+
+        $cfg = MPollHelper::getConfig();
+        $db = JFactory::getDBO();
+        $user = JFactory::getUser();
+
+        $cost = $poll->poll_payment_amount;
+
+        $newpayment=new stdClass();
+        $newpayment->pay_cm=$completition->cm_id;
+        $newpayment->pay_poll=$poll->poll_id;
+        $newpayment->pay_sale_type="subscription";
+        $newpayment->pay_type='paypal';
+        $newpayment->pay_status = "created";
+        $newpayment->pay_amount=floatval($cost);
+        $newpayment->pay_updated=date("Y-m-d H:i:s");
+        if (!$db->insertObject('#__mpoll_payment',$newpayment)) {
+            $this->setError("Error creating payment");
+            return false;
+        }
+        $newpaymentid = $db->insertid();
+
+        $invoicenum = (1000+$poll->poll_id).'-'.(1000000+$completition->cm_id).'-'.str_pad($newpaymentid,8,0,STR_PAD_LEFT);
+        $setinvoice = $db->getQuery(true);
+        $setinvoice->update('#__mpoll_payment');
+        $setinvoice->set('pay_invoice = "'.$db->escape($invoicenum).'"');
+        $setinvoice->where('pay_id = '.$newpaymentid);
+        $db->setQuery($setinvoice);
+        $db->execute();
+
+        $createSub = [];
+
+        $createSub['plan_id'] = $poll->poll_payment_subplan;
+        $createSub['custom_id'] = $invoicenum;
+
+        $applicationContext = [];
+        $applicationContext['shipping_preference'] = "NO_SHIPPING";
+        $createSub['application_context'] = $applicationContext;
+
+        return json_encode($createSub);
+
+    }
+
+    public function PayPalActivateSub($poll,$completition) {
+        $cfg = MPollHelper::getConfig();
+        $db = JFactory::getDBO();
+        $user = JFactory::getUser();
+        $jinput = JFactory::getApplication()->input;
+
+        $subId = $jinput->getVar('subscription');
+
+        if (!$subId) {
+            $this->setError("Capture ID Not provided");
+            return false;
+        }
+
+        $payPalService = new PayPalService($cfg->paypal_api_id,$cfg->paypal_api_secret,$cfg->paypal_mode);
+
+        if (!$ppResult = $payPalService->getSubscription($subId)) {
+            $this->setError(json_encode($payPayService->error));
+            return false;
+        }
+
+        $paymentquery = $db->getQuery(true);
+        $paymentquery->select('*');
+        $paymentquery->from('#__mpoll_payment');
+        $paymentquery->where('pay_invoice = "'.$ppResult['custom_id'].'"');
+        $paymentquery->where('pay_cm = '.$completition->cm_id);
+        $db->setQuery( $paymentquery );
+        $payment = $db->loadObject();
+        if (!$payment) {
+            $this->setError("Could not find Payment");
+            return false;
+        }
+
+        $setstatus = $db->getQuery(true);
+        $setstatus->update('#__mpoll_payment');
+        if ($ppResult['status'] == "ACTIVE") $setstatus->set('pay_status = "subscribed"');
+        else $setstatus->set('pay_status = "notsubscribed"');
+        $setstatus->set('pay_updated = "'.date("Y-m-d H:i:s").'"');
+        $setstatus->set('pay_payid = "'.$subId.'"');
+        $setstatus->where('pay_id = '.$payment->pay_id);
+        $db->setQuery($setstatus);
+        $db->execute();
+
+        if ($ppResult['status'] == "ACTIVE") {
+            // do the dates
+            $currentDate = new Date('now');
+            $start = $currentDate->format("Y-m-d");
+            $endDate = new Date($ppResult['billing_info']['next_billing_time']);
+            $end = $endDate->format("Y-m-t");
+
+            $setcmstatus = $db->getQuery(true);
+            $setcmstatus->update('#__mpoll_completed');
+            $setcmstatus->set('cm_status = "subscribed"');
+            $setcmstatus->set('cm_start = "'.$start.'"');
+            $setcmstatus->set('cm_end = "'.$end.'"');
+            $setcmstatus->where('cm_id = '.$payment->pay_cm);
+            $db->setQuery($setcmstatus);
+            $db->execute();
+
+            // User Notification Email
+            if ($poll->poll_payment_to) {
+                $qa = $db->getQuery(true);
+                $qa->select('res_ans');
+                $qa->from('#__mpoll_results');
+                $qa->where('res_qid='.$poll->poll_payment_to);
+                $qa->where('res_cm='.$payment->pay_cm);
+                $db->setQuery($qa);
+                $toEmail=$db->loadResult();
+
+                if ($toEmail) {
+                    $mail = &JFactory::getMailer();
+                    $sent = $mail->sendMail( $poll->poll_payment_fromemail, $poll->poll_payment_fromname, $toEmail, $poll->poll_payment_subject, $poll->poll_payment_body, true );
+                }
+            }
+
+            // Admin Notification Email
+            if ($poll->poll_payment_adminemail) {
+                $resultsemail = 'A payment has been made to the form <strong>'.$poll->poll_name.'</strong> with  ID #<strong>'.$payment->pay_cm.'</strong>';
+
+                $emllist = Array();
+                $emllist = explode(",",$poll->poll_payment_adminemail);
+
+                $replyTo = null;
+                if ($poll->poll_payment_to) {
+                    $replyToField = 'q_'.$poll->poll_payment_to;
+                    if ($item->$replyToField) $replyTo = $item->$replyToField;
+                }
+
+                $mail = &JFactory::getMailer();
+                $sent = $mail->sendMail ($poll->poll_payment_fromemail, $poll->poll_payment_fromname, $emllist, $poll->poll_payment_adminsubject, $resultsemail, true, null, null, null, $replyTo);
+            }
+        }
+
+        return true;
+    }
+
+    public function PayPalGetPlan($subId) {
+        $cfg = MPollHelper::getConfig();
+        $payPalService = new PayPalService($cfg->paypal_api_id,$cfg->paypal_api_secret,$cfg->paypal_mode);
+        $ppResult = $payPalService->getPlan($subId);
+        return $ppResult;
+    }
+
+    public function checkForNeededSub($cmpl,$triggerFieldId)
+    {
+        if ($triggerFieldId == 0) {
+            return false;
+        }
+        $db   = JFactory::getDBO();
+        $qa = $db->getQuery(true);
+        $qa->select('res_ans');
+        $qa->from('#__mpoll_results');
+        $qa->where('res_qid='.$triggerFieldId);
+        $qa->where('res_cm='.$cmpl->cm_id);
+        $db->setQuery($qa);
+        $trigger=$db->loadResult();
+        if ($trigger == 1) return true;
+        return false;
+    }
 
 	private function getHeaders() {
 		$headers = [];

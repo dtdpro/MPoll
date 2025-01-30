@@ -283,6 +283,8 @@ try {
                     } else {
                         $resultsemail .= "No";
                     }
+                    $resultsemail .= '<br />';
+                    $resultsemail .= '<br />';
                 } else if (in_array($fieldname,$optfs)) {
                     $resultsemail .= $optionsdata[$item->$fieldname];
                     if ($other->$fieldname) $resultsemail .= ': '.$other->$fieldname;

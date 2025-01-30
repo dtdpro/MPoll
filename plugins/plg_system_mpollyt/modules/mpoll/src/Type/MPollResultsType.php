@@ -1,5 +1,8 @@
 <?php
 
+
+use Joomla\CMS\Date\Date;
+
 class MPollResultsType
 {
     public static function config()
@@ -19,6 +22,17 @@ class MPollResultsType
                     'type' => 'String',
                     'metadata' => [
                         'label' => 'Featured Status'
+                    ]
+                ],
+                'pubstate' => [
+                    'type' => 'String',
+                    'metadata' => [
+                        'label' => 'Publishing Status'
+                    ],
+                    'extensions' => [
+                        'call' => [
+                            'func'=>__CLASS__ . '::resolvePubState'
+                        ]
                     ]
                 ],
                 'debug' => [
@@ -174,6 +188,15 @@ class MPollResultsType
     public static function resolveDebug($obj, $args, $context, $info)
     {
         return print_r($obj,true).print_r($args,true);
+    }
+
+    public static function resolvePubState($obj, $args, $context, $info) {
+        $status = "during";
+        $currentDate = new Date('now');
+        $now = $currentDate->format("Y-m-d");
+        if ($now < $obj->cm_start) $status = "before";
+        if ($now > $obj->cm_end) $status = "after";
+        return $status;
     }
 
 

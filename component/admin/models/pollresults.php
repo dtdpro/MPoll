@@ -158,8 +158,8 @@ class MPollModelPollResults extends JModelList
                 foreach ($cmd as $c) {
                     $fn = 'q_' . $c->res_qid;
                     $fno = 'q_' . $c->res_qid . '_other';
-                    $d->$fn = $c->res_ans;
-                    $d->$fno = $c->res_ans_other;
+                    $d->$fn = stripslashes($c->res_ans);
+                    $d->$fno = stripslashes($c->res_ans_other);
                 }
             }
         }

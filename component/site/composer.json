@@ -1,7 +1,8 @@
 {
     "require": {
         "league/oauth2-client": "^2.7",
-        "dtdpro/mrecaptcha": "dev-master"
+        "dtdpro/mrecaptcha": "dev-master",
+        "league/csv": "^9.16"
     },
     "repositories": [
         {

@@ -1,7 +1,11 @@
 <?php
+use Joomla\CMS\Component\Router\RouterView;
+use Joomla\CMS\Router\Router;
+
+
 defined('_JEXEC') or die;
 
-class MPollRouter extends JComponentRouterView
+class MPollRouter extends RouterView
 {
 	public function __construct($app = null, $menu = null)
 	{
@@ -13,8 +17,24 @@ class MPollRouter extends JComponentRouterView
 
 		JLoader::register('MPollRouterRulesLegacy', __DIR__ . '/helpers/legacyrouter.php');
 		$this->attachRule(new MPollRouterRulesLegacy($this));
-	}
 
+        // needed for Joomla 4
+        $router = $app::getRouter();
+        $router->attachParseRule([$this, 'parseProcessAfter'], Router::PROCESS_AFTER);
+
+    }
+
+    /**
+     * @param Router $router
+     * @param Uri    $uri
+     *
+     * @return void
+     */
+    public function parseProcessAfter(Router $router, Uri $uri)
+    {
+        // Kinda crazy but needed in Joomla 4
+        $uri->setPath(null);
+    }
 }
 
 /**

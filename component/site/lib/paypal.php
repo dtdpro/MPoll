@@ -167,4 +167,64 @@ class PayPalService {
 
         return json_decode($response->getBody(),true);
     }
+
+    public function listPlans() {
+        $request = $this->provider->getAuthenticatedRequest(
+            'GET',
+            $this->url.'/v1/billing/plans',
+            $this->accessToken
+        );
+
+        try {
+            $response = $this->provider->getResponse( $request );
+        } catch ( BadResponseException $e ) {
+            $this->error = json_decode( (string) $e->getResponse()->getBody(), true );
+            $this->errorRequest = ['body'=>[],'url'=>'/v1/billing/plans','method'=>'GET'];
+            return false;
+        }
+
+        $body = json_decode($response->getBody(),true);
+
+        return $body['plans'];
+    }
+
+    public function getPlan($subId) {
+        $request = $this->provider->getAuthenticatedRequest(
+            'GET',
+            $this->url.'/v1/billing/plans/'.$subId,
+            $this->accessToken
+        );
+
+        try {
+            $response = $this->provider->getResponse( $request );
+        } catch ( BadResponseException $e ) {
+            $this->error = json_decode( (string) $e->getResponse()->getBody(), true );
+            $this->errorRequest = ['body'=>[],'url'=>'/v1/billing/plans'.$subId,'method'=>'GET'];
+            return false;
+        }
+
+        $body = json_decode($response->getBody(),true);
+
+        return $body;
+    }
+
+    public function getSubscription($subId) {
+        $request = $this->provider->getAuthenticatedRequest(
+            'GET',
+            $this->url.'/v1/billing/subscriptions/'.$subId,
+            $this->accessToken
+        );
+
+        try {
+            $response = $this->provider->getResponse( $request );
+        } catch ( BadResponseException $e ) {
+            $this->error = json_decode( (string) $e->getResponse()->getBody(), true );
+            $this->errorRequest = ['body'=>[],'url'=>'/v1/billing/subscriptions'.$subId,'method'=>'GET'];
+            return false;
+        }
+
+        $body = json_decode($response->getBody(),true);
+
+        return $body;
+    }
 }

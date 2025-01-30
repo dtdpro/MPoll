@@ -4,7 +4,9 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Button\PublishedButton;
 use Joomla\CMS\Button\FeaturedButton;
 
-
+$wa = $this->document->getWebAssetManager();
+$wa->useScript('table.columns')
+    ->useScript('multiselect');
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_mpoll&view=pollresults'); ?>" method="post" name="adminForm" id="adminForm">
     <div id="j-main-container">
@@ -24,16 +26,13 @@ use Joomla\CMS\Button\FeaturedButton;
 					<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 			</th>
             <th width="1%" style="min-width:55px" class="nowrap center">
-                <?php echo JText::_('JSTATUS'); ?>
-            </th>
-            <th width="1%" style="min-width:55px" class="nowrap center">
-                <?php echo JText::_('JFEATURED'); ?>
+                <?php echo JText::_('JPUBLISHED'); ?>
             </th>
 			<th>
 				<?php echo JText::_( 'ID#' ); ?>
 			</th>
             <th>
-				<?php echo JText::_( 'Public ID' ); ?>
+				<?php echo JText::_( 'Public ID, Start/End' ); ?>
             </th>
             <th>
 				<?php echo JText::_( 'Status' ); ?>
@@ -64,10 +63,6 @@ use Joomla\CMS\Button\FeaturedButton;
                 <?php
                 $options = [ 'task_prefix' => 'pollresults.', 'id' => 'state-' . $item->cm_id ];
                 echo ( new PublishedButton() )->render( (int) $item->published, $i, $options );
-                ?>
-            </td>
-            <td class="center text-center">
-                <?php
                 $options = [ 'task_prefix' => 'pollresults.', 'id' => 'featured-' . $item->cm_id ];
                 echo ( new FeaturedButton() )->render( (int) $item->featured, $i, $options );
                 ?>
@@ -75,13 +70,12 @@ use Joomla\CMS\Button\FeaturedButton;
 			<td>
                 <a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=pollresult.edit&cm_id='.(int) $item->cm_id); ?>"><?php echo $item->cm_id; ?></a>
 			</td>
-            <td>
-				<?php echo $item->cm_pubid; ?>
-                <?php if ($this->poll->poll_payment_enabled && $item->cm_status != "paid") { ?>
-                    <!--<br><small><a href="<?php /*echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=pay&poll='.$this->poll->poll_id. '&payment=' . base64_encode('cmplid='.$item->cm_id.'&id=' . $item->cm_pubid),false); */?>">Payment Link</a></small>-->
-                <?php } ?>
+            <td class="small">
+				<?php echo $item->cm_pubid.'<br>'; ?>
+                <?php echo $item->cm_start.' - '.$item->cm_end; ?>
             </td>
             <td>
+                <?php echo $item->cm_type.'<br>'; ?>
 				<?php echo $item->cm_status; ?>
             </td>
 			<td>

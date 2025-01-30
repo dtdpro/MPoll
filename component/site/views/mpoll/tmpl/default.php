@@ -117,7 +117,7 @@ if ( $this->task == 'ballot' ) {
 			//field title/label
 			if ( $f->q_type != "message" && $f->q_type != "header" ) {
 				echo '<div class="uk-form-label uk-text-bold">';
-				if ( $f->q_req && $this->params->get( 'showreq', 1 ) ) {
+				if ( $f->q_req && $this->params->get( 'showreq', 1 ) && $f->q_type != "cbox" ) {
 					echo "*";
 				}
 				if ( $f->q_type != "cbox" && $f->q_type != "message" && $f->q_type != "header" ) {
@@ -679,64 +679,130 @@ if ( $this->task == 'pay' ) {
 	echo '<div class="mpollcom-payment-instructions">'.$this->pdata->poll_payment_instructions.'</div>';
 	echo '<hr>';
 
-	// Certficitaion Details
-	echo '<div class="uk-grid">';
-	echo '<div class="uk-width-1-2">';
-	echo '<strong>' . $this->pdata->poll_payment_title . '</strong><br>';
-	echo 'Date of submission: ' . date( "F j, Y", strtotime( $this->completition->cm_time ) );
-	echo '</div>';
-	echo '<div class="uk-width-1-2" style="text-align: right;"><h2>$';
-	echo number_format($this->pdata->poll_payment_amount,2);
-	echo '</h2>';
-	echo '</div>';
-	echo '</div>';
-	echo '<hr>';
-	?>
+    if (!$this->needsSub) {
+        // Payment Details
+        echo '<div class="uk-grid">';
+        echo '<div class="uk-width-1-2">';
+        echo '<strong>' . $this->pdata->poll_payment_title . '</strong><br>';
+        echo 'Date of submission: ' . date( "F j, Y", strtotime( $this->completition->cm_time ) );
+        echo '</div>';
+        echo '<div class="uk-width-1-2" style="text-align: right;"><h2>$';
+        echo number_format($this->pdata->poll_payment_amount,2);
+        echo '</h2>';
+        echo '</div>';
+        echo '</div>';
+        echo '<hr>';
+        ?>
 
-    <script>
-        paypal.Buttons({
-            createOrder: function(data, actions) {
-                return fetch('<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_create&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>', {
-                    method: 'post',
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                }).then(function(res) {
-                    return res.json();
-                }).then(function(data) {
-                    return data.id;
-                });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(orderData) {
-                    var transaction = orderData.purchase_units[0].payments.captures[0];
-                    var url = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_execute&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
-                    url += '&capture='+transaction.id;
+        <script>
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return fetch('<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_create&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>', {
+                        method: 'post',
+                        headers: {
+                            'content-type': 'application/json'
+                        }
+                    }).then(function(res) {
+                        return res.json();
+                    }).then(function(data) {
+                        return data.id;
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(orderData) {
+                        var transaction = orderData.purchase_units[0].payments.captures[0];
+                        var url = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_execute&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
+                        url += '&capture='+transaction.id;
+                        window.location.href = url;
+                    });
+                },
+                onCancel: function(data) {
+                    window.location.href = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_cancel&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
+                },
+                onError(err) {
+                    alert("An error occurred, please try again")
+                },
+                style:{}
+            }).render('#paypal-button');
+        </script>
+
+        <?php
+
+        echo '<div class="uk-grid">';
+        echo '<div class="uk-width-1-3"></div>';
+        echo '<div class="uk-width-1-3">';
+        echo '<div id="paypal-button"></div>';
+        echo '</div>';
+        echo '<div class="uk-width-1-3"></div>';
+        echo '</div>';
+    } else {
+        /*if ($this->subinfo) {
+            echo '<pre>';
+            print_r( $this->subinfo );
+            echo '</pre><hr>';
+        }*/
+        // Subscription Details
+        echo '<div class="uk-grid">';
+        echo '<div class="uk-width-1-2">';
+        echo '<strong>' . $this->pdata->poll_payment_title . '</strong><br>';
+        echo 'Date of submission: ' . date( "F j, Y", strtotime( $this->completition->cm_time ) );
+        echo '</div>';
+        echo '<div class="uk-width-1-2" style="text-align: right;"><h2>$';
+        echo number_format($this->subinfo['billing_cycles'][0]['pricing_scheme']['fixed_price']['value'],2).'/';
+        if ($this->subinfo['billing_cycles'][0]['frequency']['interval_count'] != 1) {
+            echo $this->subinfo['billing_cycles'][0]['frequency']['interval_count'].' ';
+        }
+        echo strtolower($this->subinfo['billing_cycles'][0]['frequency']['interval_unit']);
+        if ($this->subinfo['billing_cycles'][0]['frequency']['interval_count'] != 1) {
+            echo 's';
+        }
+        echo '</h2>';
+        echo '</div>';
+        echo '</div>';
+        echo '<hr>';
+        ?>
+
+        <script>
+            paypal.Buttons({
+                createSubscription: async function (data, actions) {
+                    subData = await fetch('<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_create_sub&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>', {
+                        method: 'post',
+                        headers: {
+                            'content-type': 'application/json'
+                        }
+                    }).then(function(res) {
+                        return res.json();
+                    }).then(function(resData) {
+                        return resData;
+                    });
+                    return actions.subscription.create(subData);
+
+                },
+                onApprove: function(data, actions) {
+                    var url = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_activate_sub&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
+                    url += '&subscription='+data.subscriptionID;
                     window.location.href = url;
-                });
-            },
-            onCancel: function(data) {
-                window.location.href = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_cancel&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
-            },
-            onError(err) {
-                alert("An error occurred, please try again")
-            },
-            style:{}
-        }).render('#paypal-button');
-    </script>
+                },
+                onCancel: function(data) {
+                    window.location.href = "<?php echo JUri::root().JRoute::_('index.php?option=com_mpoll&task=paypal_cancel&poll=',false) . $this->pdata->poll_id.'&payment='.$this->payment; ?>";
+                },
+                onError(err) {
+                    alert("An error occurred, please try again")
+                },
+                style:{}
+            }).render('#paypal-button');
+        </script>
 
-    <?php
+        <?php
 
-	echo '<div class="uk-grid">';
-	echo '<div class="uk-width-1-3">';
-	echo '</div>';
-	echo '<div class="uk-width-1-3">';
-	echo '<div id="paypal-button"></div>';
-	echo '</div>';
-	echo '<div class="uk-width-1-3">';
-	echo '</div>';
-	echo '</div>';
-
+        echo '<div class="uk-grid">';
+        echo '<div class="uk-width-1-3"></div>';
+        echo '<div class="uk-width-1-3">';
+        echo '<div id="paypal-button"></div>';
+        echo '</div>';
+        echo '<div class="uk-width-1-3"></div>';
+        echo '</div>';
+    }
 }
 
 if ( $this->task == 'search' ) {

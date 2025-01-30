@@ -21,28 +21,31 @@ class MPollViewMPoll extends JViewLegacy
 		// Load Config
 		$this->cfg = MPollHelper::getConfig();
 
-		if (!$this->pollid){
-			throw new \Exception("Not Found", 404);
-		}
-
+		// When not a paypal webnhook
 		if ($this->task != "paypal_webhook") {
+			// Check for poll id
+			if (!$this->pollid){
+				throw new \Exception("Not Found", 404);
+			}
+
+			// Get Poll based on id
 			$this->pdata = $model->getPoll( $this->pollid );
 			$this->ended = false;
 			$this->started = true;
 
-			//check if poll exists
+			// Check if poll exists
 			if ( empty( $this->pdata ) ) {
 				throw new \Exception("Not Found", 404);
 				return false;
 			}
 
-			// if poll is not serachable and search task, kick out
+			// When poll is not serachable and search task, kick out
 			if ( !$this->pdata->poll_results_searchable && $this->task == "search") {
 				throw new \Exception("Not Found", 404);
 				return false;
 			}
 
-			//Check Availablity - Start
+			// Check Availablity - Start
 			if ( ( strtotime( $this->pdata->poll_start ) > strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				$this->started=false;
 				if ( ! $this->pdata->poll_shownotstarted ) {
@@ -52,7 +55,7 @@ class MPollViewMPoll extends JViewLegacy
 			}
 
 
-			//Check Availablity - End
+			// Check Availablity - End
 			if ( ( strtotime( $this->pdata->poll_end ) < strtotime( date( "Y-m-d H:i:s" ) ) ) && $this->pdata->poll_start != '0000-00-00 00:00:00' ) {
 				$this->ended = true;
 				if ( ! $this->pdata->poll_showended ) {
@@ -79,6 +82,8 @@ class MPollViewMPoll extends JViewLegacy
 			case "paypal_execute": // excute paypal payment
 			case "paypal_cancel": // cancel paypal payment
 			case "paypal_cancel_link": //cancel payppal paymnet url
+			case "paypal_create_sub": // Create paypal sub
+			case "paypal_activate_sub": // Activate sub after payment
 			case "pay": // Pay screen
 				$this->payment = $jinput->getVar('payment');
 				$this->payurl = JRoute::_('index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid. '&payment=' . $this->payment);
@@ -104,8 +109,30 @@ class MPollViewMPoll extends JViewLegacy
 								$app->redirect(JRoute::_($url,false));
 							}
 						}
+						if ($this->task == 'paypal_create_sub') {
+							if (!$output = $model->PayPalCreateSub($this->pdata,$this->completition)) {
+								$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid .'&payment=' . $this->payment;
+								if ( $this->params->get( 'rtmpl', '' ) ) {
+									$url .= '&tmpl=' . $rtmpl;
+								}
+								$app->enqueueMessage($model->getError(), 'error');
+								$app->redirect(JRoute::_($url,false));
+							}
+						}
 						if ($this->task == 'paypal_execute') {
 							if (!$model->PayPalExecute($this->pdata,$this->completition)) {
+								$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid .'&payment=' . $this->payment;
+								if ( $this->params->get( 'rtmpl', '' ) ) {
+									$url .= '&tmpl=' . $rtmpl;
+								}
+								$app->enqueueMessage($model->getError(), 'error');
+								$app->redirect(JRoute::_($url,false));
+							}
+							$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . $this->payment;
+							$app->redirect(JRoute::_($url,false));
+						}
+						if ($this->task == 'paypal_activate_sub') {
+							if (!$model->PayPalActivateSub($this->pdata,$this->completition)) {
 								$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll=' . $this->pollid .'&payment=' . $this->payment;
 								if ( $this->params->get( 'rtmpl', '' ) ) {
 									$url .= '&tmpl=' . $rtmpl;
@@ -127,7 +154,16 @@ class MPollViewMPoll extends JViewLegacy
 							$app->redirect(JRoute::_($url,false));
 						}
 						if ($this->task == 'pay') {
-							$doc->addScript( 'https://www.paypal.com/sdk/js?client-id='.$this->cfg->paypal_api_id );
+							$this->needsSub = $model->checkForNeededSub($this->completition,$this->pdata->poll_payment_subplan_trigger);
+							if (str_starts_with($this->pdata->poll_payment_subplan,'P-') && $this->needsSub) {
+								$doc->addScript( 'https://www.paypal.com/sdk/js?client-id='.$this->cfg->paypal_api_id.'&vault=true&intent=subscription' );
+								// Sub
+								$this->subinfo = $model->PayPalGetPlan($this->pdata->poll_payment_subplan);
+							} else {
+								$doc->addScript( 'https://www.paypal.com/sdk/js?client-id='.$this->cfg->paypal_api_id );
+								// No Sub
+								$this->subinfo=false;
+							}
 						}
 					}
 				}
