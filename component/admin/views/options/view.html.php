@@ -6,6 +6,8 @@ defined('_JEXEC') or die('Restricted access');
 // import Joomla view library
 jimport('joomla.application.component.view');
 
+use Joomla\CMS\MVC\View\GenericDataException;
+
 class MPollViewOptions extends JViewLegacy
 {
 	protected $items;
@@ -26,14 +28,10 @@ class MPollViewOptions extends JViewLegacy
 		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');
 
-		if (JVersion::MAJOR_VERSION == 3) MPOLLHelper::addQuestionSubmenu($jinput->getVar('view'),$this->questiontitle);
-	
-		// Check for errors.
-		if (count($errors = $this->get('Errors')))
-		{
-			JError::raiseError(500, implode('<br />', $errors));
-			return false;
-		}
+        if (count($errors = $this->get('Errors')))
+        {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
 	
 		// Set the toolbar
 		$this->addToolBar();
@@ -68,7 +66,7 @@ class MPollViewOptions extends JViewLegacy
 			JToolBarHelper::trash('options.trash');
 			JToolBarHelper::divider();
 		}
-		if (JVersion::MAJOR_VERSION >= 4) JToolbarHelper::link('index.php?option=com_mpoll&view=questions','Return to Questions','chevron-left');
+		JToolbarHelper::link('index.php?option=com_mpoll&view=questions','Return to Questions','chevron-left');
 	}
 	
 	protected function getSortFields()

@@ -24,6 +24,8 @@ CREATE TABLE `#__mpoll_polls` (
   `poll_notstart_msg` varchar(255) NOT NULL,
   `poll_end` datetime NOT NULL,
   `poll_end_msg` varchar(255) NOT NULL,
+  `poll_redirect` tinyint(1) NOT NULL DEFAULT '0',
+  `poll_redirect_url` varchar(255) NOT NULL,
   `poll_showended` tinyint(1) NOT NULL DEFAULT '0',
   `poll_recaptcha` tinyint(1) NOT NULL DEFAULT '0',
   `poll_printresults` tinyint(1) NOT NULL DEFAULT '0',
@@ -59,9 +61,9 @@ CREATE TABLE `#__mpoll_polls` (
   `poll_conffromemail` varchar(255) NOT NULL,
   `poll_conffromname` varchar(255) NOT NULL,
   `poll_payment_enabled` int(11) NOT NULL DEFAULT '0',
-  `poll_payment_trigger` INT NOT NULL DEFAULT '0',
+  `poll_payment_trigger` VARCHAR(255) NOT NULL DEFAULT '0',
   `poll_payment_subplan` varchar(255) NOT NULL DEFAULT '0',
-  `poll_payment_subplan_trigger` INT NOT NULL DEFAULT '0',
+  `poll_payment_subplan_trigger` VARCHAR(255) NOT NULL DEFAULT '0',
   `poll_payment_amount` double NOT NULL,
   `poll_payment_to` int(11) NOT NULL,
   `poll_payment_title` varchar(255) NOT NULL,
@@ -150,6 +152,22 @@ CREATE TABLE IF NOT EXISTS `#__mpoll_payment_log` (
   `log_verified` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `#__mpoll_email_templates` (
+   `tmpl_id` int NOT NULL,
+   `tmpl_poll` int NOT NULL,
+   `tmpl_name` varchar(255) NOT NULL,
+   `tmpl_email_to` INT NOT NULL,
+   `tmpl_from_name` varchar(150) DEFAULT NULL,
+   `tmpl_from_email` varchar(150) DEFAULT NULL,
+   `tmpl_subject` varchar(255) DEFAULT NULL,
+   `tmpl_content` longtext,
+   `published` int NOT NULL DEFAULT '1',
+   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `created_by` int NOT NULL,
+   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `modified_by` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 ALTER TABLE `#__mpoll_completed` ADD PRIMARY KEY (`cm_id`);
 ALTER TABLE `#__mpoll_polls` ADD PRIMARY KEY (`poll_id`);
 ALTER TABLE `#__mpoll_questions` ADD PRIMARY KEY (`q_id`);
@@ -157,6 +175,7 @@ ALTER TABLE `#__mpoll_questions_opts` ADD PRIMARY KEY (`opt_id`);
 ALTER TABLE `#__mpoll_results` ADD PRIMARY KEY (`res_id`);
 ALTER TABLE `#__mpoll_payment` ADD PRIMARY KEY (`pay_id`);
 ALTER TABLE `#__mpoll_payment_log` ADD PRIMARY KEY (`log_id`);
+ALTER TABLE `#__mpoll_email_templates` ADD PRIMARY KEY (`tmpl_id`);
 
 ALTER TABLE `#__mpoll_completed` MODIFY `cm_id` bigint(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `#__mpoll_polls` MODIFY `poll_id` int(11) NOT NULL AUTO_INCREMENT;
@@ -165,3 +184,4 @@ ALTER TABLE `#__mpoll_questions_opts` MODIFY `opt_id` bigint(20) NOT NULL AUTO_I
 ALTER TABLE `#__mpoll_results`  MODIFY `res_id` bigint(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `#__mpoll_payment` MODIFY `pay_id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `#__mpoll_payment_log` MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `#__mpoll_email_templates` MODIFY `tmpl_id` int NOT NULL AUTO_INCREMENT;

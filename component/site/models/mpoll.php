@@ -242,17 +242,19 @@ class MPollModelMPoll extends JModelLegacy
             $paymentNeeded = false;
             $subNeeded = false;
             if ($pollinfo->poll_payment_enabled) {
-                if ($pollinfo->poll_payment_trigger != 0) {
-                    $trigger = 'q_'.$pollinfo->poll_payment_trigger;
-                    if ($item->$trigger == 1) {
+                if ($pollinfo->poll_payment_trigger != 'none') {
+                    $paymentTrigger = explode("-",$pollinfo->poll_payment_trigger);
+                    $trigger = 'q_'.$paymentTrigger[0];
+                    if ($item->$trigger == $paymentTrigger[1]) {
                         $paymentNeeded = true;
                     }
                 } else {
                     $paymentNeeded = true;
                 }
-                if ($pollinfo->poll_payment_subplan_trigger != 0) {
-                    $trigger = 'q_'.$pollinfo->poll_payment_subplan_trigger;
-                    if ($item->$trigger == 1) {
+                if ($pollinfo->poll_payment_subplan_trigger != 'none') {
+                    $subplanTrigger = explode("-",$pollinfo->poll_payment_subplan_trigger);
+                    $trigger = 'q_'.$subplanTrigger[0];
+                    if ($item->$trigger == $subplanTrigger[1]) {
                         $subNeeded = true;
                     }
                 }
@@ -842,8 +844,7 @@ class MPollModelMPoll extends JModelLegacy
 		$format = strtolower(JFile::getExt($file['name']));
 
 		//Check if type allowed
-		if (JVersion::MAJOR_VERSION == 3) $allowable = explode(',', $params->get('upload_extensions'));
-		else $allowable = explode(',', $params->get('restrict_uploads_extensions'));
+		$allowable = explode(',', $params->get('restrict_uploads_extensions'));
 		$ignored = explode(',', $params->get('ignore_extensions'));
 		if (!in_array($format, $allowable) && !in_array($format, $ignored))
 		{
@@ -1431,9 +1432,9 @@ class MPollModelMPoll extends JModelLegacy
         return $ppResult;
     }
 
-    public function checkForNeededSub($cmpl,$triggerFieldId)
+    public function checkForNeededSub($cmpl, $triggerFieldId, $triggerFieldValue)
     {
-        if ($triggerFieldId == 0) {
+        if ($triggerFieldId == "none") {
             return false;
         }
         $db   = JFactory::getDBO();
@@ -1444,7 +1445,7 @@ class MPollModelMPoll extends JModelLegacy
         $qa->where('res_cm='.$cmpl->cm_id);
         $db->setQuery($qa);
         $trigger=$db->loadResult();
-        if ($trigger == 1) return true;
+        if ($trigger == $triggerFieldValue) return true;
         return false;
     }
 

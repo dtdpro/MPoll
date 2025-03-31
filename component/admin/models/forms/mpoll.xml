@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
+    <config>
+        <inlinehelp button="show"/>
+    </config>
     <fieldset name="general">
 
         <field
@@ -85,7 +88,7 @@
                 type="hidden"
         />
     </fieldset>
-    <fieldset name="results_opts">poll_results_searchable
+    <fieldset name="results_opts">
         <field
                 name="poll_results_emails"
                 type="subform"
@@ -126,7 +129,7 @@
                 name="poll_resultsemail"
                 type="radio"
                 label="COM_MPOLL_MPOLL_FIELD_RESEMAIL_LABEL"
-                description="COM_MPOLL_MPOLL_FIELD_RESMAIL_DESC"
+                description="COM_MPOLL_MPOLL_FIELD_RESEMAIL_DESC"
                 size="1"
                 class="btn-group"
                 required="false"
@@ -226,7 +229,7 @@
                 name="poll_confmsg"
                 type="editor"
                 label="COM_MPOLL_MPOLL_FIELD_CONFMSG_LABEL"
-                description="COM_MPOLL_MPOLL_FIELDB_CONFMSG_DESC"
+                description="COM_MPOLL_MPOLL_FIELD_CONFMSG_DESC"
                 class="inputbox"
                 filter="JComponentHelper::filterText"
                 buttons="true"
@@ -250,7 +253,7 @@
                 name="poll_payment_trigger"
                 type="QuestionTrigger"
                 label="Payment Trigger"
-                description=""
+                description="Field and value to trigger one time payment, set to None for mandated payment"
                 class="inputbox"
                 required="false"
                 default="0"
@@ -269,7 +272,7 @@
                 name="poll_payment_title"
                 type="text"
                 label="Item Title"
-                description="Amount in dollars and cents: xx.xx"
+                description="Title to use for this item in the order"
                 size="40"
                 class="inputbox"
                 required="false"
@@ -279,7 +282,7 @@
                 name="poll_payment_instructions"
                 type="textarea"
                 label="Payment Instructions"
-                description=""
+                description="Insturctions to user on payment page"
                 rows="5"
                 cols="30"
                 class="inputbox"
@@ -290,7 +293,7 @@
                 name="poll_payment_adminemail"
                 type="text"
                 label="Notification To"
-                description="COM_MPOLL_MPOLL_FIELD_EMAILTO_DESC"
+                description="Comma Seperated list of admin email addresses to send payment notifications"
                 size="40"
                 class="inputbox"
                 required="false"
@@ -300,7 +303,7 @@
                 name="poll_payment_adminsubject"
                 type="text"
                 label="Notification Subject"
-                description=""
+                description="Subject of email for admin payment notification"
                 size="40"
                 class="inputbox"
                 required="false"
@@ -310,7 +313,7 @@
                 name="poll_payment_subplan"
                 type="PPSubPlans"
                 label="Subscription Plan"
-                description=""
+                description="PayPal subscruiption plan to use for subscriptions, set to none for no plan, subscriptions come before one time payment"
                 class="inputbox"
                 required="false"
                 default=""
@@ -319,7 +322,7 @@
                 name="poll_payment_subplan_trigger"
                 type="QuestionTrigger"
                 label="Subscription Trigger"
-                description=""
+                description="Field and value to trigger subscription, set to None for no subscription"
                 class="inputbox"
                 required="false"
                 default="0"
@@ -394,7 +397,7 @@
                 name="poll_results_msg_before"
                 type="editor"
                 label="COM_MPOLL_MPOLL_FIELD_RMSGB_LABEL"
-                description="COM_MPOLL_MPOLL_FIELDB_RMSG_DESC"
+                description="COM_MPOLL_MPOLL_FIELD_RMSGB_DESC"
                 class="inputbox"
                 filter="JComponentHelper::filterText"
                 buttons="true"
@@ -471,6 +474,28 @@
                 type="text"
                 label="COM_MPOLL_MPOLL_FIELD_ENDMSG_LABEL"
                 description="COM_MPOLL_MPOLL_FIELD_ENDMSG_DESC"
+                size="40"
+                class="inputbox"
+                required="false"
+                default=""
+        />
+        <field
+                name="poll_redirect"
+                type="radio"
+                label="COM_MPOLL_MPOLL_FIELD_REDIRECT_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_REDIRECT_DESC"
+                size="1"
+                class="btn-group"
+                required="false"
+                default="0">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </field>
+        <field
+                name="poll_redirect_url"
+                type="text"
+                label="COM_MPOLL_MPOLL_FIELD_REDIRECT_URL_LABEL"
+                description="COM_MPOLL_MPOLL_FIELD_REDIRECT_URL_DESC"
                 size="40"
                 class="inputbox"
                 required="false"
@@ -570,14 +595,12 @@
                 name="poll_created_by"
                 type="user"
                 label="JGLOBAL_FIELD_CREATED_BY_LABEL"
-                description="JGLOBAL_FIELD_CREATED_BY_Desc"
         />
         <field
                 name="poll_modified"
                 type="calendar"
                 class="readonly"
                 label="JGLOBAL_FIELD_MODIFIED_LABEL"
-                description="JGLOBAL_FIELD_MODIFIED_DESC"
                 size="22"
                 readonly="true"
                 format="%Y-%m-%d %H:%M:%S"
@@ -677,7 +700,7 @@
                 name="poll_results_msg_noresults"
                 type="textarea"
                 label="COM_MPOLL_MPOLL_FIELD_RESULTS_MSG_NORESULTS_LABEL"
-                description="COM_MPOLL_MPOLL_RESULTS_MSG_NORESULTS_DESC"
+                description="COM_MPOLL_MPOLL_FIELD_RESULTS_MSG_NORESULTS_DESC"
                 rows="3"
                 cols="30"
                 class="inputbox"

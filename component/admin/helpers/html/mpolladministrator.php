@@ -29,11 +29,11 @@ abstract class JHtmlMPollAdministrator
         return $html;
     }
 
-    public static function results($i, $canEdit = true)
+    public static function results($i, $canEdit = true, $elgibleItems = 1)
     {
         JHtml::_('bootstrap.tooltip');
 
-        if ($canEdit) {
+        if ($canEdit && $elgibleItems) {
             $html = '<a href="#" onclick="return Joomla.listItemTask(\'cb' . $i . '\',\'mpolls.pollresults\')" title="Records" class="btn btn-primary btn-sm"><i class="fa fa-sm fa-database"></i> Results</a>';
         } else {
             $html = '<span class="disabled btn btn-sm btn-secondary"><i class="fa fa-sm fa-database"></i> Results</span>';
@@ -42,14 +42,27 @@ abstract class JHtmlMPollAdministrator
         return $html;
     }
 
-    public static function tally($i, $canEdit = true)
+    public static function tally($i, $canEdit = true, $elgibleItems = 1)
     {
         JHtml::_('bootstrap.tooltip');
 
-        if ($canEdit) {
-            $html = '<a href="#" onclick="return Joomla.listItemTask(\'cb' . $i . '\',\'mpolls.tally\')" title="Records" class="btn btn-primary btn-sm"><i class="fa fa-sm fa-database"></i> Tally</a>';
+        if ($canEdit && $elgibleItems) {
+            $html = '<a href="#" onclick="return Joomla.listItemTask(\'cb' . $i . '\',\'mpolls.tally\')" title="Records" class="btn btn-primary btn-sm"><i class="fa fa-sm fa-chart-bar"></i> Tally</a>';
         } else {
             $html = '<span class="disabled btn btn-sm btn-secondary"><i class="fa fa-sm fa-chart-bar"></i> Tally</span>';
+        }
+
+        return $html;
+    }
+
+    public static function emailtemplates($i, $canEdit = true, $elgibleItems = 1)
+    {
+        JHtml::_('bootstrap.tooltip');
+
+        if ($canEdit && $elgibleItems) {
+            $html = '<a href="#" onclick="return Joomla.listItemTask(\'cb' . $i . '\',\'mpolls.emailtemplates\')" title="Records" class="btn btn-primary btn-sm"><i class="fa fa-sm fa-envelope"></i> Email Templates</a>';
+        } else {
+            $html = '<span class="disabled btn btn-sm btn-secondary"><i class="fa fa-sm fa-envelope"></i> Email Templates</span>';
         }
 
         return $html;

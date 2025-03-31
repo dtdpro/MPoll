@@ -6,6 +6,11 @@ defined('_JEXEC') or die('Restricted access');
 // import Joomla view library
 jimport('joomla.application.component.view');
 
+use Joomla\CMS\Toolbar\Toolbar;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\View\GenericDataException;
+
 class MPollViewMPolls extends JViewLegacy
 {
 	protected $items;
@@ -22,17 +27,12 @@ class MPollViewMPolls extends JViewLegacy
 		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');
 	
-		// Set the submenu
-		if (JVersion::MAJOR_VERSION == 3) MPollHelper::addSubmenu($jinput->getVar('view'));
-	
 		if (count($errors = $this->get('Errors')))
 		{
-			JError::raiseError(500, implode('<br />', $errors));
-			return false;
+            throw new GenericDataException(implode("\n", $errors), 500);
 		}
 	
 		$this->addToolBar();
-		$this->sidebar = JHtmlSidebar::render();
 		parent::display($tpl);
 	}
 	
@@ -40,32 +40,34 @@ class MPollViewMPolls extends JViewLegacy
 	{
 		$state	= $this->get('State');
 		$canDo = MPollHelper::getActions();
-		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_POLLS'), 'MPoll');
-		if ($canDo->get('core.create')) 
+
+        $toolbar = Toolbar::getInstance();
+
+        ToolbarHelper::title(Text::_('COM_MPOLL_MANAGER_POLLS'), 'MPoll');
+
+        if ($canDo->get('core.create'))
+        {
+            $toolbar->addNew('mpoll.add');
+            $toolbar->standardButton('copy', 'JTOOLBAR_COPY', 'mpolls.copy');
+        }
+
+        if ($canDo->get('core.edit'))
 		{
-			JToolBarHelper::addNew('mpoll.add', 'JTOOLBAR_NEW');
-			JToolBarHelper::custom('mpolls.copy', 'copy.png', 'copy_f2.png','JTOOLBAR_COPY', true);
-		}
-		if ($canDo->get('core.edit')) 
-		{
-			JToolBarHelper::editList('mpoll.edit', 'JTOOLBAR_EDIT');
-			JToolBarHelper::divider();
-			JToolBarHelper::custom('mpolls.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
-			JToolBarHelper::custom('mpolls.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
-			JToolBarHelper::divider();
-			JToolBarHelper::archiveList('mpolls.archive');
+            $toolbar->divider();
+            $toolbar->publish('mpolls.publish')->listCheck(true);
+            $toolbar->unpublish('mpolls.unpublish')->listCheck(true);
+            $toolbar->archive('mpolls.archive')->listCheck(true);
 		}
 		if ($state->get('filter.published') == -2 && $canDo->get('core.delete')) {
-			JToolBarHelper::deleteList('', 'mpolls.delete', 'JTOOLBAR_EMPTY_TRASH');
-			JToolBarHelper::divider();
+            $toolbar->delete('mpolls.delete', 'JTOOLBAR_EMPTY_TRASH')
+                ->message('JGLOBAL_CONFIRM_DELETE')
+                ->listCheck(true);
 		} else if ($canDo->get('core.edit.state')) {
-			JToolBarHelper::trash('mpolls.trash');
-			JToolBarHelper::divider();
+            $toolbar->trash('mpolls.trash')->listCheck(true);
 		}
 		if ($canDo->get('core.admin')) 
 		{
-			JToolBarHelper::divider();
-			JToolBarHelper::preferences('com_mpoll');
+            $toolbar->preferences('com_mpoll');
 		}
 	}
 	

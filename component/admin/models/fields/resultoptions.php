@@ -50,9 +50,11 @@ class JFormFieldResultOptions extends JFormField
 		//$html[] = '<select name="'.$this->name.'" class="inputbox" '.$attr.'>';
 		$html[] = JHtml::_('select.groupedlist',$result_options,$this->name, array(
 			'id' => $this->id, 'list.select' => $this->value, 'group.items' => null, 'option.key.toHtml' => false,
-			'option.text.toHtml' => false,
+			'option.text.toHtml' => false, 'list.attr' => 'class="form-select"'
 		));
 		//$html[] = '</select>';
+
+
 		return implode($html);;
 	}
 	

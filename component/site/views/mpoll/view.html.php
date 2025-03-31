@@ -154,7 +154,8 @@ class MPollViewMPoll extends JViewLegacy
 							$app->redirect(JRoute::_($url,false));
 						}
 						if ($this->task == 'pay') {
-							$this->needsSub = $model->checkForNeededSub($this->completition,$this->pdata->poll_payment_subplan_trigger);
+							$subplanTrigger = explode("-",$this->pdata->poll_payment_subplan_trigger);
+							$this->needsSub = $model->checkForNeededSub($this->completition,$subplanTrigger[0],$subplanTrigger[1]);
 							if (str_starts_with($this->pdata->poll_payment_subplan,'P-') && $this->needsSub) {
 								$doc->addScript( 'https://www.paypal.com/sdk/js?client-id='.$this->cfg->paypal_api_id.'&vault=true&intent=subscription' );
 								// Sub
@@ -174,9 +175,13 @@ class MPollViewMPoll extends JViewLegacy
 					if ($completition->cm_status == "unpaid"){ //payment
 						$url = 'index.php?option=com_mpoll&view=mpoll&task=pay&poll='.$this->pollid.'&payment=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
 					} else { //no payment
-						$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid .'&cmpl=' . base64_encode('cmplid='.$this->cmplid.'&id=' . $completition->cm_pubid);
-						if ( $this->params->get( 'rtmpl', '' ) ) {
-							$url .= '&tmpl=' . $rtmpl;
+						if ($this->pdata->poll_redirect) { // redirect to url
+							$url = $this->pdata->poll_redirect_url;
+						} else { // show results
+							$url = 'index.php?option=com_mpoll&view=mpoll&task=results&poll=' . $this->pollid . '&cmpl=' . base64_encode('cmplid=' . $this->cmplid . '&id=' . $completition->cm_pubid);
+							if ($this->params->get('rtmpl', '')) {
+								$url .= '&tmpl=' . $rtmpl;
+							}
 						}
 					}
 					$app->redirect(JRoute::_($url,false));

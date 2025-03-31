@@ -208,6 +208,7 @@ use Joomla\CMS\Language\Text;
 
                 ?>
                 <h3>Payments</h3>
+                <p><strong>Payment URL:</strong> <?php echo $this->payUrl; ?></p>
                 <table class="adminlist table table-striped">
                     <thead>
                     <th>Invoice</th>

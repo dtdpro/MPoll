@@ -1,11 +1,13 @@
 <?php
 // No direct access to this file
 defined('_JEXEC') or die('Restricted Access');
-// load tooltip behavior
-JHtml::_('bootstrap.tooltip');
-//JHtml::_('behavior.multiselect');
-JHtml::_('dropdown.init');
-//JHtml::_('formbehavior.chosen', 'select');
+
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Button\FeaturedButton;
+use Joomla\CMS\Button\PublishedButton;
+
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 $app	= JFactory::getApplication();
@@ -117,33 +119,10 @@ if ($saveOrder) {
 						<?php echo JHtml::_('grid.id', $i, $item->q_id); ?>
 					</td>
 					<td class="center text-center">
-						<div class="btn-group">
-							<?php echo JHtml::_('jgrid.published', $item->published, $i, 'questions.', true);?>
-							<?php
-
-							    if ( JVersion::MAJOR_VERSION == 3 ) {
-								    echo JHtml::_( 'mpolladministrator.options', $i, $item->q_type, true );
-								    // Create dropdown items
-
-								    if ( $item->published ) :
-									    JHtml::_( 'actionsdropdown.unpublish', 'cb' . $i, 'questions' );
-								    else :
-									    JHtml::_( 'actionsdropdown.publish', 'cb' . $i, 'questions' );
-								    endif;
-
-								    JHtml::_( 'actionsdropdown.divider' );
-
-								    if ( $trashed ) :
-									    JHtml::_( 'actionsdropdown.untrash', 'cb' . $i, 'questions' );
-								    else :
-									    JHtml::_( 'actionsdropdown.trash', 'cb' . $i, 'questions' );
-								    endif;
-
-								    // Render dropdown list
-								    echo JHtml::_( 'actionsdropdown.render' );
-							    }
-							?>
-						</div>
+                        <?php
+                        $options = [ 'task_prefix' => 'questions.', 'id' => 'state-' . $item->q_id ];
+                        echo ( new PublishedButton() )->render( (int) $item->published, $i, $options );
+                        ?>
 					</td>
 					<td>
 							<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=question.edit&q_id='.(int) $item->q_id); ?>">
@@ -170,10 +149,8 @@ if ($saveOrder) {
 								<?php 
 									if ($item->q_type=='mlist' ||$item->q_type=='multi' || $item->q_type=='mcbox' || $item->q_type=='dropdown') {
 										echo ' | <strong>Options:</strong> '.$item->options;
-								        if ( JVersion::MAJOR_VERSION >= 4 ) {
-                                            echo '<br>';
-									        echo JHtml::_( 'mpolladministrator.options', $i, $item->q_type, true );
-								        }
+                                        echo '<br>';
+                                        echo JHtml::_( 'mpolladministrator.options', $i, $item->q_type, true );
 									}
 								?>
 							</div>

@@ -155,5 +155,33 @@ class MPollControllerPollResult extends JControllerForm
         return true;
     }
 
+    public function createemail()
+    {
+        $resultId = $this->input->get('id');
+        $this->setRedirect(\JRoute::_('index.php?option=com_mpoll&view=pollresult&layout=createemail&id=' . $resultId,false));
+        return true;
+    }
+
+    public function cancelemail()
+    {
+        $resultId = $this->input->get('id');
+        $this->setRedirect(\JRoute::_('index.php?option=com_mpoll&task=pollresult.edit&cm_id=' . $resultId,false));
+        return true;
+    }
+
+    public function sendemail()
+    {
+        $resultId = $this->input->get('id');
+        $templateId = $this->input->get('templateId');
+        $model = $this->getModel();
+        if (!$model->sendEmail($resultId,$templateId)) {
+            $this->setRedirect(\JRoute::_('index.php?option=com_mpoll&task=pollresult.edit&cm_id=' . $resultId,false),'Could not send email',"error");
+        } else {
+            $this->setRedirect(\JRoute::_('index.php?option=com_mpoll&task=pollresult.edit&cm_id=' . $resultId,false),'Email sent');
+        }
+    }
+
+
+
 
 }

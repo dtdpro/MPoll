@@ -244,8 +244,7 @@ try {
             } else {
                 $cmres->res_ans_other_alt = "";
             }
-
-                $db->insertObject('#__mpoll_results',$cmres);
+            $db->insertObject('#__mpoll_results',$cmres);
         }
     }
 
@@ -481,8 +480,7 @@ function canUpload($file,&$err)
     $format = strtolower(JFile::getExt($file['name']));
 
     //Check if type allowed
-    if (JVersion::MAJOR_VERSION == 3) $allowable = explode(',', $params->get('upload_extensions'));
-    else $allowable = explode(',', $params->get('restrict_uploads_extensions'));
+    $allowable = explode(',', $params->get('restrict_uploads_extensions'));
     $ignored = explode(',', $params->get('ignore_extensions'));
     if (!in_array($format, $allowable) && !in_array($format, $ignored))
     {

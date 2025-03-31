@@ -7,6 +7,7 @@ defined('_JEXEC') or die('Restricted access');
 jimport('joomla.application.component.modeladmin');
 
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Mail\Mail;
 
 class MPollModelPollResult extends JModelAdmin
 {
@@ -263,6 +264,148 @@ class MPollModelPollResult extends JModelAdmin
 
         if ($contents) return $contents;
         else return FALSE;
+    }
+
+    function getAvailableTemplates($pollId)
+    {
+        $db = JFactory::getDBO();
+        $app=Jfactory::getApplication();
+        $query=$db->getQuery(true);
+        $query->select('*');
+        $query->from('#__mpoll_email_templates');
+        $query->where('tmpl_poll = '.$db->escape($pollId));
+        $query->where('published >= 1');
+        $db->setQuery( $query );
+        $qdata = $db->loadObjectList();
+
+        return $qdata;
+    }
+
+    function getTemplate($templateId)
+    {
+        $db = JFactory::getDBO();
+        $app=Jfactory::getApplication();
+        $query=$db->getQuery(true);
+        $query->select('*');
+        $query->from('#__mpoll_email_templates');
+        $query->where('tmpl_id = '.$db->escape($templateId));
+        $query->where('published >= 1');
+        $db->setQuery( $query );
+        $qdata = $db->loadObject();
+
+        return $qdata;
+    }
+
+    public function hasEmailField($pollId) {
+        $query = $this->_db->getQuery(true);
+        $query->select('q_id');
+        $query->from('#__mpoll_questions');
+        $query->where('q_poll='.$pollId);
+        $query->where('q_type="email"');
+        $this->_db->setQuery( $query );
+        $emailFields = $this->_db->loadResult();
+
+        if ($emailFields) {
+            return true;
+        }
+        return false;
+    }
+
+    function sendEmail($cmId,$templateId) {
+        $db = JFactory::getDBO();
+        $item = $this->getItem($cmId);
+        $questions = $this->getQuestions($item->cm_poll,false);
+        $template = $this->getTemplate($templateId);
+
+        // Gather questions that have options
+        $optfs = array();
+        $moptfs = array();
+        foreach ($questions as $d) {
+            $fieldname = 'q_'.$d->q_id;
+            if ($d->q_type == "multi" || $d->q_type == "dropdown") {
+                $optfs[] = $fieldname;
+            }
+            if ($d->q_type == "mcbox" || $d->q_type == "mlist") {
+                $moptfs[] = $fieldname;
+            }
+        }
+
+        $optionsdata = array();
+
+        // Get Options
+        $odsql=$db->getQuery(true);
+        $odsql->select('*');
+        $odsql->from('#__mpoll_questions_opts');
+        $db->setQuery($odsql);
+        $optionsdata = array();
+        $optres = $db->loadObjectList();
+        foreach ($optres as $o) {
+            $optionsdata[$o->opt_id]=$o->opt_txt;
+        }
+
+        $sendEmailField = 'q_'.$template->tmpl_email_to;
+        $sendEmail = false;
+        if (property_exists($item,$sendEmailField)) {
+            $sendEmail = $item->$sendEmailField;
+        }
+
+        try {
+            if ($sendEmail) {
+
+                $completedid = base64_encode('cmplid='.$item->cm_id.'&id=' . $item->cm_pubid);
+                $cmplurl = JUri::root().JRoute::link('site','index.php?option=com_mpoll&task=results&poll='.$item->cm_poll. '&cmpl=' . $completedid,false);
+                $payurl = JUri::root().JRoute::link('site','index.php?option=com_mpoll&task=pay&poll='.$item->cm_poll. '&payment=' . $completedid,false);
+
+                $confemail = $template->tmpl_content;
+                $confemail = str_replace("{name}",$user->name,$confemail);
+                $confemail = str_replace("{username}",$user->username,$confemail);
+                $confemail = str_replace("{email}",$user->email,$confemail);
+                $confemail = str_replace("{resid}",$cmId,$confemail);
+                $confemail = str_replace("{resurl}",$cmplurl,$confemail);
+                $confemail = str_replace("{payurl}",$payurl,$confemail);
+                foreach ($questions as $d) {
+                    $fieldname = 'q_'.$d->q_id;
+                    if (property_exists($item,$fieldname)) {
+                        if ($d->q_type=="attach") {
+
+                        } else if (in_array($fieldname,$optfs)) {
+                            $youropts="";
+                            $youropts = $optionsdata[$item->$fieldname];
+                            if ($other->$fieldname) $youropts .= ': '.$other->$fieldname;
+                            $confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
+                        } else if (in_array($fieldname,$moptfs)) {
+                            $youropts="";
+                            $ans = $item->$fieldname;
+                            foreach ($ans as $i) {
+                                $youropts .= $optionsdata[$i].' ';
+                            }
+                            $confemail = str_replace("{i".$d->q_id."}",$youropts,$confemail);
+                        } else {
+                            $confemail = str_replace("{i" . $d->q_id . "}", $item->$fieldname, $confemail);
+                        }
+                    }
+                }
+                $mail = &JFactory::getMailer();
+                $sent = $mail->sendMail($template->tmpl_from_email, $template->tmpl_from_name, $sendEmail, $template->tmpl_subject, $confemail, true);
+            } else {
+                return false;
+            }
+        }
+        catch (Exception $e)
+        {
+            $this->setError($e->getMessage());
+
+            return false;
+        }
+
+        return true;
+
+    }
+
+    public function getPayUrl($item) {
+        $completedid = base64_encode('cmplid='.$item->cm_id.'&id=' . $item->cm_pubid);
+        $payurl = JUri::root().JRoute::link('site','index.php?option=com_mpoll&task=pay&poll='.$item->cm_poll. '&payment=' . $completedid,false);
+        return $payurl;
     }
 
 }

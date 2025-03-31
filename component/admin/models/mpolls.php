@@ -94,6 +94,15 @@ class MPollModelMPolls extends JModelList
 			$query->where('cm_poll='.$i->poll_id);
 			$db->setQuery( $query );
 			$i->results = $this->_db->loadResult();
+
+            // Has Email field
+            $query = $db->getQuery(true);
+            $query->select('q_id');
+            $query->from('#__mpoll_questions');
+            $query->where('q_poll='.$i->poll_id);
+            $query->where('q_type="email"');
+            $db->setQuery( $query );
+            $i->emailFields = $this->_db->loadResult();
 		}
 		
 		// Add the items to the internal cache.

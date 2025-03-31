@@ -8,7 +8,7 @@ jimport('joomla.application.component.view');
 
 use Joomla\CMS\MVC\View\GenericDataException;
 
-class MPollViewQuestions extends JViewLegacy
+class MPollViewEmailtemplates extends JViewLegacy
 {
 	protected $items;
 	protected $pagination;
@@ -44,30 +44,26 @@ class MPollViewQuestions extends JViewLegacy
 	{
 		$state	= $this->state;
 		$canDo = MPollHelper::getActions();
-		JToolBarHelper::title(JText::_('COM_MPOLL_MANAGER_QUESTIONS'), 'MPoll');
+		JToolBarHelper::title('Email Templates', 'MPoll');
 		if ($canDo->get('core.create'))
 		{
-			JToolBarHelper::addNew('question.add', 'JTOOLBAR_NEW');
-			JToolBarHelper::custom('questions.copy', 'copy.png', 'copy_f2.png','JTOOLBAR_COPY', true);
+			JToolBarHelper::addNew('emailtemplate.add', 'JTOOLBAR_NEW');
+			JToolBarHelper::custom('emailtemplates.copy', 'copy.png', 'copy_f2.png','JTOOLBAR_COPY', true);
 		}
 		if ($canDo->get('core.edit'))
 		{
-			JToolBarHelper::editList('question.edit', 'JTOOLBAR_EDIT');
-			JToolBarHelper::divider();
-			JToolBarHelper::custom('questions.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
-			JToolBarHelper::custom('questions.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
+			JToolBarHelper::custom('emailtemplates.publish', 'publish.png', 'publish_f2.png','JTOOLBAR_PUBLISH', true);
+			JToolBarHelper::custom('emailtemplates.unpublish', 'unpublish.png', 'unpublish_f2.png','JTOOLBAR_UNPUBLISH', true);
 			JToolBarHelper::divider();
 		}
 		if ($state->get('filter.published') == -2 && $canDo->get('core.delete')) {
-			JToolBarHelper::deleteList('', 'questions.delete', 'JTOOLBAR_EMPTY_TRASH');
+			JToolBarHelper::deleteList('', 'emailtemplates.delete', 'JTOOLBAR_EMPTY_TRASH');
 			JToolBarHelper::divider();
 		} else if ($canDo->get('core.edit.state')) {
-			JToolBarHelper::trash('questions.trash');
+			JToolBarHelper::trash('emailtemplates.trash');
 			JToolBarHelper::divider();
 		}
 		JToolbarHelper::link('index.php?option=com_mpoll&view=mpolls','Return to Polls','chevron-left');
-		
-		
 	}
 	
 	protected function getSortFields()

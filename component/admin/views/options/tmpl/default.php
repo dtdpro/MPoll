@@ -1,11 +1,12 @@
 <?php 
 // No direct access to this file
 defined('_JEXEC') or die('Restricted Access');
-// load tooltip behavior
-JHtml::_('bootstrap.tooltip');
-//JHtml::_('behavior.multiselect');
-JHtml::_('dropdown.init');
-//JHtml::_('formbehavior.chosen', 'select');
+
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Button\FeaturedButton;
+use Joomla\CMS\Button\PublishedButton;
 
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 $listOrder	= $this->escape($this->state->get('list.ordering'));
@@ -109,35 +110,15 @@ if ($saveOrder) {
 						<?php echo JHtml::_('grid.id', $i, $item->opt_id); ?>
 					</td>
 					<td class="center text-center">
-						<div class="btn-group">
-							<?php echo JHtml::_('jgrid.published', $item->published, $i, 'options.', true);?>
-							<?php
-							    if ( JVersion::MAJOR_VERSION == 3 ) {
-								    // Create dropdown items
-
-								    if ( $item->published ) :
-									    JHtml::_( 'actionsdropdown.unpublish', 'cb' . $i, 'options' );
-								    else :
-									    JHtml::_( 'actionsdropdown.publish', 'cb' . $i, 'options' );
-								    endif;
-
-								    JHtml::_( 'actionsdropdown.divider' );
-
-								    if ( $trashed ) :
-									    JHtml::_( 'actionsdropdown.untrash', 'cb' . $i, 'options' );
-								    else :
-									    JHtml::_( 'actionsdropdown.trash', 'cb' . $i, 'options' );
-								    endif;
-
-								    // Render dropdown list
-								    echo JHtml::_( 'actionsdropdown.render' );
-							    }
-							?>
-						</div>
+                        <?php
+                        $options = [ 'task_prefix' => 'options.', 'id' => 'state-' . $item->opy_id ];
+                        echo ( new PublishedButton() )->render( (int) $item->published, $i, $options );
+                        ?>
 					</td>
 					<td>
-							<a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=option.edit&opt_id='.(int) $item->opt_id); ?>">
-							<?php echo $this->escape($item->opt_txt); ?></a>
+                        <a href="<?php echo JRoute::_('index.php?option=com_mpoll&task=option.edit&opt_id='.(int) $item->opt_id); ?>">
+                            <?php echo $this->escape($item->opt_txt); ?>
+                        </a>
 					</td>
 					<td class="center text-center small">
 						<?php echo ($item->opt_selectable) ? '<span style="color:#008000">Yes</span>' : '<span style="color:#800000">No</span>'; ?>

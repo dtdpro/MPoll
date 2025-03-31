@@ -1,11 +1,13 @@
 <?php
 // No direct access to this file
 defined('_JEXEC') or die('Restricted Access');
-// load tooltip behavior
-JHtml::_('bootstrap.tooltip');
-//JHtml::_('behavior.multiselect');
-//JHtml::_('dropdown.init');
-//JHtml::_('formbehavior.chosen', 'select');
+
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Button\FeaturedButton;
+use Joomla\CMS\Button\PublishedButton;
+
 JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 $app	= JFactory::getApplication();
@@ -91,32 +93,10 @@ $sortFields = $this->getSortFields();
 			<tr class="row<?php echo $i % 2; ?>">
 				<td><?php echo JHtml::_('grid.id', $i, $item->poll_id); ?></td>
                 <td class="center text-center">
-					<div class="btn-group">
-						<?php
-						echo JHtml::_('jgrid.published', $item->published, $i, 'mpolls.', true);
-						if ( JVersion::MAJOR_VERSION == 3 ) {
-							echo JHtml::_('mpolladministrator.questions',$i, true);
-
-							// Create dropdown items
-							if ( $item->published ) :
-								JHtml::_( 'actionsdropdown.unpublish', 'cb' . $i, 'mpolls' );
-							else :
-								JHtml::_( 'actionsdropdown.publish', 'cb' . $i, 'mpolls' );
-							endif;
-
-							JHtml::_( 'actionsdropdown.divider' );
-
-							if ( $trashed ) :
-								JHtml::_( 'actionsdropdown.untrash', 'cb' . $i, 'mpolls' );
-							else :
-								JHtml::_( 'actionsdropdown.trash', 'cb' . $i, 'mpolls' );
-							endif;
-
-							// Render dropdown list
-							echo JHtml::_( 'actionsdropdown.render' );
-						}
-						?>
-					</div>
+                    <?php
+                    $options = [ 'task_prefix' => 'mpolls.', 'id' => 'state-' . $item->poll_id ];
+                    echo ( new PublishedButton() )->render( (int) $item->published, $i, $options );
+                    ?>
 				</td>
 				<td class="nowrap has-context">
 					<div class="pull-left">
@@ -140,13 +120,10 @@ $sortFields = $this->getSortFields();
 						 	| <strong>Submissions:</strong>
 						 	<?php 
 						 		echo $item->results.'<br>';
-                                if ( JVersion::MAJOR_VERSION >= 4 ) {
-                                    echo JHtml::_('mpolladministrator.questions',$i, true);
-                                }
-						 		if ($item->results) {//<a href="#" onclick="return listItemTask(\'cb' . $i . '\',\'mpolls.questions\')" class="btn btn-micro hasTooltip' . '" title="Questions"><i class="icon-question"></i></a>
-								    echo '&nbsp;' . JHtml::_('mpolladministrator.results',$i, true);
-								    echo '&nbsp;' . JHtml::_('mpolladministrator.tally',$i, true);
-								}
+                                echo JHtml::_('mpolladministrator.questions',$i, true);
+                                echo '&nbsp;' . JHtml::_('mpolladministrator.emailtemplates',$i, true, $item->emailFields);
+                                echo '&nbsp;' . JHtml::_('mpolladministrator.results',$i, true, $item->results);
+								echo '&nbsp;' . JHtml::_('mpolladministrator.tally',$i, true, $item->results);
 							?>
 						</div>
 					</div>
